@@ -2,7 +2,7 @@
 " Helper Functions for Pandoc {{{1
 " ============================================================================
 
-function! DisplayMessages(channel, text, ...)
+function! pandoc#conversion#DisplayMessages(channel, text, ...)
 	" To write to quickfix list. Note that `...` is there because neovim will
 	" include `stdout` and `stderr` as part of its arguments; I can simply
 	" ignore those.
@@ -16,7 +16,7 @@ function! DisplayMessages(channel, text, ...)
 		laddexpr l:item
 		if l:item[0] ==# '!'
 			echom 'ERROR: ' . l:item
-			call KillProcess('silent')
+			call pandoc#conversion#KillProcess('silent')
 		elseif l:item[:15] =~? 'error'
 			echom l:item
 			let b:errorFlag = 1
@@ -25,7 +25,7 @@ function! DisplayMessages(channel, text, ...)
 	echohl None
 endfunction
 
-function! DisplayError(channel, text, ...)
+function! pandoc#conversion#DisplayError(channel, text, ...)
 	" To write to messages
 	let l:winWidth = winwidth(0)
 	echohl Comment
@@ -43,7 +43,7 @@ function! DisplayError(channel, text, ...)
 	echohl None
 endfunction
 
-function! EndProcess(...)
+function! pandoc#conversion#EndProcess(...)
 	if b:converting  " If job hasn't already been killed
 		if b:errorFlag
 			echohl WarningMsg
@@ -58,7 +58,7 @@ function! EndProcess(...)
 	endif
 endfunction
 
-function! KillProcess(...)
+function! pandoc#conversion#KillProcess(...)
 	" Presence of any argument indicates silence.
 	if b:converting
 		if has('nvim')
@@ -88,7 +88,7 @@ endfunction
 
 " Following function calls the conversion script given by a:command only if
 " another conversion is not currently running.
-function! MyConvertHelper(command, ...)
+function! s:MyConvertHelper(command, ...)
 	if empty(a:command)
 		let l:command = b:lastConversionMethod
 	else
@@ -109,15 +109,38 @@ function! MyConvertHelper(command, ...)
 		let b:converting = 0
 	endif
 	if b:converting
-		call DisplayError(0, 'Already converting...')
+		call pandoc#conversion#DisplayError(0, 'Already converting...')
 	else
 		let b:converting = 1
 		call setloclist(0, [])
 		if has('nvim')
-			let b:conversionJob = jobstart('/usr/bin/env python3 ' . fnamemodify('~/.vim/python-scripts/' . l:command, ':p') . ' "' . l:fileName . '"', {'on_stdout': 'DisplayMessages', 'on_stderr': 'DisplayError', 'on_exit': 'EndProcess'})
+			let b:conversionJob = jobstart('/usr/bin/env python3 ' . fnamemodify('~/.vim/python-scripts/' . l:command, ':p') . ' "' . l:fileName . '"', {'on_stdout': 'pandoc#conversion#DisplayMessages', 'on_stderr': 'pandoc#conversion#DisplayError', 'on_exit': 'pandoc#conversion#EndProcess'})
 		else
-			let b:conversionJob = job_start('/usr/bin/env python3 ' . fnamemodify('~/.vim/python-scripts/' . l:command, ':p') . ' "' . l:fileName . '"', {'out_cb': 'DisplayMessages', 'err_cb': 'DisplayError', 'close_cb': 'EndProcess'})
+			let b:conversionJob = job_start('/usr/bin/env python3 ' . fnamemodify('~/.vim/python-scripts/' . l:command, ':p') . ' "' . l:fileName . '"', {'out_cb': 'pandoc#conversion#DisplayMessages', 'err_cb': 'pandoc#conversion#DisplayError', 'close_cb': 'pandoc#conversion#EndProcess'})
 		endif
+	endif
+endfunction
+
+" Following sets up autogroup to call .pdf conversion script when leaving
+" insert mode.
+function! pandoc#conversion#ToggleAutoPDF()
+	if b:autoPDFEnabled
+		let b:autoPDFEnabled = 0
+		augroup AutoPDFConvert
+			autocmd!
+		augroup END
+		echohl Comment
+		echom 'Auto PDF Off...'
+		echohl None
+	else
+		let b:autoPDFEnabled = 1
+		augroup AutoPDFConvert
+			autocmd!
+			autocmd BufWritePost <buffer> :call <SID>MyConvertHelper("markdown-to-PDF-LaTeX.py")
+		augroup END
+		echohl Comment
+		echom 'Auto PDF On...'
+		echohl None
 	endif
 endfunction
 
@@ -126,14 +149,14 @@ endfunction
 " It will also check to see if the current buffer has a filename, and if not
 " it will create a temporary .md file with the text of the current buffer and
 " run the conversion on that file.
-function! MyConvertMappingHelper(command)
+function! pandoc#conversion#MyConvertMappingHelper(command)
 	if !exists('b:autoPDFEnabled')
 		let b:autoPDFEnabled = 0
 	endif
 	if b:autoPDFEnabled
-		call <SID>ToggleAutoPDF()
+		call conversion#ToggleAutoPDF()
 		call <SID>MyConvertHelper(a:command)
-		call <SID>ToggleAutoPDF()
+		call conversion#ToggleAutoPDF()
 	else
 		call <SID>MyConvertHelper(a:command)
 	endif
