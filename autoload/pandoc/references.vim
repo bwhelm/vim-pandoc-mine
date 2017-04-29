@@ -29,15 +29,24 @@ function! s:JumpToReference(searchString)
 				endif
 			endif
 		endfor
-		" TODO: This is pretty slow, though very accurate. I wonder if I should use the bibliographic routines I've laid out in doing completion below to do this much faster.
-		let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/Bibdatabase-new.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/Bibdatabase-helm-new.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
+		" The pandoc method is pretty slow, though very accurate. Using my
+		" citation is much faster, and probably accurate enough for most
+		" purposes.
+		"let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/Bibdatabase-new.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/Bibdatabase-helm-new.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
+		python import references
+		let l:biblio = pyeval("references.constructOneEntry('" . a:searchString . "')")
 		if l:biblio !=# ''
 			new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell
 			resize 5
 			put! =l:biblio
-			normal! Gddgg2ddvGJ0
-			nnoremap <buffer> <CR> gx
+			$d
+            " Move to URL (if there is one; fail silently if not)
+            silent! normal! f<
+			" Use next line only with pandoc method
+			"normal! gg2ddvGJ0
+			nmap <buffer> <CR> <Plug>NetrwBrowseX
 			nnoremap <buffer> q ZQ
+			nnoremap <buffer> <Esc> ZQ
 		else
 			echohl WarningMsg
 			echom 'Cannot find ID.'
@@ -156,177 +165,9 @@ function! s:FindHeaderID(base)
 endfunction
 
 function! pandoc#references#GetBibEntries(base)
-
-python << endpython
-from re import findall, match, search, sub, IGNORECASE
-from vim import command, eval
-
-def readFile(fileName):
-	"""
-	Read text from file on disk.
-	"""
-	with open(fileName, 'r') as f:
-		text = f.read()
-	return text
-
-def getBibData():
-	"""Read data from .bib files"""
-	bibText = readFile('/Users/bennett/Library/texmf/bibtex/bib/' +
-					   'Bibdatabase-new.bib')
-	bibText += readFile('/Users/bennett/Library/texmf/bibtex/bib/' +
-						'Bibdatabase-helm-new.bib')
-	return bibText
-
-def retrieveBibField(bibItem, fieldname):
-	try:
-		field = search(r'\b' + fieldname + r'\s*=\s*{(.*)}[,}]', bibItem,
-						IGNORECASE).group(1)
-	except AttributeError:
-		field = ''
-	return field
-
-def constructBookEntry(bibItem):
-	"""Create markdown bibliography entry for book"""
-	author = retrieveBibField(bibItem, 'author')
-	if author == '':
-		editor = retrieveBibField(bibItem, 'editor')
-		# entry = editor
-		shortEntry = editor[:editor.find(',')]
-	else:
-		# entry = author
-		shortEntry = author[:author.find(',')]
-	year = retrieveBibField(bibItem, 'year')
-	# entry += ' (' + year + ').'
-	shortEntry += '(' + year + ').'
-	booktitle = retrieveBibField(bibItem, 'booktitle')
-	if booktitle != '':
-		# entry += ' *' + booktitle + '*.'
-		shortEntry += ' *' + booktitle + '*.'
-	else:
-		# entry += ' *' + retrieveBibField(bibItem, 'title') + '*.'
-		shortEntry += ' *' + retrieveBibField(bibItem, 'title') + '*.'
-	return shortEntry
-
-def constructArticleEntry(bibItem):
-	"""Create markdown bibliography entry for article"""
-	author = retrieveBibField(bibItem, 'author')
-	# entry = author + ' (' + retrieveBibField(bibItem, 'year') + '). "' + retrieveBibField(bibItem, 'title') + '". *' + retrieveBibField(bibItem, 'journal') + '*.'
-	shortEntry = author[:author.find(',')] + '(' + \
-				 retrieveBibField(bibItem, 'year') + '). "' + \
-				 retrieveBibField(bibItem, 'title') + '". *' + \
-				 retrieveBibField(bibItem, 'journal') + '*.'
-	volume = retrieveBibField(bibItem, 'volume')
-	# if volume != '':
-		# entry += ' ' + volume + ':'
-		# entry += retrieveBibField(bibItem, 'pages') + '.'
-	return shortEntry
-
-def constructInCollEntry(bibItem, crossref):
-	"""Create markdown bibliography entry for incollection"""
-	year = retrieveBibField(bibItem, 'year')
-	if year == '':
-		try:
-			year = search(r'\(([^)]*)\)', crossref).group(1)
-		except AttributeError:
-			pass
-	author = retrieveBibField(bibItem, 'author')
-	if author == '':
-		try:
-			author = search(r'[^(]*', crossref).group(0)
-		except AttributeError:
-			pass
-	if crossref == '':
-		crossref = '*' + retrieveBibField(bibItem, 'booktitle') + '*'
-		# entry = author + ' (' + year + '). "' + retrieveBibField(bibItem, 'title') + '". In ' + crossref + retrieveBibField(bibItem, 'pages') + '.'
-	shortEntry = author[:author.find(',')] + '(' + year + '). "' + \
-	             retrieveBibField(bibItem, 'title') + '". In ' + crossref + '.'
-	return shortEntry
-
-def removeLatex(text):
-	"""Quick substitution of markdown for common LaTeX"""
-	text = sub(r'\\emph{([^}]*)}', r'*\1*', text)  # Swamp emphasis
-	text = sub(r'\\mkbibquote{([^}]*)}', r'"\1"', text)  # Remove mkbibquote
-	text = sub(r'{?\\ldots{?}?', '...', text)  # Replace `...`
-	text = sub(r"{\\'\\(.)}", r'\1', text)  # Replace latex accents
-	text = sub(r"\\['`\"^v]", '', text)  # Replace latex accents
-	text = sub(r'{(.)}', r'\1', text)  # Remove braces around single letters
-	text = text.replace('{}', '')  # Remove excess braces
-	text = text.replace("\\v", "")  # Remove 'v' accent
-	text = text.replace('\\&', '&')  # Don't escape `&`
-	return text
-
-def constructBibEntry(bibItem, bibDataList):
-	"""Create markdown bibliography entry for .bib entry"""
-	# First extract relevant bibtex fields...
-	entryType = search(r'(?<=@)[^{]*', bibItem, IGNORECASE).group(0)
-	#try:
-	key = search(r'@[^{]*{([^,]*)', bibItem, IGNORECASE).group(1)
-	#except AttributeError:
-	#	return {}
-	# Now construct rough markdown representations of citation
-	if entryType == 'book':
-		shortEntry = constructBookEntry(bibItem)
-	elif entryType == 'article':
-		shortEntry = constructArticleEntry(bibItem)
-	elif entryType == 'incollection':
-		try:
-			crossref = search(r'(\s*crossref\s*=\s*{)(.*)}[,}]', bibItem,
-							  IGNORECASE).group(2)
-			for item in bibDataList:
-				if item.startswith('@book{' + crossref):
-					crossref = constructBibEntry(item, bibDataList)['abbr']
-					break
-		except AttributeError:
-			crossref = ''
-		shortEntry = constructInCollEntry(bibItem, crossref)
-	else:  # Some other entry type; make it minimal....
-		author = retrieveBibField(bibItem, 'author')
-		# entry = author + ' (' + retrieveBibField(bibItem, 'year') + '). ' + retrieveBibField(bibItem, 'title') + '.'
-		shortEntry = author[:author.find(',')] + '(' + \
-		             retrieveBibField(bibItem, 'year') + '). ' + \
-					 '"' + retrieveBibField(bibItem, 'title') + '".'
-	# Construct dictionary entry to return
-	entryDict = {'word': key}
-	entryDict['abbr'] = removeLatex(shortEntry)
-	#entryDict['abbr'] = key[:abbrLength]
-	#entryDict['info'] = removeLatex(entry)
-	#entryDict['menu'] = removeLatex(title)[:60]
-	entryDict['icase'] = 1
-	return entryDict
-
-def createBibList(base):
-	"""Create list of entries that match on every word in base"""
-	bibText = getBibData()
-	bibDataList = findall(r'@[^@]*', bibText)
-	baseList = base.lower().split(' ')  # List of terms to match
-	matchedList = []  # List of matched bibliography items
-	for bibItem in bibDataList:
-		if bibItem.startswith('@comment{'):
-			pass
-		else:
-			keep = True
-			for baseItem in baseList:
-				if baseItem not in bibItem.lower():
-					keep = False
-					break
-			if keep:
-				matchedList.append(bibItem)
-	# Sort matchedList by citation key (`AuthorDATETitle`)
-	matchedList = sorted(matchedList, key=lambda item: match('@[^{]*{([^,]*)',
-															 item).group(1))
-	constructedList = [constructBibEntry(item, bibDataList) for item in
-					   matchedList]
-	return constructedList
-
-abbrLength = int(eval('s:abbrLength'))  # Length of key abbreviations
-base = eval('a:base')
-matchedList = createBibList(base)
-# Need to do the following replacement here to convert from python-style
-# single quotes to vim-style single quotes.
-command('let l:matchedList = ' + str(matchedList).replace("\\'", "''"))
-endpython
-
-return l:matchedList
+	python import references
+	let l:matchedList = pyeval("references.createBibList('" . a:base . "')")
+	return l:matchedList
 endfunction
 
 function! pandoc#references#MyCompletion(findstart, base)

@@ -51,29 +51,45 @@ inoremap <buffer><silent> <Esc> <Esc>`^
 nnoremap <buffer><silent> <LocalLeader>cc :call pandoc#conversion#MyConvertMappingHelper("")<CR>
 inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvertMappingHelper("")<CR>
 " PDF conversion
-nnoremap <buffer><silent> <LocalLeader>cp :call pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
-inoremap <buffer><silent> <LocalLeader>cp <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
-nnoremap <buffer><silent> <LocalLeader>cP :call pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
-inoremap <buffer><silent> <LocalLeader>cP <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
+nnoremap <buffer><silent> <LocalLeader>cp :call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
+inoremap <buffer><silent> <LocalLeader>cp
+		\ <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
+nnoremap <buffer><silent> <LocalLeader>cP :call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
+inoremap <buffer><silent> <LocalLeader>cP <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
 " HTML conversion
-nnoremap <buffer><silent> <LocalLeader>ch :call pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
-inoremap <buffer><silent> <LocalLeader>ch <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
+nnoremap <buffer><silent> <LocalLeader>ch :call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
+inoremap <buffer><silent> <LocalLeader>ch <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
 " RevealJS conversion
-nnoremap <buffer><silent> <LocalLeader>cr :call pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
-inoremap <buffer><silent> <LocalLeader>cr <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
+nnoremap <buffer><silent> <LocalLeader>cr :call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
+inoremap <buffer><silent> <LocalLeader>cr <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
 " LaTeX Beamer conversion
-nnoremap <buffer><silent> <LocalLeader>cb :call pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
-inoremap <buffer><silent> <LocalLeader>cb <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
+nnoremap <buffer><silent> <LocalLeader>cb :call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
+inoremap <buffer><silent> <LocalLeader>cb <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
 " Word .docx conversion
-nnoremap <buffer><silent> <LocalLeader>cd :call pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
-inoremap <buffer><silent> <LocalLeader>cd <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
+nnoremap <buffer><silent> <LocalLeader>cd :call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
+inoremap <buffer><silent> <LocalLeader>cd <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
 " Markdown conversion
-nnoremap <buffer><silent> <LocalLeader>cm :call pandoc#conversion#MyConvertMappingHelper("convert-to-markdown.py")<CR>
+nnoremap <buffer><silent> <LocalLeader>cm :call
+		\ pandoc#conversion#MyConvertMappingHelper("convert-to-markdown.py")<CR>
 nnoremap <buffer><silent> <LocalLeader>cM :call pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
-inoremap <buffer><silent> <LocalLeader>cM <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
+inoremap <buffer><silent> <LocalLeader>cM <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
 " Kill current conversion
 nnoremap <buffer><silent> <LocalLeader>ck :call pandoc#conversion#KillProcess()<CR>
-command! RemoveAuxFiles :execute '!' . fnamemodify('~/.vim/python-scripts/remove-aux-files.py', ':p') . ' ' . fnameescape(expand('%:p'))
+command! RemoveAuxFiles :execute '!'
+			\ . fnamemodify('~/.vim/python-scripts/remove-aux-files.py', ':p')
+			\ . ' ' . fnameescape(expand('%:p'))
 nnoremap <buffer><silent> <LocalLeader>cK :RemoveAuxFiles<CR>
 
 nnoremap <buffer><silent> <LocalLeader>ca :call pandoc#conversion#ToggleAutoPDF()<CR>
@@ -132,9 +148,15 @@ vnoremap <buffer><silent> <C-x> c<i <Esc>pa><Esc>mip`i
 nnoremap <buffer><silent> <C-x> ciw<i <Esc>pa><Esc>mip`i
 " Jump to corresponding line in Skim.app
 if has('nvim')
-	command! JumpToPDF silent call jobstart("/usr/bin/env python3 " . fnamemodify("~/.vim/python-scripts/jump-to-line-in-Skim.py", ":p") . ' "' . expand('%:p') . '" ' . line("."), {"on_stdout": "DisplayMessages", "on_stderr": "DisplayError"})
+	command! JumpToPDF silent call jobstart("/usr/bin/env python3 "
+				\ . fnamemodify("~/.vim/python-scripts/jump-to-line-in-Skim.py",
+				\ ":p") . ' "' . expand('%:p') . '" ' . line("."), {"on_stdout":
+				\ "DisplayMessages", "on_stderr": "DisplayError"})
 else  " normal vim
-	command! JumpToPDF silent call job_start("/usr/bin/env python3 " . fnamemodify("~/.vim/python-scripts/jump-to-line-in-Skim.py", ":p") . ' "' . expand('%:p') . '" ' . line("."), {"out_cb": "DisplayMessages", "err_cb": "DisplayError"})
+	command! JumpToPDF silent call job_start("/usr/bin/env python3 "
+				\ . fnamemodify("~/.vim/python-scripts/jump-to-line-in-Skim.py",
+				\ ":p") . ' "' . expand('%:p') . '" ' . line("."), {"out_cb":
+				\ "DisplayMessages", "err_cb": "DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
 " nnoremap <buffer><silent> <LocalLeader>j :call system('python ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
@@ -184,21 +206,19 @@ call textobj#user#plugin('pandoccomments', {
 " ============================================================================ }}}
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
-
 setlocal omnifunc=pandoc#references#MyCompletion
 
 " ============================================================================ }}}
 " My Tab Completion {{{1
 " ============================================================================
-
-inoremap <expr> <Tab> pumvisible() ? "\<C-N>" : pandoc#completion#RecursiveSimpleSnippets()
+inoremap <expr> <Tab> pumvisible() ? "\<C-N>" :
+			\ pandoc#completion#RecursiveSimpleSnippets()
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-P>" : "\<S-Tab>"
 
 
 " ============================================================================ }}}
 " TOC Support {{{1
 " ============================================================================
-
 command! TOC call pandoc#toc#ShowTOC()
 
 
@@ -215,59 +235,3 @@ setlocal spell spelllang=en_us
 setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs\ --normalize
 " Allow wrapping past BOL and EOL when using `h` and `l`
 set whichwrap+=h,l
-
-
-" ============================================================================ }}}
-" Abbreviations {{{1
-" ============================================================================
-inoreabbr abotu about
-inoreabbr Ccd Cognitive--conative divide
-inoreabbr ccd cognitive--conative divide
-inoreabbr cn communal norm
-inoreabbr cns communal norms
-inoreabbr Cor Community of respect
-inoreabbr cor community of respect
-inoreabbr Cors Communities of respect
-inoreabbr cors communities of respect
-inoreabbr Dof Direction of fit
-inoreabbr dof direction of fit
-inoreabbr Em Emotion
-inoreabbr em emotion
-inoreabbr Emo Emotion
-inoreabbr emo emotion
-inoreabbr Emos Emotions
-inoreabbr emos emotions
-inoreabbr Emotino Emotion
-inoreabbr emotino emotion
-inoreabbr Emotinos Emotions
-inoreabbr emotinos emotions
-inoreabbr Ems Emotions
-inoreabbr ems emotions
-inoreabbr fo of
-inoreabbr ghp Greatest Happiness Principle
-inoreabbr hte the
-inoreabbr improtant important
-inoreabbr Mtw Mind-to-world
-inoreabbr mtw mind-to-world
-inoreabbr nad and
-inoreabbr nto not
-inoreabbr ot to
-inoreabbr phi philosophy
-inoreabbr psy psychology
-inoreabbr Ra Reactive attitude
-inoreabbr ra reactive attitude
-inoreabbr Ras Reactive attitudes
-inoreabbr ras reactive attitudes
-inoreabbr res responsible
-inoreabbr Rr Recognition respect
-inoreabbr rr recognition respect
-inoreabbr si is
-inoreabbr Taht That
-inoreabbr taht that
-inoreabbr Teh The
-inoreabbr teh the
-inoreabbr tehre there
-inoreabbr Thta That
-inoreabbr thta that
-inoreabbr Wtm World-to-mind
-inoreabbr wtm world-to-mind
