@@ -9,7 +9,7 @@ let b:pandoc_enabled=1
 
 
 " =========================================================================== }}}
-" Commands for Conversions {{{1
+" Variables for Conversions {{{1
 " ===========================================================================
 
 let b:converting = 0  " Used to keep track of whether currently converting or not
@@ -20,28 +20,11 @@ let b:lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method used for 
 " Key mappings {{{1
 " ============================================================================
 
-"" FIXME: This deletes bad vim-pandoc mappings and restores my preferred mappings.
-"" (Bad vim-pandoc!)
-"if mapcheck(",o") != ""
-"	unmap ,o
-"endif
-"if mapcheck(",O") != ""
-"	unmap ,O
-"endif
-nnoremap <LocalLeader>o :only<CR>
-
 " taken from vim-pandoc {{{2
 " ---------------------
 " FIXME: These work, but will wrap. Should I change this?
 noremap <buffer> <silent> ]] /^#\{1,6}\s.*<CR>
 noremap <buffer> <silent> [[ ?^#\{1,6}\s.*<CR>
-
-" exiting insert mode {{{2
-" -------------------
-" The following will move the cursor one character to the right when
-" exiting insert mode unless the cursor is in the rightmost column.
-inoremap <buffer><silent> <LocalLeader>. <Esc>`^
-inoremap <buffer><silent> <Esc> <Esc>`^
 
 " for conversions {{{2
 " ---------------
@@ -104,9 +87,6 @@ nmap <buffer><silent> <LocalLeader>fc /\[.\{-}\]{\.[a-z]\{-}}/<CR>
 
 " Citations {{{2
 " ---------
-" Make insertion of citations easier by automatically calling autocomplete
-"inoremap <buffer> @ @<C-x><C-o>
-
 " Find page references needing complete citations
 noremap <buffer><silent> <LocalLeader>fr /(\(\d\+f\{0,2}\(, \d\+f\{0,2}\\|--\d\+\)\?\))<CR>
 

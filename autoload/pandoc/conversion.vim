@@ -106,17 +106,34 @@ function! s:MyConvertHelper(command, ...)
 		update
 	endif
 	if !exists('b:converting')
+		" `b:converting` is used to keep track of whether a current .tex file
+		" is being used for conversion and so should not be overwritten.
 		let b:converting = 0
 	endif
-	if b:converting
+	" Don't change existing .tex file if currently in use
+	if b:converting && (l:command ==# 'markdown-to-PDF-LaTeX.py' ||
+					\ l:command ==# 'convert-to-markdown.py')
 		call pandoc#conversion#DisplayError(0, 'Already converting...')
 	else
-		let b:converting = 1
+		if l:command ==# 'markdown-to-PDF-LaTeX.py' ||
+					\ l:command ==# 'convert-to-markdown.py'
+			let b:converting = 1
+		endif
 		call setloclist(0, [])
 		if has('nvim')
-			let b:conversionJob = jobstart('/usr/bin/env python3 ' . fnamemodify('~/.vim/python-scripts/' . l:command, ':p') . ' "' . l:fileName . '"', {'on_stdout': 'pandoc#conversion#DisplayMessages', 'on_stderr': 'pandoc#conversion#DisplayError', 'on_exit': 'pandoc#conversion#EndProcess'})
+			let b:conversionJob = jobstart('/usr/bin/env python3 ' .
+					\ fnamemodify('~/.vim/python-scripts/' . l:command, ':p') .
+					\ ' "' . l:fileName . '"',
+					\ {'on_stdout': 'pandoc#conversion#DisplayMessages',
+					\ 'on_stderr': 'pandoc#conversion#DisplayError',
+					\ 'on_exit': 'pandoc#conversion#EndProcess'})
 		else
-			let b:conversionJob = job_start('/usr/bin/env python3 ' . fnamemodify('~/.vim/python-scripts/' . l:command, ':p') . ' "' . l:fileName . '"', {'out_cb': 'pandoc#conversion#DisplayMessages', 'err_cb': 'pandoc#conversion#DisplayError', 'close_cb': 'pandoc#conversion#EndProcess'})
+			let b:conversionJob = job_start('/usr/bin/env python3 ' .
+					\ fnamemodify('~/.vim/python-scripts/' . l:command, ':p') .
+					\ ' "' . l:fileName . '"',
+					\ {'out_cb': 'pandoc#conversion#DisplayMessages',
+					\ 'err_cb': 'pandoc#conversion#DisplayError',
+					\ 'close_cb': 'pandoc#conversion#EndProcess'})
 		endif
 	endif
 endfunction
