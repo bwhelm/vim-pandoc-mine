@@ -46,7 +46,7 @@ def removeOldFiles(directory, time):
 
 """
 Note: latexmk sends messages to stderr by default. I don't want that. So in
-~/.vim/after/ftplugin/pandoc.vim, I'm sending stderr to vim messages and
+autoload/pandoc/conversion.vim, I'm sending stderr to vim messages and
 stdout to the quickfix list. That means in defining writeError and
 writeMessage, I'm sending errors to stdout and messages to stderr. That's
 on purpose.
