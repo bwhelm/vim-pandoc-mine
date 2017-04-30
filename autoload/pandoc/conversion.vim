@@ -85,6 +85,9 @@ endfunction
 " Functions for Conversions {{{1
 " ===========================================================================
 
+" Path to plugin's python conversion folder (e.g.,
+" `~/.vim/plugged/vim-pandoc-mine/pythonx/conversion/`)
+let s:pythonScriptDir = expand('<sfile>:p:h:h:h') . '/pythonx/conversion/'
 
 " Following function calls the conversion script given by a:command only if
 " another conversion is not currently running.
@@ -122,14 +125,14 @@ function! s:MyConvertHelper(command, ...)
 		call setloclist(0, [])
 		if has('nvim')
 			let b:conversionJob = jobstart('/usr/bin/env python3 ' .
-					\ fnamemodify('~/.vim/python-scripts/' . l:command, ':p') .
+					\ s:pythonScriptDir . l:command .
 					\ ' "' . l:fileName . '"',
 					\ {'on_stdout': 'pandoc#conversion#DisplayMessages',
 					\ 'on_stderr': 'pandoc#conversion#DisplayError',
 					\ 'on_exit': 'pandoc#conversion#EndProcess'})
 		else
 			let b:conversionJob = job_start('/usr/bin/env python3 ' .
-					\ fnamemodify('~/.vim/python-scripts/' . l:command, ':p') .
+					\ s:pythonScriptDir . l:command .
 					\ ' "' . l:fileName . '"',
 					\ {'out_cb': 'pandoc#conversion#DisplayMessages',
 					\ 'err_cb': 'pandoc#conversion#DisplayError',

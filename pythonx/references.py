@@ -50,6 +50,13 @@ def constructBookEntry(bibItem):
     else:
         entry += ' *' + retrieveBibField(bibItem, 'title') + '*.'
         shortEntry += ' *' + retrieveBibField(bibItem, 'title') + '*.'
+    publisher = retrieveBibField(bibItem, 'publisher')
+    if publisher != '':
+        address = retrieveBibField(bibItem, 'address')
+        if address:
+            entry += ' ' + address + ': ' + publisher + '.'
+        else:
+            entry += ' ' + publisher + '.'
     doi = retrieveBibField(bibItem, 'Doi')
     if doi:
         entry += ' <http://doi.org/' + doi + '>'
@@ -212,8 +219,9 @@ def createBibList(base):
             if keep:
                 matchedList.append(bibItem)
     # Sort matchedList by citation key (`AuthorDATETitle`)
-    matchedList = sorted(matchedList, key=lambda item: match('@[^{]*{([^,]*)',
-                                                             item).group(1))
+    matchedList = sorted(matchedList,
+                         key=lambda item: match('@[^{]*{([^,]*)', item,
+                                                IGNORECASE).group(1))
     constructedList = [constructEntryDict(item, bibDataList) for item in
                        matchedList]
     return constructedList

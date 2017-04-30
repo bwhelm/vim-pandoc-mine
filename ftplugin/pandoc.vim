@@ -36,8 +36,8 @@ inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvert
 " PDF conversion
 nnoremap <buffer><silent> <LocalLeader>cp :call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
-inoremap <buffer><silent> <LocalLeader>cp
-		\ <C-o>:call pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
+inoremap <buffer><silent> <LocalLeader>cp <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
 nnoremap <buffer><silent> <LocalLeader>cP :call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
 inoremap <buffer><silent> <LocalLeader>cP <C-o>:call
@@ -70,8 +70,12 @@ inoremap <buffer><silent> <LocalLeader>cM <C-o>:call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
 " Kill current conversion
 nnoremap <buffer><silent> <LocalLeader>ck :call pandoc#conversion#KillProcess()<CR>
+
+" Path to plugin's python conversion folder (e.g.,
+" `~/.vim/plugged/vim-pandoc-mine/pythonx/conversion/`)
+let s:pythonScriptDir = expand('<sfile>:p:h:h') . '/pythonx/conversion/'
 command! RemoveAuxFiles :execute '!'
-			\ . fnamemodify('~/.vim/python-scripts/remove-aux-files.py', ':p')
+			\ . s:pythonScriptDir . 'remove-aux-files.py'
 			\ . ' ' . fnameescape(expand('%:p'))
 nnoremap <buffer><silent> <LocalLeader>cK :RemoveAuxFiles<CR>
 
@@ -126,17 +130,18 @@ endif
 " In visual and normal modes, select text to be indexed and hit <ctrl-x> ("indeX")
 vnoremap <buffer><silent> <C-x> c<i <Esc>pa><Esc>mip`i
 nnoremap <buffer><silent> <C-x> ciw<i <Esc>pa><Esc>mip`i
+
 " Jump to corresponding line in Skim.app
 if has('nvim')
-	command! JumpToPDF silent call jobstart("/usr/bin/env python3 "
-				\ . fnamemodify("~/.vim/python-scripts/jump-to-line-in-Skim.py",
-				\ ":p") . ' "' . expand('%:p') . '" ' . line("."), {"on_stdout":
-				\ "DisplayMessages", "on_stderr": "DisplayError"})
+	command! JumpToPDF silent call jobstart("/usr/bin/env python3 " .
+				\ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
+				\ ' "' . expand('%:p') . '" ' . line("."), {"on_stdout":
+				\ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
 else  " normal vim
-	command! JumpToPDF silent call job_start("/usr/bin/env python3 "
-				\ . fnamemodify("~/.vim/python-scripts/jump-to-line-in-Skim.py",
-				\ ":p") . ' "' . expand('%:p') . '" ' . line("."), {"out_cb":
-				\ "DisplayMessages", "err_cb": "DisplayError"})
+	command! JumpToPDF silent call job_start("/usr/bin/env python3 " .
+				\ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
+				\ ' "' . expand('%:p') . '" ' . line("."), {"out_cb":
+				\ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
 " nnoremap <buffer><silent> <LocalLeader>j :call system('python ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
