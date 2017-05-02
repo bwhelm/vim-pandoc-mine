@@ -36,7 +36,7 @@ function! s:JumpToReference(searchString)
 		python import references
 		let l:biblio = pyeval("references.constructOneEntry('" . a:searchString . "')")
 		if l:biblio !=# ''
-			new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell
+			new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable
 			resize 5
 			put! =l:biblio
 			$d
@@ -123,10 +123,9 @@ function! s:GenerateHeaderID(header)
 endfunction
 
 function! s:FindHeaderID(base)
-	return []
 	let l:text = getline(0, '$')
 	let l:completionList = []
-	let l:matchHeaderPattern = '#\{1,6}\s\+\(.\{-}\)\s\+{#\([[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß\-_+:]\+\).\{-}}'
+	let l:matchHeaderPattern = '\(#\{1,6}\s\+.\{-}\)\s\+{#\([[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß\-_+:]\+\).\{-}}'
 	let l:matchItemPattern = '^(\?@\zs[^.]\{-}\ze[).]\s'
 	for l:line in l:text
 		if match(l:line, '^#\{1,6}\s') == 0   " If line is a header
@@ -135,29 +134,30 @@ function! s:FindHeaderID(base)
 				if len(l:match) && l:line !~? '[ {]-[ }]\|\.unnumbered'
 					" ID provided (and header is not unnumbered)
 					let l:completionList += [{'word': l:match[2],
-								\ 'abbr': l:match[2][:s:abbrLength],
-								\ 'menu': l:match[1],
-								\ 'icase': 1,
-								\ 'info': l:line}]
+								\ 'abbr': l:match[1],
+								\ 'icase': 1}]
+								"\ 'info': l:line}]
+								"\ 'menu': l:match[1],
 				elseif l:line !~? '[ {]-[ }]\|\.unnumbered'
 					" Line is a header, but no ID provided (and header is not
 					" unnumbered); need to generate it.
 					let l:headerID = <SID>GenerateHeaderID(l:line)
 					let l:completionList += [{'word': l:headerID,
-								\ 'abbr': l:headerID[:s:abbrLength],
-								\ 'menu': l:line,
-								\ 'icase': 1,
-								\ 'info': l:line}]
+								\ 'abbr': l:line,
+								\ 'icase': 1}]
+								"\ 'menu': l:line,
+								"\ 'info': l:line}]
 				endif
 			endif
 		elseif match(l:line, '^(\?@[^.]\{1,20}[).]\s') == 0
+			" Named list item
 			if l:line =~ a:base
 				let l:match = matchstr(l:line, l:matchItemPattern)
 				let l:completionList += [{'word': l:match,
-							\ 'abbr': l:match[:s:abbrLength],
-							\ 'menu': '(List ID)',
-							\ 'icase': 1,
-							\ 'info': l:line}]
+							\ 'abbr': l:match ' (List ID)',
+							\ 'icase': 1}]
+							"\ 'menu': '(List ID)',
+							"\ 'info': l:line}]
 			endif
 		endif
 	endfor

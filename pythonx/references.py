@@ -111,7 +111,6 @@ def constructInCollEntry(bibItem, crossref):
         retrieveBibField(bibItem, 'title') + '". In ' + crossref + \
         retrieveBibField(bibItem, 'pages') + '.'
     doi = retrieveBibField(bibItem, 'Doi')
-    print('hello' + doi)
     if doi:
         entry += ' <http://doi.org/' + doi + '>'
     else:
