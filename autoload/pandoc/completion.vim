@@ -34,7 +34,7 @@ let s:SimpleSnippetsList = {
 			\ '`': [1, 1, '~', '~', ''],
 			\ }
 
-function! s:InsertSnippet(key)
+function! s:InsertSnippet(key) abort
 	let [l:compLength, l:keyLength, l:left, l:right, l:next] =
 				\ s:SimpleSnippetsList[a:key]
 	if l:right !=# ''
@@ -46,7 +46,7 @@ function! s:InsertSnippet(key)
 	return l:typed
 endfunction
 
-function! s:JumpOutOfSnippet(line, cursor)
+function! s:JumpOutOfSnippet(line, cursor) abort
 	let [l:key, l:next] = b:recursiveSnippetList[-1]
 	call remove(b:recursiveSnippetList, - 1)
 	let [l:compLength, l:keyLength, l:left, l:right, l:next] =
@@ -59,7 +59,7 @@ function! s:JumpOutOfSnippet(line, cursor)
 	return l:typed
 endfunction
 
-function! pandoc#completion#RecursiveSimpleSnippets()
+function! pandoc#completion#RecursiveSimpleSnippets() abort
 	if !exists('b:recursiveSnippetList')
 		let b:recursiveSnippetList = []
 	endif

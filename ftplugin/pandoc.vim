@@ -2,19 +2,19 @@
 scriptencoding utf-8
 " My settings that should apply only to files with filetype=pandoc.
 
-if exists('b:pandoc_enabled')
+if exists('b:loaded_pandoc_mine')
 	finish
 endif
-let b:pandoc_enabled=1
+let b:loaded_pandoc_mine=1
 
 
 " =========================================================================== }}}
 " Variables for Conversions {{{1
 " ===========================================================================
 
-let b:converting = 0  " Used to keep track of whether currently converting or not
-let b:autoPDFEnabled = 0  " Turn autoPDF off by default...
-let b:lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method used for conversions
+let b:pandoc_converting = 0  " keeps track of whether currently converting or not
+let b:pandoc_autoPDFEnabled = 0  " Turn autoPDF off by default...
+let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method used for conversions
 
 " ============================================================================ }}}
 " Key mappings {{{1

@@ -1,5 +1,5 @@
 " Following creates tag-like jumps for cross-references
-function! s:JumpToReference(searchString)
+function! s:JumpToReference(searchString) abort
 	" Construct string to search for relevant label (whether a
 	" pandoc-style heading identifier or a pandocCommentFilter-style
 	" cross-reference)
@@ -36,7 +36,7 @@ function! s:JumpToReference(searchString)
 		python import references
 		let l:biblio = pyeval("references.constructOneEntry('" . a:searchString . "')")
 		if l:biblio !=# ''
-			new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable
+			new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ setlocal statusline=Reference
 			resize 5
 			put! =l:biblio
 			$d
@@ -55,13 +55,12 @@ function! s:JumpToReference(searchString)
 	endtry
 endfunction
 
-function! pandoc#references#GoToReference()
+function! pandoc#references#GoToReference() abort
 	" Need ignorecase and smartcase turned off ... but save values to restore
 	" later
 	let l:ignorecaseSave = &ignorecase
 	let l:smartcaseSave = &smartcase
-	set noignorecase
-	set nosmartcase
+	set noignorecase nosmartcase
 	normal! mx
 	let l:line = getline('.')
 	let [l:bufnum, l:lnum, l:col, l:off] = getpos('.')

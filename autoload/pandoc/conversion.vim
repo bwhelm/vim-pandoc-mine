@@ -25,7 +25,7 @@ function! pandoc#conversion#DisplayMessages(channel, text, ...)
 	echohl None
 endfunction
 
-function! pandoc#conversion#DisplayError(channel, text, ...)
+function! pandoc#conversion#DisplayError(channel, text, ...) abort
 	" To write to messages
 	let l:winWidth = winwidth(0)
 	echohl Comment
@@ -44,7 +44,7 @@ function! pandoc#conversion#DisplayError(channel, text, ...)
 endfunction
 
 function! pandoc#conversion#EndProcess(...)
-	if b:converting  " If job hasn't already been killed
+	if b:pandoc_converting  " If job hasn't already been killed
 		if b:errorFlag
 			echohl WarningMsg
 			echom 'Conversion Complete with Errors'
@@ -54,13 +54,13 @@ function! pandoc#conversion#EndProcess(...)
 			echom 'Conversion Complete'
 			echohl None
 		endif
-		let b:converting=0
+		let b:pandoc_converting=0
 	endif
 endfunction
 
-function! pandoc#conversion#KillProcess(...)
+function! pandoc#conversion#KillProcess(...) abort
 	" Presence of any argument indicates silence.
-	if b:converting
+	if b:pandoc_converting
 		if has('nvim')
 			call jobstop(b:conversionJob)
 		else
@@ -72,7 +72,7 @@ function! pandoc#conversion#KillProcess(...)
 			echom 'Job killed.'
 			echohl None
 		endif
-		let b:converting=0
+		let b:pandoc_converting=0
 	else
 		echohl Comment
 		echom 'No job to kill!'
@@ -91,11 +91,11 @@ let s:pythonScriptDir = expand('<sfile>:p:h:h:h') . '/pythonx/conversion/'
 
 " Following function calls the conversion script given by a:command only if
 " another conversion is not currently running.
-function! s:MyConvertHelper(command, ...)
+function! s:MyConvertHelper(command, ...) abort
 	if empty(a:command)
-		let l:command = b:lastConversionMethod
+		let l:command = b:pandoc_lastConversionMethod
 	else
-		let b:lastConversionMethod = a:command
+		let b:pandoc_lastConversionMethod = a:command
 		let l:command = a:command
 	endif
 	messages clear
@@ -108,19 +108,19 @@ function! s:MyConvertHelper(command, ...)
 	else
 		update
 	endif
-	if !exists('b:converting')
-		" `b:converting` is used to keep track of whether a current .tex file
+	if !exists('b:pandoc_converting')
+		" `b:pandoc_converting` is used to keep track of whether a current .tex file
 		" is being used for conversion and so should not be overwritten.
-		let b:converting = 0
+		let b:pandoc_converting = 0
 	endif
 	" Don't change existing .tex file if currently in use
-	if b:converting && (l:command ==# 'markdown-to-PDF-LaTeX.py' ||
+	if b:pandoc_converting && (l:command ==# 'markdown-to-PDF-LaTeX.py' ||
 					\ l:command ==# 'convert-to-markdown.py')
 		call pandoc#conversion#DisplayError(0, 'Already converting...')
 	else
 		if l:command ==# 'markdown-to-PDF-LaTeX.py' ||
 					\ l:command ==# 'convert-to-markdown.py'
-			let b:converting = 1
+			let b:pandoc_converting = 1
 		endif
 		call setloclist(0, [])
 		if has('nvim')
@@ -143,9 +143,9 @@ endfunction
 
 " Following sets up autogroup to call .pdf conversion script when leaving
 " insert mode.
-function! pandoc#conversion#ToggleAutoPDF()
-	if b:autoPDFEnabled
-		let b:autoPDFEnabled = 0
+function! pandoc#conversion#ToggleAutoPDF() abort
+	if b:pandoc_autoPDFEnabled
+		let b:pandoc_autoPDFEnabled = 0
 		augroup AutoPDFConvert
 			autocmd!
 		augroup END
@@ -153,7 +153,7 @@ function! pandoc#conversion#ToggleAutoPDF()
 		echom 'Auto PDF Off...'
 		echohl None
 	else
-		let b:autoPDFEnabled = 1
+		let b:pandoc_autoPDFEnabled = 1
 		augroup AutoPDFConvert
 			autocmd!
 			autocmd BufWritePost <buffer> :call <SID>MyConvertHelper("markdown-to-PDF-LaTeX.py")
@@ -169,11 +169,11 @@ endfunction
 " It will also check to see if the current buffer has a filename, and if not
 " it will create a temporary .md file with the text of the current buffer and
 " run the conversion on that file.
-function! pandoc#conversion#MyConvertMappingHelper(command)
-	if !exists('b:autoPDFEnabled')
-		let b:autoPDFEnabled = 0
+function! pandoc#conversion#MyConvertMappingHelper(command) abort
+	if !exists('b:pandoc_autoPDFEnabled')
+		let b:pandoc_autoPDFEnabled = 0
 	endif
-	if b:autoPDFEnabled
+	if b:pandoc_autoPDFEnabled
 		call conversion#ToggleAutoPDF()
 		call <SID>MyConvertHelper(a:command)
 		call conversion#ToggleAutoPDF()
