@@ -7,7 +7,6 @@ if exists('b:loaded_pandoc_mine')
 endif
 let b:loaded_pandoc_mine=1
 
-
 " =========================================================================== }}}
 " Variables for Conversions {{{1
 " ===========================================================================
@@ -172,7 +171,6 @@ nnoremap <buffer><silent> csch mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`c
 "}}}
 
-
 " ============================================================================ }}}
 " TextObjects {{{1
 " ============================================================================
@@ -194,18 +192,9 @@ call textobj#user#plugin('pandoccomments', {
 setlocal omnifunc=pandoc#references#MyCompletion
 
 " ============================================================================ }}}
-" My Tab Completion {{{1
-" ============================================================================
-inoremap <expr> <Tab> pumvisible() ? "\<C-N>" :
-			\ pandoc#completion#RecursiveSimpleSnippets()
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-P>" : "\<S-Tab>"
-
-
-" ============================================================================ }}}
 " TOC Support {{{1
 " ============================================================================
 command! TOC call pandoc#toc#ShowTOC()
-
 
 " ============================================================================ }}}
 " Other {{{1
