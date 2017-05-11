@@ -39,14 +39,13 @@ function! s:JumpToReference(searchString) abort
 			new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference
 			resize 5
 			put! =l:biblio
-			$d
+			$delete_
             " Move to URL (if there is one; fail silently if not)
             silent! normal! f<
 			" Use next line only with pandoc method
-			"normal! gg2ddvGJ0
 			nmap <buffer> <CR> <Plug>NetrwBrowseX
-			nnoremap <buffer> q ZQ
-			nnoremap <buffer> <Esc> ZQ
+			nnoremap <silent><buffer> q :quit<CR>
+			nnoremap <silent><buffer> <Esc> :quit<CR>
 		else
 			echohl WarningMsg
 			echom 'Cannot find ID.'
@@ -148,6 +147,14 @@ function! s:FindHeaderID(base)
 								"\ 'info': l:line}]
 				endif
 			endif
+		elseif match(l:line, '^\s*!\[\(.*\)\]([^)]*){#\([[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß\-_+:]\+\).\{-}}') == 0
+			" Figure header
+			if l:line =~ '#' . a:base
+				let l:match = matchlist(l:line, '^\s*!\[\(.*\)\]([^)]*){#\([[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß\-_+:]\+\).\{-}}')
+				let l:completionList += [{'word': l:match[2],
+							\ 'abbr': 'Figure: ' . l:match[1],
+							\ 'icase': 1}]
+			endif
 		elseif match(l:line, '^(\?@[^.]\{1,20}[).]\s') == 0
 			" Named list item
 			if l:line =~ a:base
@@ -189,8 +196,7 @@ function! pandoc#references#MyCompletion(findstart, base)
 		" Find matching header IDs...
 		let l:completionList = <SID>FindHeaderID(a:base)
 		" Add in bibliographic matches...
-		let l:bibMatches = pandoc#references#GetBibEntries(a:base)
-		let l:completionList += l:bibMatches
+		let l:completionList += pandoc#references#GetBibEntries(a:base)
 		return {'words': l:completionList}
 	endif
 endfunction

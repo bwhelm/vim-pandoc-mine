@@ -22,8 +22,8 @@ let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method us
 " taken from vim-pandoc {{{2
 " ---------------------
 " FIXME: These work, but will wrap. Should I change this?
-noremap <buffer> <silent> ]] /^#\{1,6}\s.*<CR>
-noremap <buffer> <silent> [[ ?^#\{1,6}\s.*<CR>
+noremap <buffer><silent> ]] /^#\{1,6}\s.*<CR>
+noremap <buffer><silent> [[ ?^#\{1,6}\s.*<CR>
 
 " for conversions {{{2
 " ---------------
@@ -209,3 +209,6 @@ setlocal spell spelllang=en_us
 setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs\ --normalize
 " Allow wrapping past BOL and EOL when using `h` and `l`
 set whichwrap+=h,l
+" List of characters that can cause a line break; don't want breaking at '@',
+" since this marks citations/cross-references.
+set breakat-=@

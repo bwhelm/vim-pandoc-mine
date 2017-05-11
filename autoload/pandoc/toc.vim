@@ -1,3 +1,5 @@
+scriptencoding utf-8
+" vim: set fdm=marker foldlevel=0:
 " ============================================================================ }}}
 " TOC Support {{{1
 " ============================================================================
@@ -9,8 +11,8 @@ function! pandoc#toc#ShowTOC() abort
 	" hitting `<CR>` (closing location list) or `<C-CR>` (leaving location
 	" list open). Much of this is taken from vim-pandoc's TOC code.
 	normal! mtj
-	normal [[
-	let l:currentSection = getline('.')
+	let l:pos = search('^#\{1,6}\s', 'b')
+	let l:currentSection = getline(l:pos)
 	silent lvimgrep /^#\{1,6}\s/ %
 	if len(getloclist(0)) == 0
 		return
@@ -43,8 +45,8 @@ function! pandoc#toc#ShowTOC() abort
 	highlight link TOCBullet Delimiter
 
 	setlocal linebreak foldmethod=indent shiftwidth=4
-	execute "normal \<C-w>K"
-	normal! zR
+	wincmd K
+	foldopen!
 	call cursor(l:currentLine, 1)
 	normal! zz
 
