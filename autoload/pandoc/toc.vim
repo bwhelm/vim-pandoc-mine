@@ -46,7 +46,7 @@ function! pandoc#toc#ShowTOC() abort
 
 	setlocal linebreak foldmethod=indent shiftwidth=4
 	wincmd K
-	foldopen!
+	0,$foldopen!
 	call cursor(l:currentLine, 1)
 	normal! zz
 

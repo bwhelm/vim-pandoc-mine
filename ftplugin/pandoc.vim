@@ -8,6 +8,16 @@ endif
 let b:loaded_pandoc_mine=1
 
 " =========================================================================== }}}
+" AutoCmd
+" ===========================================================================
+
+augroup pandoc
+	autocmd!
+	" CD to directory of current file
+	autocmd BufWinEnter * lcd %:p:h
+augroup END
+
+" =========================================================================== }}}
 " Variables for Conversions {{{1
 " ===========================================================================
 
@@ -19,8 +29,8 @@ let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method us
 " Key mappings {{{1
 " ============================================================================
 
-" taken from vim-pandoc {{{2
-" ---------------------
+" Jumping to Headings {{{2
+" -------------------
 " FIXME: These work, but will wrap. Should I change this?
 noremap <buffer><silent> ]] /^#\{1,6}\s.*<CR>
 noremap <buffer><silent> [[ ?^#\{1,6}\s.*<CR>
