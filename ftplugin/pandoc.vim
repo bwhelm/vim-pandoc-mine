@@ -200,6 +200,10 @@ call textobj#user#plugin('pandoccomments', {
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
 setlocal omnifunc=pandoc#references#MyCompletion
+augroup pandoc
+	autocmd!
+	autocmd BufWinEnter <buffer> setlocal omnifunc=pandoc#references#MyCompletion
+augroup END
 
 " ============================================================================ }}}
 " TOC Support {{{1
