@@ -36,7 +36,7 @@ function! s:JumpToReference(searchString) abort
 		python import references
 		let l:biblio = pyeval("references.constructOneEntry('" . a:searchString . "')")
 		if l:biblio !=# ''
-			new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference
+			new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference\ filetype=pandoc
 			resize 5
 			put! =l:biblio
 			$delete_
