@@ -31,9 +31,22 @@ let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method us
 
 " Jumping to Headings {{{2
 " -------------------
-" FIXME: These work, but will wrap. Should I change this?
-noremap <buffer><silent> ]] /^#\{1,6}\s.*<CR>
-noremap <buffer><silent> [[ ?^#\{1,6}\s.*<CR>
+function! s:JumpToHeader(direction)
+	let l:jumpLine = search('^#\{1,6}\s.*', a:direction . 'nW')
+	if l:jumpLine > 0
+		execute l:jumpLine
+	else
+		echohl Error
+		if a:direction == 'b'
+			echo 'No previous header'
+		else
+			echo 'No next header'
+		endif
+		echohl None
+	endif
+endfunction
+noremap <buffer><silent> ]] :call <SID>JumpToHeader('')<CR>
+noremap <buffer><silent> [[ :call <SID>JumpToHeader('b')<CR>
 
 " for conversions {{{2
 " ---------------
@@ -205,6 +218,11 @@ set omnifunc=pandoc#references#MyCompletion
 " TOC Support {{{1
 " ============================================================================
 command! TOC call pandoc#toc#ShowTOC()
+
+" ============================================================================ }}}
+" Folding {{{1
+" ============================================================================
+set foldtext=pandoc#fold#FoldText()
 
 " ============================================================================ }}}
 " Other {{{1
