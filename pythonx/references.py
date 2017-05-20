@@ -108,7 +108,7 @@ def constructInCollEntry(bibItem, crossref):
     if crossref == '':
         crossref = '*' + retrieveBibField(bibItem, 'booktitle') + '*'
     entry = author + ' (' + year + '). "' + \
-        retrieveBibField(bibItem, 'title') + '". In ' + crossref + \
+        retrieveBibField(bibItem, 'title') + '". In ' + crossref + ' ' + \
         retrieveBibField(bibItem, 'pages') + '.'
     doi = retrieveBibField(bibItem, 'Doi')
     if doi:
