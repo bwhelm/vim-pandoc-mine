@@ -197,17 +197,71 @@ nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 " ============================================================================ }}}
 " TextObjects {{{1
 " ============================================================================
-" Creates text object for deleting/changing/etc.
-call textobj#user#plugin('pandoccomments', {
-\	'comment': {
-\		'pattern': ['\[', '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
-\		'select-a': 'ac',
-\		'select-i': 'ic',
-\	},
-\ })
-
-" TODO: Create text objects for section (`aS` includes section header; `iS`
-" does not)
+" If textobj-user plugin is loaded, ...
+if exists('*textobj#user#plugin')
+	" Create text object for deleting/changing/etc.
+	call textobj#user#plugin('pandoccomments', {
+		\	'comment': {
+		\		'pattern': ['\[',
+					\ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
+		\		'select-a': 'ac',
+		\		'select-i': 'ic',
+		\	},
+		\ })
+	" Create text object for (sub)sections
+	function! FindAroundSection()
+		if getline('.') =~ '^#\{1,6}\s'
+			let l:startLine = getpos('.')[1]
+		else
+			let l:startLine = search('^#\{1,6}\s', 'bnW')
+			if l:startLine == 0
+				if getline(1) == '---'
+					call cursor(2, 0)
+					let l:startLine = search('^---$', 'nW')  " At end of YAML header
+				endif
+				let l:startLine = l:startLine + 1  " This is either start of file or after YAML header
+			endif
+		endif
+		let l:endLine = search('^#\{1,6}\s', 'nW')
+		if l:endLine == 0
+			let l:endLine = line('$')
+		else
+			let l:endLine = l:endLine - 1
+		endif
+		echom l:startLine . "|" . l:endLine
+		return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
+	endfunction
+	function! FindInsideSection()
+		let [l:mode, l:startPos, l:endPos] = FindAroundSection()
+		let l:start = l:startPos[1]
+		let l:eof = line('$')
+		while l:start < l:eof
+			if getline(l:start) =~ '\S'
+				"let l:start = l:start - 1
+				break
+			endif
+			let l:start = l:start + 1
+		endwhile
+		let l:startPos[1] = l:start
+		let l:end = l:endPos[1]
+		while l:end > l:start
+			if getline(l:end) =~ '\S'
+				break
+			endif
+			let l:end = l:end - 1
+		endwhile
+		let l:endPos[1] = l:end
+		return [l:mode, l:startPos, l:endPos]
+	endfunction
+	call textobj#user#plugin('pandocmine', {
+		\ 'section': {
+		\ 		'select-a-function': "FindAroundSection",
+		\		'select-a': 'a#',
+		\ 		'select-i-function': "FindInsideSection",
+		\		'select-i': 'i#',
+		\	},
+		\ })
+endif
 
 " ============================================================================ }}}
 " Completion Function for References/Bibliography {{{1

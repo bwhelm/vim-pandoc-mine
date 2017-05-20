@@ -8,9 +8,12 @@ function! pandoc#fold#FoldText()
 	if l:text == '---'
 		let l:cursor = getpos('.')
 		call cursor(v:foldstart, 1)
-		let l:titleLine = search('^title:\s', '')
-		if l:titleLine > 0
-			let l:text = getline(l:titleLine)
+		let l:searchEnd = search('^---$', 'nW')
+		if l:searchEnd > 0
+			let l:titleLine = search('^title:\s', 'nW', l:searchEnd)
+			if l:titleLine > 0
+				let l:text = getline(l:titleLine)
+			endif
 		endif
 		call cursor(l:cursor[1], l:cursor[2])
 	endif
