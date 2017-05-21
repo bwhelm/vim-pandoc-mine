@@ -1,3 +1,4 @@
+scriptencoding utf-8
 " Following creates tag-like jumps for cross-references
 function! s:JumpToReference(searchString) abort
 	" Construct string to search for relevant label (whether a
@@ -160,7 +161,7 @@ function! s:FindHeaderID(base)
 			if l:line =~ a:base
 				let l:match = matchstr(l:line, l:matchItemPattern)
 				let l:completionList += [{'word': l:match,
-							\ 'abbr': l:match ' (List ID)',
+							\ 'abbr': l:match . ' (List ID)',
 							\ 'icase': 1}]
 							"\ 'menu': '(List ID)',
 							"\ 'info': l:line}]

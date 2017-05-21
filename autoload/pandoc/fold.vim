@@ -5,7 +5,7 @@ scriptencoding utf-8
 function! pandoc#fold#FoldText()
 	let l:text = getline(v:foldstart)
 	let l:numLines = ' (' . string(v:foldend - v:foldstart + 1) . ' lines)'
-	if l:text == '---'
+	if l:text ==# '---'
 		let l:cursor = getpos('.')
 		call cursor(v:foldstart, 1)
 		let l:searchEnd = search('^---$', 'nW')

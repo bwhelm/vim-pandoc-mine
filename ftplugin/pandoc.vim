@@ -37,7 +37,7 @@ function! s:JumpToHeader(direction)
 		execute l:jumpLine
 	else
 		echohl Error
-		if a:direction == 'b'
+		if a:direction ==# 'b'
 			echo 'No previous header'
 		else
 			echo 'No next header'
@@ -210,12 +210,12 @@ if exists('*textobj#user#plugin')
 		\ })
 	" Create text object for (sub)sections
 	function! FindAroundSection()
-		if getline('.') =~ '^#\{1,6}\s'
+		if getline('.') =~# '^#\{1,6}\s'
 			let l:startLine = getpos('.')[1]
 		else
 			let l:startLine = search('^#\{1,6}\s', 'bnW')
 			if l:startLine == 0
-				if getline(1) == '---'
+				if getline(1) ==# '---'
 					call cursor(2, 0)
 					let l:startLine = search('^---$', 'nW')  " At end of YAML header
 				endif
@@ -228,7 +228,7 @@ if exists('*textobj#user#plugin')
 		else
 			let l:endLine = l:endLine - 1
 		endif
-		echom l:startLine . "|" . l:endLine
+		echom l:startLine . '|' . l:endLine
 		return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
 	endfunction
 	function! FindInsideSection()
@@ -236,7 +236,7 @@ if exists('*textobj#user#plugin')
 		let l:start = l:startPos[1]
 		let l:eof = line('$')
 		while l:start < l:eof
-			if getline(l:start) =~ '\S'
+			if getline(l:start) =~# '\S'
 				"let l:start = l:start - 1
 				break
 			endif
@@ -245,7 +245,7 @@ if exists('*textobj#user#plugin')
 		let l:startPos[1] = l:start
 		let l:end = l:endPos[1]
 		while l:end > l:start
-			if getline(l:end) =~ '\S'
+			if getline(l:end) =~# '\S'
 				break
 			endif
 			let l:end = l:end - 1
@@ -255,9 +255,9 @@ if exists('*textobj#user#plugin')
 	endfunction
 	call textobj#user#plugin('pandocmine', {
 		\ 'section': {
-		\ 		'select-a-function': "FindAroundSection",
+		\ 		'select-a-function': 'FindAroundSection',
 		\		'select-a': 'a#',
-		\ 		'select-i-function': "FindInsideSection",
+		\ 		'select-i-function': 'FindInsideSection',
 		\		'select-i': 'i#',
 		\	},
 		\ })
