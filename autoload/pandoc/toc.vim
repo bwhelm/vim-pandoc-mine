@@ -10,26 +10,36 @@ function! pandoc#toc#ShowTOC() abort
 	" Show the TOC in location list, and allow user to jump to locations by
 	" hitting `<CR>` (closing location list) or `<C-CR>` (leaving location
 	" list open). Much of this is taken from vim-pandoc's TOC code.
-	normal! mtj
-	let l:pos = search('^#\{1,6}\s', 'b')
+	let l:winID = win_getid()
+	let l:pos = search('^#\{1,6}\s', 'bnW')
 	let l:currentSection = getline(l:pos)
-	silent lvimgrep /^#\{1,6}\s/ %
-	if len(getloclist(0)) == 0
+	try
+		silent lvimgrep /^#\{1,6}\s/j %
+	catch /E480/
+		echohl WarningMsg
+		echo'No section headings found.'
+		echohl None
+		return
+	endtry
+	if len(getloclist(l:winID)) == 0
 		return
 	endif
 	try
-		lopen
+		" Must specify `botright` to put cursor in it when there are other
+		" windows around!
+		botright lopen
 	catch /E776/  " no location list
 		echohl ErrorMsg
 		echom 'No TOC to show!'
 		echohl None
+		return
 	endtry
 	setlocal statusline=TOC modifiable
 	silent %substitute/^\([^|]*|\)\{2,2} //e
 	let l:currentLine = 0
-	for l:line in range(1, line('$'))
-		let l:heading = getloclist(0)[l:line - 1]
-		if l:heading['text'] == l:currentSection
+	for l:line in range(1, len(getloclist(l:winID)))
+		let l:heading = getloclist(l:winID)[l:line - 1]
+		if l:heading['text'] ==# l:currentSection
 			let l:currentLine = l:line
 		endif
 		let l:level = len(matchstr(l:heading.text, '#*', '')) - 1
@@ -46,11 +56,11 @@ function! pandoc#toc#ShowTOC() abort
 
 	setlocal linebreak foldmethod=indent shiftwidth=4
 	wincmd K
-	0,$foldopen!
+	silent! 0,$foldopen!
 	call cursor(l:currentLine, 1)
 	normal! zz
 
-	noremap <buffer> q :lclose<CR>`t
+	noremap <buffer> q :lclose<CR>
 	noremap <buffer> <CR> <CR>:lclose<CR>
 	noremap <buffer> <C-CR> <CR>
 endfunction

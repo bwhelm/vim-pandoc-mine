@@ -128,16 +128,6 @@ imap <buffer><silent> ; ;<C-G>u
 " The following interferes with listmode.
 "imap <buffer><silent> <CR> <CR><C-G>u
 
-" Spelling {{{2
-" --------
-nnoremap <buffer><silent> <LocalLeader>S a<C-X><C-S>
-inoremap <buffer><silent> <LocalLeader>S <C-X><C-S>
-
-" Display word count {{{2
-" ------------------
-noremap <buffer> <LocalLeader>w g<C-g>
-inoremap <buffer> <LocalLeader>w <C-o>g<C-g>
-
 " List mode {{{2
 " ---------
 " Start with listmode on by default ... but don't toggle list mode if the
