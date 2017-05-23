@@ -61,6 +61,7 @@ function! pandoc#toc#ShowTOC() abort
 	normal! zz
 
 	noremap <buffer> q :lclose<CR>
+	noremap <buffer> <Esc> :lclose<CR>
 	noremap <buffer> <CR> <CR>:lclose<CR>
 	noremap <buffer> <C-CR> <CR>
 endfunction

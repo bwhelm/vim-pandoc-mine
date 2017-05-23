@@ -3,9 +3,9 @@
 " ============================================================================
 
 function! pandoc#conversion#DisplayMessages(channel, text, ...)
-	" To write to quickfix list. Note that `...` is there because neovim will
-	" include `stdout` and `stderr` as part of its arguments; I can simply
-	" ignore those.
+	" To write to location list. Note that `...` is there because neovim
+	" will include `stdout` and `stderr` as part of its arguments; I can
+	" simply ignore those.
 	if has('nvim')
 		let l:text = a:text
 	else
@@ -37,7 +37,7 @@ function! pandoc#conversion#DisplayError(channel, text, ...) abort
 	for l:line in l:text
 		if l:line !~? '^----\|^Running\|^Latexmk\|^  Citation\|^  Reference'
 			echom l:line
-			"echom l:line[: l:winWidth - 1]
+			" echom l:line[: l:winWidth - 1]
 		endif
 	endfor
 	echohl None
