@@ -201,7 +201,7 @@ if exists('*textobj#user#plugin')
 	" Create text object for (sub)sections
 	function! FindAroundSection()
 		if getline('.') =~# '^#\{1,6}\s'
-			let l:startLine = getpos('.')[1]
+			let l:startLine = line('.')
 		else
 			let l:startLine = search('^#\{1,6}\s', 'bnW')
 			if l:startLine == 0
@@ -218,7 +218,6 @@ if exists('*textobj#user#plugin')
 		else
 			let l:endLine = l:endLine - 1
 		endif
-		echom l:startLine . '|' . l:endLine
 		return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
 	endfunction
 	function! FindInsideSection()
@@ -226,11 +225,10 @@ if exists('*textobj#user#plugin')
 		let l:start = l:startPos[1]
 		let l:eof = line('$')
 		while l:start < l:eof
+			let l:start = l:start + 1
 			if getline(l:start) =~# '\S'
-				"let l:start = l:start - 1
 				break
 			endif
-			let l:start = l:start + 1
 		endwhile
 		let l:startPos[1] = l:start
 		let l:end = l:endPos[1]
@@ -245,10 +243,10 @@ if exists('*textobj#user#plugin')
 	endfunction
 	call textobj#user#plugin('pandocmine', {
 		\ 'section': {
-		\ 		'select-a-function': 'FindAroundSection',
 		\		'select-a': 'a#',
-		\ 		'select-i-function': 'FindInsideSection',
+		\ 		'select-a-function': 'FindAroundSection',
 		\		'select-i': 'i#',
+		\ 		'select-i-function': 'FindInsideSection',
 		\	},
 		\ })
 endif

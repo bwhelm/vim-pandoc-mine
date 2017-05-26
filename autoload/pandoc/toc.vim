@@ -36,7 +36,7 @@ function! pandoc#toc#ShowTOC() abort
 	endtry
 	setlocal statusline=TOC modifiable
 	silent %substitute/^\([^|]*|\)\{2,2} //e
-	let l:currentLine = 0
+	let l:currentLine = 1
 	for l:line in range(1, len(getloclist(l:winID)))
 		let l:heading = getloclist(l:winID)[l:line - 1]
 		if l:heading['text'] ==# l:currentSection
