@@ -19,3 +19,58 @@ function! pandoc#fold#FoldText()
 	endif
 	return l:text . l:numLines
 endfunction
+
+function! pandoc#fold#FindSectionBoundaries()
+	if getline('.') =~# '^#\{1,6}\s'
+		let l:startLine = line('.')
+	else
+		let l:startLine = search('^#\{1,6}\s', 'bnW')
+		if l:startLine == 0
+			if getline(1) ==# '---'
+				call cursor(2, 0)
+				let l:startLine = search('^---$', 'nW')  " At end of YAML header
+			endif
+			let l:startLine = l:startLine + 1  " This is either start of file or after YAML header
+		endif
+	endif
+	let l:endLine = search('^#\{1,6}\s', 'nW')
+	if l:endLine == 0
+		let l:endLine = line('$')
+	else
+		let l:endLine = l:endLine - 1
+	endif
+	return [l:startLine, l:endLine]
+endfunction
+
+function! pandoc#fold#foldSection()
+	if foldlevel('.') > 0
+		echohl WarningMsg
+		echo 'Already in a fold.'
+		echohl None
+		let l:endLine = 0
+	else
+		let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
+		if l:startLine > line('.')  " If we're in YAML header
+			execute '1,' . string(l:startLine - 1) . 'fold'
+		else
+			execute l:startLine . ',' . l:endLine . 'fold'
+		endif
+	endif
+	return l:endLine
+endfunction
+
+function! pandoc#fold#foldAllSections()
+	" Delete all folds
+	normal! zE
+	let l:origCursor = getpos('.')
+	1
+	let l:cursor = 1
+	while l:cursor < line('$')
+		let l:cursor = pandoc#fold#foldSection()
+		if l:cursor == 0
+			break
+		endif
+		call setpos('.', [0, l:cursor + 1, 1, 0])
+	endwhile
+	call setpos('.', l:origCursor)
+endfunction

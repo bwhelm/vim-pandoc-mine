@@ -8,7 +8,7 @@ endif
 let b:loaded_pandoc_mine=1
 
 " =========================================================================== }}}
-" AutoCmd
+" AutoCmd {{{1
 " ===========================================================================
 
 augroup pandoc
@@ -47,6 +47,11 @@ function! s:JumpToHeader(direction)
 endfunction
 noremap <buffer><silent> ]] :call <SID>JumpToHeader('')<CR>
 noremap <buffer><silent> [[ :call <SID>JumpToHeader('b')<CR>
+
+" Fold Section {{{2
+" ------------
+nnoremap <buffer><silent> z3 :call pandoc#fold#foldSection()<CR>
+nnoremap <buffer><silent> z# :call pandoc#fold#foldAllSections()<CR>
 
 " for conversions {{{2
 " ---------------
@@ -200,46 +205,25 @@ if exists('*textobj#user#plugin')
 		\ })
 	" Create text object for (sub)sections
 	function! FindAroundSection()
-		if getline('.') =~# '^#\{1,6}\s'
-			let l:startLine = line('.')
-		else
-			let l:startLine = search('^#\{1,6}\s', 'bnW')
-			if l:startLine == 0
-				if getline(1) ==# '---'
-					call cursor(2, 0)
-					let l:startLine = search('^---$', 'nW')  " At end of YAML header
-				endif
-				let l:startLine = l:startLine + 1  " This is either start of file or after YAML header
-			endif
-		endif
-		let l:endLine = search('^#\{1,6}\s', 'nW')
-		if l:endLine == 0
-			let l:endLine = line('$')
-		else
-			let l:endLine = l:endLine - 1
-		endif
+		let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
 		return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
 	endfunction
 	function! FindInsideSection()
-		let [l:mode, l:startPos, l:endPos] = FindAroundSection()
-		let l:start = l:startPos[1]
+		let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
 		let l:eof = line('$')
-		while l:start < l:eof
-			let l:start = l:start + 1
-			if getline(l:start) =~# '\S'
+		while l:startLine < l:eof
+			let l:startLine = l:startLine + 1
+			if getline(l:startLine) =~# '\S'
 				break
 			endif
 		endwhile
-		let l:startPos[1] = l:start
-		let l:end = l:endPos[1]
-		while l:end > l:start
-			if getline(l:end) =~# '\S'
+		while l:endLine > l:startLine
+			if getline(l:endLine) =~# '\S'
 				break
 			endif
-			let l:end = l:end - 1
+			let l:endLine = l:endLine - 1
 		endwhile
-		let l:endPos[1] = l:end
-		return [l:mode, l:startPos, l:endPos]
+		return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
 	endfunction
 	call textobj#user#plugin('pandocmine', {
 		\ 'section': {

@@ -34,6 +34,7 @@ function! pandoc#conversion#DisplayError(channel, text, ...) abort
 	else
 		let l:text = [a:text]
 	endif
+	call filter(l:text, 'v:val !=# ""')
 	for l:line in l:text
 		if l:line !~? '^----\|^Running\|^Latexmk\|^  Citation\|^  Reference'
 			echom l:line
