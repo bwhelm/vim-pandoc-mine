@@ -42,8 +42,8 @@ function! pandoc#fold#FindSectionBoundaries()
 	return [l:startLine, l:endLine]
 endfunction
 
-function! pandoc#fold#foldSection()
-	if foldlevel('.') > 0
+function! pandoc#fold#foldSection(exclusive)
+	if foldlevel('.') > 0 && a:exclusive == 1
 		echohl WarningMsg
 		echo 'Already in a fold.'
 		echohl None
@@ -52,6 +52,7 @@ function! pandoc#fold#foldSection()
 		let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
 		if l:startLine > line('.')  " If we're in YAML header
 			execute '1,' . string(l:startLine - 1) . 'fold'
+			execute l:startLine . ',' . l:endLine . 'fold'
 		else
 			execute l:startLine . ',' . l:endLine . 'fold'
 		endif
@@ -66,11 +67,39 @@ function! pandoc#fold#foldAllSections()
 	1
 	let l:cursor = 1
 	while l:cursor < line('$')
-		let l:cursor = pandoc#fold#foldSection()
+		let l:cursor = pandoc#fold#foldSection(0) + 1
 		if l:cursor == 0
 			break
 		endif
-		call setpos('.', [0, l:cursor + 1, 1, 0])
+		call setpos('.', [0, l:cursor, 1, 0])
 	endwhile
+	call setpos('.', l:origCursor)
+endfunction
+
+function! pandoc#fold#foldAllSectionsNested()
+	" Delete all folds
+	normal! zE
+	let l:origCursor = getpos('.')
+	call setpos('.', [0, 1, 1, 0])
+	let l:cursorStart = 1
+	if getline('.') ==# '---'
+		let l:cursorStart = pandoc#fold#foldSection(0) + 1
+	endif
+	for l:i in range(6, 1, -1)
+		execute l:cursorStart
+		let l:cursor = l:cursorStart
+		while l:cursor < line('$')
+			let l:startPos = search('^#\{' . l:i . '}\s', 'cW')
+			if l:startPos < 1
+				break
+			endif
+			let l:endPos = search('^#\{1,' . l:i . '}\s', 'W') - 1
+			if l:endPos < 1
+				let l:endPos = line('$')
+			endif
+			execute l:startPos . ',' . l:endPos . 'fold'
+			let l:cursor = l:endPos + 1
+		endwhile
+	endfor
 	call setpos('.', l:origCursor)
 endfunction

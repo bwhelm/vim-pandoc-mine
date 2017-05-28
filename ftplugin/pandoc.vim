@@ -50,8 +50,9 @@ noremap <buffer><silent> [[ :call <SID>JumpToHeader('b')<CR>
 
 " Fold Section {{{2
 " ------------
-nnoremap <buffer><silent> z3 :call pandoc#fold#foldSection()<CR>
+nnoremap <buffer><silent> z3 :call pandoc#fold#foldSection(1)<CR>
 nnoremap <buffer><silent> z# :call pandoc#fold#foldAllSections()<CR>
+nnoremap <buffer><silent> zn# :call pandoc#fold#foldAllSectionsNested()<CR>
 
 " for conversions {{{2
 " ---------------
