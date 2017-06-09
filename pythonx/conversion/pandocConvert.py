@@ -337,11 +337,11 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      path.expanduser('~/Applications/pandoc/' +
                                      'pandoc-reference-filter/' +
                                      'internalreferences.py'),
+                     '--filter',
+                     path.expanduser('~/Applications/pandoc/' +
+                                     'Comment-Filter/pandocCommentFilter.py'),
                      '--to=' + toFormat] +\
-                     extraOptions.split()
-                     # '--filter',
-                     # path.expanduser('~/Applications/pandoc/' +
-                     #                 'Comment-Filter/pandocCommentFilter.py'),
+        extraOptions.split()
 
     # addedFilter might be a String, a List, or None. This will add all to
     # pandocOptions.
