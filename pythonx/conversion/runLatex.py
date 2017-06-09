@@ -1,4 +1,4 @@
-#!/opt/local/bin/python
+#!/usr/bin/env python3
 
 '''
 This script is designed to run LaTeX on the provided file within TextMate.

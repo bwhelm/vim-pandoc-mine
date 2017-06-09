@@ -1,4 +1,4 @@
-#!/opt/local/bin/python3
+#!/usr/bin/env python3
 
 """
 This script is designed to be run from within vim. It retrieves the filename
@@ -22,6 +22,8 @@ addedFilter = '/usr/local/bin/pandoc-citeproc'
 imageFormat = '.png'
 
 theFile = argv[1].strip('"')
+platform = argv[2]
 
 pandocConvert.convertMd(theFile, toFormat, toExtension, extraOptions,
-                        bookOptions, articleOptions, addedFilter, imageFormat)
+                        bookOptions, articleOptions, addedFilter, imageFormat,
+                        platform)

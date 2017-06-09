@@ -1,4 +1,4 @@
-#!/opt/local/bin/python3
+#!/usr/bin/env python3
 
 """
 This script is designed to be called by another script in vim, providing the
@@ -300,7 +300,7 @@ def runLatex(latexPath, baseFileName, latexFormat):
 
 
 def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
-              articleOptions, addedFilter, imageFormat):
+              articleOptions, addedFilter, imageFormat, platform):
     writeMessage('Starting conversion to ' + toExtension)
 
     tempPath = path.expanduser('~/tmp/pandoc/')
@@ -330,19 +330,18 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
 
     # Figure out command to send to pandoc
     pandocOptions = ['--standalone',
-                     '--wrap=none',
                      '--from=markdown-fancy_lists',
                      '--mathml',
                      '--smart',
-                     '--to=' + toFormat,
-                     '--filter',
-                     path.expanduser('~/Applications/pandoc/' +
-                                     'Comment-Filter/pandocCommentFilter.py'),
                      '--filter',
                      path.expanduser('~/Applications/pandoc/' +
                                      'pandoc-reference-filter/' +
-                                     'internalreferences.py')] +\
-        extraOptions.split()
+                                     'internalreferences.py'),
+                     '--to=' + toFormat] +\
+                     extraOptions.split()
+                     # '--filter',
+                     # path.expanduser('~/Applications/pandoc/' +
+                     #                 'Comment-Filter/pandocCommentFilter.py'),
 
     # addedFilter might be a String, a List, or None. This will add all to
     # pandocOptions.
@@ -417,7 +416,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     else:
         pandocOptions = pandocOptions + articleOptions.split()
 
-    pandocCommandList = ['/usr/local/bin/pandoc', newFilePath, '-o',
+    pandocCommandList = ['/usr/bin/env', 'pandoc', newFilePath, '-o',
                          path.join(tempPath, baseFileName + toExtension)] +\
         pandocOptions
 
@@ -435,14 +434,28 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         if latexError:
             writeError('Error running LaTeX.')
             exit(1)
-        call(['open', '-a', '/Applications/Skim.app', '-g',
-              path.join(tempPath, baseFileName + '.pdf')])
+        if platform == 'raspberrypi':
+            pass
+        else:
+            call(['open', '-a', '/Applications/Skim.app', '-g',
+                  path.join(tempPath, baseFileName + '.pdf')])
     elif toExtension == '.pdf':
-        call(['open', '-a', '/Applications/Skim.app', '-g',
-              path.join(tempPath, baseFileName + toExtension)])
+        if platform == 'raspberrypi':
+            pass
+        else:
+            call(['open', '-a', '/Applications/Skim.app', '-g',
+                  path.join(tempPath, baseFileName + toExtension)])
     else:
-        call(['open', path.join(tempPath, baseFileName + toExtension)])
+        if platform == 'raspberrypi':
+            pass
+        else:
+            call(['open', path.join(tempPath, baseFileName + toExtension)])
 
-    call(['afplay', '/System/Library/Sounds/Morse.aiff'])
+    if platform == 'raspberrypi':
+        # TODO: Here I need to copy the .pdf file to the cloud (G-Drive?) for
+        # easy download.
+        pass
+    else:
+        call(['afplay', '/System/Library/Sounds/Morse.aiff'])
 
     exit(0)
