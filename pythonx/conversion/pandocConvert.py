@@ -20,7 +20,7 @@ Here's what each of these are (read from stdin):
 """
 
 from os import makedirs, chdir, listdir, environ, path, remove
-from subprocess import run, PIPE, call
+from subprocess import run, check_output, PIPE, call
 from sys import stdout, stderr
 from re import match, finditer, MULTILINE
 from shutil import copyfile
@@ -369,24 +369,24 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         line = mdTextSplit[lineIndex].lower()
         if lineIndex == 0 and line != "---":
             break
-        elif 'book: ' in line and line[6:] != 'false':
+        elif line.startswith('book: ') and line[6:] != 'false':
             # bookFlag can be "true", "section", "chapter", or "part"
             bookFlag = line[6:]
             if bookFlag == "true":  # Default to "chapter"
                 bookFlag = "chapter"
-        elif 'biblatex: true' in line and toExtension == '.tex':
+        elif line.startswith('biblatex: true') and toExtension == '.tex':
             pandocOptions.append('--biblatex')
-        elif 'bibinline: true' in line and toExtension != '.tex':
+        elif line.startswith('bibinline: true') and toExtension != '.tex':
             pandocOptions.append(intextCSL)
-        elif 'biboptions: notes' in line and toExtension != '.tex':
+        elif line.startswith('biboptions: notes') and toExtension != '.tex':
             pandocOptions.append(notesCSL)
-        elif 'htmltoc: true' in line and toExtension == '.html':
+        elif line.startswith('htmltoc: true') and toExtension == '.html':
             pandocOptions.append('--toc')
-        elif 'lualatex: true' in line:
+        elif line.startswith('lualatex: true'):
             latexFormat = '-lualatex'
-        elif 'xelatex: true' in line:
+        elif line.startswith('xelatex: true'):
             latexFormat = '-xelatex'
-        elif 'geometry: ipad' in line:  # Special case for ipad geometry
+        elif line.startswith('geometry: ipad'):  # Special case for ipad geom
             mdTextSplit[lineIndex] = 'geometry: paperwidth=176mm,' +\
                 'paperheight=234mm,' +\
                 'top=2.5pc,' +\
@@ -398,6 +398,22 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                 'includefoot,' +\
                 'centering,' +\
                 'marginparwidth=27mm'
+        elif line.startswith('bibliography:'):
+            # Check kpsewhich to retrieve full path to bib databases.
+            if line[13:].strip():
+                mdTextSplit[lineIndex] = \
+                    'bibliography: ' + \
+                    check_output(['kpsewhich', line[13:].strip()])\
+                    .decode('utf-8')
+            else:
+                for i in range(lineIndex + 1, len(mdTextSplit)):
+                    if mdTextSplit[i].startswith('- '):
+                        mdTextSplit[i] = '- ' + \
+                                check_output(['kpsewhich',
+                                              mdTextSplit[i][2:]])[:-1]\
+                                .decode('utf-8')
+                    else:
+                        break
         elif line[:3] in ('...', '---') and lineIndex != 0:
             break
 
