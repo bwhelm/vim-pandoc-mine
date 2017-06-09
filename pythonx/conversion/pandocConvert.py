@@ -337,11 +337,11 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      path.expanduser('~/Applications/pandoc/' +
                                      'pandoc-reference-filter/' +
                                      'internalreferences.py'),
-                     '--filter',
-                     path.expanduser('~/Applications/pandoc/' +
-                                     'Comment-Filter/pandocCommentFilter.py'),
                      '--to=' + toFormat] +\
         extraOptions.split()
+                     # '--filter',
+                     # path.expanduser('~/Applications/pandoc/' +
+                     #                 'Comment-Filter/pandocCommentFilter.py'),
 
     # addedFilter might be a String, a List, or None. This will add all to
     # pandocOptions.
@@ -443,6 +443,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                    str(pandocError))
         exit(1)
 
+    endFile = baseFileName + toExtension
     if toFormat == 'latex' and toExtension == '.tex':
         writeMessage('Successfully created LaTeX file...')
         # Run LaTeX
@@ -450,27 +451,29 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         if latexError:
             writeError('Error running LaTeX.')
             exit(1)
+        endFile = baseFileName + '.pdf'
         if platform == 'raspberrypi':
             pass
         else:
             call(['open', '-a', '/Applications/Skim.app', '-g',
-                  path.join(tempPath, baseFileName + '.pdf')])
+                  path.join(tempPath, endFile)])
     elif toExtension == '.pdf':
         if platform == 'raspberrypi':
             pass
         else:
             call(['open', '-a', '/Applications/Skim.app', '-g',
-                  path.join(tempPath, baseFileName + toExtension)])
+                  path.join(tempPath, endFile)])
     else:
         if platform == 'raspberrypi':
             pass
         else:
-            call(['open', path.join(tempPath, baseFileName + toExtension)])
+            call(['open', path.join(tempPath, endFile)])
 
     if platform == 'raspberrypi':
-        # TODO: Here I need to copy the .pdf file to the cloud (G-Drive?) for
-        # easy download.
-        pass
+        message = check_output(
+            ['/home/bennett/Applications/dropbox-uploader/dropbox_uploader.sh',
+             'upload', endFile, endFile]).decode('utf-8')[:-1]
+        writeMessage(message)
     else:
         call(['afplay', '/System/Library/Sounds/Morse.aiff'])
 
