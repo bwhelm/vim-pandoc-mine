@@ -8,6 +8,7 @@ the pandocConvert.py script to complete the conversion.
 
 from sys import argv
 from os import path
+from distutils.spawn import find_executable
 import pandocConvert
 
 toFormat = 'html5'
@@ -18,7 +19,7 @@ bookOptions = '--toc --smart --css=' +\
         path.expanduser('~/Applications/pandoc/buttondown.css')
 articleOptions = '--smart --css=' +\
         path.expanduser('~/Applications/pandoc/buttondown.css')
-addedFilter = '/usr/local/bin/pandoc-citeproc'
+addedFilter = find_executable('pandoc-citeproc')
 imageFormat = '.png'
 
 theFile = argv[1].strip('"')

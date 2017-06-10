@@ -8,6 +8,7 @@ the pandocConvert.py script to complete the conversion.
 
 from sys import argv
 from os import path
+from distutils.spawn import find_executable
 import pandocConvert
 
 toFormat = 'docx'
@@ -17,7 +18,7 @@ bookOptions = '--reference-docx=' +\
         path.expanduser('~/.pandoc/default-chapter-styles.docx') + ' '
 articleOptions = '--reference-docx=' +\
         path.expanduser('~/.pandoc/default-styles.docx') + ' '
-addedFilter = '/usr/local/bin/pandoc-citeproc'
+addedFilter = find_executable('pandoc-citeproc')
 imageFormat = '.png'
 
 theFile = argv[1].strip('"')

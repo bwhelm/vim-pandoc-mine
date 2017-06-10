@@ -8,6 +8,7 @@ the pandocConvert.py script to complete the conversion.
 
 from sys import argv
 from os import path, symlink, chdir, makedirs
+from distutils.spawn import find_executable
 import pandocConvert
 
 toFormat = 'revealjs'
@@ -16,7 +17,7 @@ toExtension = '.html'
 extraOptions = ''
 articleOptions = ''
 bookOptions = articleOptions
-addedFilter = '/usr/local/bin/pandoc-citeproc'
+addedFilter = find_executable('pandoc-citeproc')
 imageFormat = '.png'
 
 # Make sure reveal.js is symlinked to tmp/pandoc

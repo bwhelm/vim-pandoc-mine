@@ -7,6 +7,7 @@ the pandocConvert.py script to complete the conversion.
 """
 
 from sys import argv
+from distutils.spawn import find_executable
 import pandocConvert
 
 toFormat = 'beamer'
@@ -14,7 +15,7 @@ toExtension = '.pdf'
 extraOptions = ''
 articleOptions = ''
 bookOptions = articleOptions
-addedFilter = '/usr/local/bin/pandoc-citeproc'
+addedFilter = find_executable('pandoc-citeproc')
 imageFormat = '.pdf'
 
 theFile = argv[1].strip('"')

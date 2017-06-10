@@ -7,6 +7,7 @@ the pandocConvert.py script to complete the conversion.
 """
 
 from sys import argv
+from distutils.spawn import find_executable
 import pandocConvert
 
 toFormat = 'markdown'
@@ -14,7 +15,7 @@ toExtension = '.md'
 extraOptions = '--preserve-tabs  --wrap=none --atx-headers '
 bookOptions = ''
 articleOptions = ''
-addedFilter = '/usr/local/bin/pandoc-citeproc'
+addedFilter = find_executable('pandoc-citeproc')
 imageFormat = ''
 
 theFile = argv[1].strip('"')
