@@ -333,15 +333,20 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      '--from=markdown-fancy_lists',
                      '--mathml',
                      '--smart',
-                     '--filter',
-                     path.expanduser('~/Applications/pandoc/' +
-                                     'pandoc-reference-filter/' +
-                                     'internalreferences.py'),
-                     '--to=' + toFormat] +\
-        extraOptions.split()
-                     # '--filter',
-                     # path.expanduser('~/Applications/pandoc/' +
-                     #                 'Comment-Filter/pandocCommentFilter.py'),
+                     '--to=' + toFormat]
+    if platform != 'raspberrypi':
+        # Because the version of pandoc available on the RaspberryPi is so old,
+        # it is incompatible with pandocCommentFilter. So only add this if not
+        # compiling document on the pi.
+        pandocOptions += ['--filter',
+                          path.expanduser('~/Applications/pandoc/' +
+                                          'Comment-Filter/' +
+                                          'pandocCommentFilter.py')]
+    pandocOptions += ['--filter',
+                      path.expanduser('~/Applications/pandoc/' +
+                                      'pandoc-reference-filter/' +
+                                      'internalreferences.py')]
+    pandocOptions += extraOptions.split()
 
     # addedFilter might be a String, a List, or None. This will add all to
     # pandocOptions.
