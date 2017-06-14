@@ -442,6 +442,10 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         pandocOptions
 
     # Run pandoc
+    if platform == 'raspberrypi':
+        # Need to sync bibliographical database
+        writeMessage('Synchronizing bibTeX databases...')
+        run(['/home/bennett/coding/sync-bib.py'])
     pandocError = runPandoc(pandocCommandList)
     if pandocError:
         writeError('Error creating ' + toExtension + ' file: ' +
