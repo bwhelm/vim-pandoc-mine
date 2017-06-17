@@ -197,16 +197,21 @@ function! pandoc#references#MyCompletion(findstart, base)
 		" Find matching header IDs...
 		let l:completionList = <SID>FindHeaderID(a:base)
 		" Add in bibliographic matches...
-		let l:completionList += pandoc#references#GetBibEntries(a:base)
+		let l:bibMatches = pandoc#references#GetBibEntries(a:base)
+		if len(l:bibMatches) == 1 && a:base == l:bibMatches[0]['word']
+			" If it's the only match and it's already complete in the text,
+			" don't pop-up a menu.
+			return ''
+		endif
+		let l:completionList += l:bibMatches
 		return {'words': l:completionList}
 	endif
 endfunction
 
 
-" The following will close the preview window that is automatically opened by
-" the completion function.
-augroup Completion
-	autocmd!
-	autocmd CompleteDone * pclose
-augroup END
-
+" " The following will close the preview window that is automatically opened by
+" " the completion function.
+" augroup Completion
+" 	autocmd!
+" 	autocmd CompleteDone * pclose
+" augroup END
