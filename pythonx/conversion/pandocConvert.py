@@ -300,8 +300,15 @@ def runLatex(latexPath, baseFileName, latexFormat):
 
 
 def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
-              articleOptions, addedFilter, imageFormat, platform):
+              articleOptions, addedFilter, imageFormat):
     writeMessage('Starting conversion to ' + toExtension)
+
+    pandocVersion = check_output(['/usr/bin/env', 'pandoc', '--version']) \
+        .decode('utf-8').split('\n')[0].split(' ')[1].split('.')
+    if int(pandocVersion[0]) < 2 and int(pandocVersion[1]) < 19:
+        platform = 'old'
+    else:
+        platform = 'new'
 
     tempPath = path.expanduser('~/tmp/pandoc/')
     imagePath = path.join(tempPath, 'Figures')
@@ -334,7 +341,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      '--mathml',
                      '--smart',
                      '--to=' + toFormat]
-    if platform != 'raspberrypi':
+    if platform == 'new':
         # Because the version of pandoc available on the RaspberryPi is so old,
         # it is incompatible with pandocCommentFilter. So only add this if not
         # compiling document on the pi.
@@ -442,7 +449,9 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         pandocOptions
 
     # Run pandoc
-    if platform == 'raspberrypi':
+    # TODO: This next should be somewhere prior to calling stuff in
+    # vim-pandoc-mine!
+    if platform == 'old':
         # Need to sync bibliographical database
         writeMessage('Synchronizing bibTeX databases...')
         run(['/home/bennett/coding/sync-bib.py'])
@@ -461,29 +470,23 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             writeError('Error running LaTeX.')
             exit(1)
         endFile = baseFileName + '.pdf'
-        if platform == 'raspberrypi':
-            pass
-        else:
+        if path.exists('/Applications/Skim.app'):
             call(['open', '-a', '/Applications/Skim.app', '-g',
                   path.join(tempPath, endFile)])
     elif toExtension == '.pdf':
-        if platform == 'raspberrypi':
-            pass
-        else:
+        if path.exists('/Applications/Skim.app'):
             call(['open', '-a', '/Applications/Skim.app', '-g',
                   path.join(tempPath, endFile)])
     else:
-        if platform == 'raspberrypi':
-            pass
-        else:
+        if path.exists('/usr/bin/open'):
             call(['open', path.join(tempPath, endFile)])
-
-    if platform == 'raspberrypi':
+    # TODO: This should be somewhere after calling stuff in vim-pandoc-mine!
+    if platform == 'old':
         message = check_output(
             ['/home/bennett/Applications/dropbox-uploader/dropbox_uploader.sh',
              'upload', endFile, endFile]).decode('utf-8')[:-1]
         writeMessage(message)
-    else:
+    if path.exists('/System/Library/Sounds/Morse.aiff'):
         call(['afplay', '/System/Library/Sounds/Morse.aiff'])
 
     exit(0)

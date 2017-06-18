@@ -22,8 +22,6 @@ addedFilter = find_executable('pandoc-citeproc')
 imageFormat = '.png'
 
 theFile = argv[1].strip('"')
-platform = argv[2]
 
 pandocConvert.convertMd(theFile, toFormat, toExtension, extraOptions,
-                        bookOptions, articleOptions, addedFilter, imageFormat,
-                        platform)
+                        bookOptions, articleOptions, addedFilter, imageFormat)

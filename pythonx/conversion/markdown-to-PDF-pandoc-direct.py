@@ -19,8 +19,6 @@ addedFilter = ''
 imageFormat = '.pdf'
 
 theFile = argv[1].strip('"')
-platform = argv[2]
 
 pandocConvert.convertMd(theFile, toFormat, toExtension, extraOptions,
-                        bookOptions, articleOptions, addedFilter, imageFormat,
-                        platform)
+                        bookOptions, articleOptions, addedFilter, imageFormat)

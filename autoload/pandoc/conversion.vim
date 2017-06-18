@@ -127,14 +127,14 @@ function! s:MyConvertHelper(command, ...) abort
 		if has('nvim')
 			let b:conversionJob = jobstart('/usr/bin/env python3 ' .
 					\ s:pythonScriptDir . l:command .
-					\ ' "' . l:fileName . '" ' . g:os,
+					\ ' "' . l:fileName . '"',
 					\ {'on_stdout': 'pandoc#conversion#DisplayMessages',
 					\ 'on_stderr': 'pandoc#conversion#DisplayError',
 					\ 'on_exit': 'pandoc#conversion#EndProcess'})
 		else
 			let b:conversionJob = job_start('/usr/bin/env python3 ' .
 					\ s:pythonScriptDir . l:command .
-					\ ' "' . l:fileName . '" ' . g:os,
+					\ ' "' . l:fileName . '"',
 					\ {'out_cb': 'pandoc#conversion#DisplayMessages',
 					\ 'err_cb': 'pandoc#conversion#DisplayError',
 					\ 'close_cb': 'pandoc#conversion#EndProcess'})
