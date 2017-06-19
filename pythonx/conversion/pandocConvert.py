@@ -449,10 +449,8 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         pandocOptions
 
     # Run pandoc
-    # TODO: This next should be somewhere prior to calling stuff in
-    # vim-pandoc-mine!
     if platform == 'old':
-        # Need to sync bibliographical database
+        # If on raspberrypi, sync the bibliographical database.
         writeMessage('Synchronizing bibTeX databases...')
         run(['/home/bennett/coding/sync-bib.py'])
     pandocError = runPandoc(pandocCommandList)
@@ -480,7 +478,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     else:
         if path.exists('/usr/bin/open'):
             call(['open', path.join(tempPath, endFile)])
-    # TODO: This should be somewhere after calling stuff in vim-pandoc-mine!
+    # If on raspberrypi, upload resulting file to dropbox.
     if platform == 'old':
         message = check_output(
             ['/home/bennett/Applications/dropbox-uploader/dropbox_uploader.sh',
