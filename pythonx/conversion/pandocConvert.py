@@ -392,6 +392,8 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             pandocOptions.append(intextCSL)
         elif line.startswith('biboptions: notes') and toExtension != '.tex':
             pandocOptions.append(notesCSL)
+        elif line.startswith('csl:') and toExtension != '.tex':
+            mdTextSplit[lineIndex] = 'csl: ' + path.expanduser(line[5:])
         elif line.startswith('htmltoc: true') and toExtension == '.html':
             pandocOptions.append('--toc')
         elif line.startswith('lualatex: true'):
