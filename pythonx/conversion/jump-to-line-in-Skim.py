@@ -40,7 +40,6 @@ PATH_TO_VIEWER = "/Applications/Skim.app"
 MAX_YAML_LINES = 50
 
 file = argv[1].strip('"')
-stderr.write('\n\n' + file + '\n\n')
 lineNumber = int(argv[2]) - 1
 
 with open(file, 'r', encoding='utf-8') as f:
@@ -118,7 +117,6 @@ if len(searchText) > 1:
     searchText = searchText[-2]
 elif len(searchText) == 1:
     searchText = searchText[0]
-stderr.write(searchText)
 
 # Need to escape text now so that we can add in regular expressions if needed
 searchText = escape(searchText)
