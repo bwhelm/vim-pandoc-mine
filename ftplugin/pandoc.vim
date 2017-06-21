@@ -115,7 +115,7 @@ nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 " Find Comments {{{2
 " -------------
 " Note: allow remaps so that it works with vim-slash
-nmap <buffer><silent> <LocalLeader>fc /\[.\{-}\]{\.[a-z]\{-}}/<CR>
+nmap <buffer><silent> <LocalLeader>fc /\(\[.\{-}\]{\.[a-z]\{-}}\\|<\(comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
 
 " Citations {{{2
 " ---------
@@ -196,10 +196,12 @@ nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 " If textobj-user plugin is loaded, ...
 if exists('*textobj#user#plugin')
 	" Create text object for deleting/changing/etc.
+		" \		'pattern': ['\[',
+		" 			\ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
 	call textobj#user#plugin('pandoccomments', {
 		\	'comment': {
-		\		'pattern': ['\[',
-					\ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
+		\ 		'pattern': ['<\(comment\|margin\|fixme\|highlight\|smcaps\)>',
+		\                   '</\(comment\|margin\|fixme\|highlight\|smcaps\)>'],
 		\		'select-a': 'ac',
 		\		'select-i': 'ic',
 		\	},
