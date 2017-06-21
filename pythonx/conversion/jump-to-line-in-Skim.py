@@ -16,18 +16,18 @@ paragraph.
 
 from os import path
 from subprocess import call, Popen, PIPE
-from sys import stdout, argv
+from sys import stdout, argv, stderr
 from re import search, sub, escape
 from pipes import quote
 import yaml
 
 
-def toFormat(string, fromThis='markdown', toThis='latex'):
+def toFormat(string, fromThis='markdown-fancy_lists', toThis='latex'):
     # Process string through pandoc to get formatted string. Is there a better
     # way?
     p1 = Popen(['echo'] + string.split(), stdout=PIPE)
     p2 = Popen(['pandoc', '--wrap=none', '--biblatex', '-f', fromThis, '-t',
-                toThis, '--filter',
+                toThis, '--smart', '--mathml', '--filter',
                 path.expanduser('~/Applications/pandoc/' +
                                 'Comment-Filter/pandocCommentFilter.py')] +
                pandocOptions, stdin=p1.stdout, stdout=PIPE)
@@ -40,7 +40,7 @@ PATH_TO_VIEWER = "/Applications/Skim.app"
 MAX_YAML_LINES = 50
 
 file = argv[1].strip('"')
-stdout.write('\n\n' + file + '\n\n')
+stderr.write('\n\n' + file + '\n\n')
 lineNumber = int(argv[2]) - 1
 
 with open(file, 'r', encoding='utf-8') as f:
@@ -118,6 +118,7 @@ if len(searchText) > 1:
     searchText = searchText[-2]
 elif len(searchText) == 1:
     searchText = searchText[0]
+stderr.write(searchText)
 
 # Need to escape text now so that we can add in regular expressions if needed
 searchText = escape(searchText)

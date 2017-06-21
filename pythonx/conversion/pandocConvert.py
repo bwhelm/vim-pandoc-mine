@@ -340,6 +340,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      '--from=markdown-fancy_lists',
                      '--mathml',
                      '--smart',
+                     '--wrap=none',
                      '--to=' + toFormat]
     if platform == 'new':
         # Because the version of pandoc available on the RaspberryPi is so old,
