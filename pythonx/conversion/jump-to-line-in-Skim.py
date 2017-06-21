@@ -26,7 +26,7 @@ def toFormat(string, fromThis='markdown-fancy_lists', toThis='latex'):
     # Process string through pandoc to get formatted string. Is there a better
     # way?
     p1 = Popen(['echo'] + string.split(), stdout=PIPE)
-    p2 = Popen(['pandoc', '--wrap=none', '--biblatex', '-f', fromThis, '-t',
+    p2 = Popen(['pandoc', '--no-wrap', '--biblatex', '-f', fromThis, '-t',
                 toThis, '--smart', '--mathml', '--filter',
                 path.expanduser('~/Applications/pandoc/' +
                                 'Comment-Filter/pandocCommentFilter.py')] +
