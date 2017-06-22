@@ -115,6 +115,8 @@ function! s:GenerateHeaderID(header)
 	let l:header = matchstr(l:header, '#\{1,6}[^A-z]\+\zs.\{-}\ze\s*$')
 	let l:header = substitute(l:header, ' ', '-', 'g')
 	let l:header = substitute(l:header, '[^A-Za-z0-9_\-.]', '', 'g')
+	let l:header = substitute(l:header, '---', '', 'g')
+	let l:header = substitute(l:header, '--', '', 'g')
 	if empty(l:header)
 		let l:header = 'section'
 	endif
