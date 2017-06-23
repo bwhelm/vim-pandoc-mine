@@ -139,6 +139,17 @@ function! s:MyConvertHelper(command, ...) abort
 					\ 'err_cb': 'pandoc#conversion#DisplayError',
 					\ 'close_cb': 'pandoc#conversion#EndProcess'})
 		endif
+		" Write servername to file if nvim; delete it if not. This will be
+		" used in pdf-md-backward-search.py to identify relevant vim server to
+		" open document in.
+		let l:serverFile = expand('~/tmp/pandoc/') .
+					\ fnamemodify(l:fileName, ':t:r') . '.nvimserver'
+		if has('nvim')
+			let l:serverName = serverlist()[0]
+			call writefile([l:serverName], l:serverFile)
+		else
+			call delete(l:serverFile)
+		endif
 	endif
 endfunction
 
