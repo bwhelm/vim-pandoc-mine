@@ -6,16 +6,24 @@ function! pandoc#fold#FoldText()
 	let l:text = getline(v:foldstart)
 	let l:numLines = ' (' . string(v:foldend - v:foldstart + 1) . ' lines)'
 	if l:text ==# '---'
-		let l:cursor = getpos('.')
-		call cursor(v:foldstart, 1)
-		let l:searchEnd = search('^---$', 'nW')
-		if l:searchEnd > 0
-			let l:titleLine = search('^title:\s', 'nW', l:searchEnd)
-			if l:titleLine > 0
-				let l:text = getline(l:titleLine)
-			endif
-		endif
-		call cursor(l:cursor[1], l:cursor[2])
+		" There seems to be a weird interaction between using the `search()`
+		" function and `incsearch`: the latter won't work if I use the former
+		" here. So rather than finding the title line, I'm just assuming that
+		" the title line will be the second line of the document -- the first
+		" in the YAML header. Won't always work, but it's better than borking
+		" `incsearch`.
+		let l:text = getline(2)
+		" let l:cursor = getpos('.')
+		" call cursor(v:foldstart, 1)
+		" let l:searchEnd = search('^---$', 'nW')
+		" if l:searchEnd > 0
+		" 	let l:titleLine = search('^title:\s', 'nW', l:searchEnd)
+		" 	let l:titleLine = 3
+		" 	if l:titleLine > 0
+		" 		let l:text = getline(l:titleLine)
+		" 	endif
+		" endif
+		" call cursor(l:cursor[1], l:cursor[2])
 	endif
 	return l:text . l:numLines
 endfunction
