@@ -526,24 +526,24 @@ syn match pandocAmpersandEscape /\v\&(#\d+|#x\x+|[[:alnum:]]+)\;/ contains=NoSpe
 " }}}
 
 " YAML: {{{3
-syn match pandocYAMLField /^\S\+:\s*.\{-}$/ contained contains=pandocYAMLFieldName,pandocYAMLFieldDelimiter,pandocYAMLFieldContents
+syn match pandocYAMLField /^\S\+:\s*.\{-}$/ contained contains=pandocYAMLFieldName,pandocYAMLFieldDelimiter,pandocYAMLFieldContents,pandocYAMLFieldTitleContents
 syn match pandocYAMLFieldName /^\S\{-}:\@=/ contained
 syn match pandocYAMLFieldDelimiter /\(^\S\{-}\)\@<=:/ contained
 syn match pandocYAMLFieldContents /\(^\S\+:\s\+\)\@<=\S.\{-}$/ contained contains=@Spell,@pandocInline
 syn match pandocYAMLFieldContents /\(^\(\t\| \{4,}\)\).\{-}$/ contained contains=@Spell,@pandocInline skipnl
+syn match pandocYAMLFieldTitleContents /\%(^title:\s\+\)\@<=.\{-}$/ contained contains=@Spell,@pandocInline
 syn match pandocYAMLItem /^\s*-\s\+.\{-}$/ contained contains=pandocYAMLItemMarker,pandocYAMLItemContents
 syn match pandocYAMLItemMarker /^\s*--\@!/ contained
 syn match pandocYAMLItemContents /\(^\s*-\s*\)\@<=\S.\{-}$/ contained
 
 syntax cluster YAML contains=pandocYAMLField,pandocYAMLItem,pandocYAMLFieldContents
 
-" syn region pandocYAMLHeader start=/\%(\%^\|\_^\s*\n\)\@<=\_^-\{3}\ze\n.\+/ end=/^\([-.]\)\1\{2}$/ keepend contains=@YAML containedin=TOP
 syn region pandocYAMLHeader start=/\%(\%^\|\_^\s*\n\)\@<=\_^---\ze\n.\+/ end=/^\(---\|...\)$/ keepend contains=@YAML containedin=TOP
 "}}}
 "}}}1
 
 " Styling: {{{1
-" My special
+" My special (taken from PandocCommentFilter)
 hi myFixme guibg=Red guifg=Black ctermbg=Red ctermfg=Black gui=bold term=bold cterm=bold
 hi link myPandocComment Special
 hi link myPandocCommentBlock Special
@@ -556,9 +556,7 @@ hi link myPandocCommentClose Operator
 hi link myPandocMargin Special
 hi link myPandocMarginOpen Operator
 hi link myPandocMarginClose Operator
-
 hi link myPandocAfterQuoteMark Identifier
-
 hi link myPandocLinkMark Operator
 hi link myPandocIndexMark Comment
 hi link myPandocIndexText Comment
@@ -568,6 +566,7 @@ hi link pandocYAMLHeader Special
 hi link pandocYAMLFieldName Identifier
 hi link pandocYAMLFieldDelimiter PreProc
 hi link pandocYAMLFieldContents Constant
+hi link pandocYAMLFieldTitleContents Special
 hi link pandocYAMLItemMarker PreProc
 hi link pandocYAMLItemContents Constant
 
