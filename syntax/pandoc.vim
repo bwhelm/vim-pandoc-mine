@@ -231,7 +231,7 @@ syn region pandocLaTeXRegion start=/\\begin{\z(.\{-}\)}/ end=/\\end{\z1}/ keepen
 syn region pandocLaTexSection start=/\\\(part\|chapter\|\(sub\)\{,2}section\|\(sub\)\=paragraph\)\*\=\(\[.*\]\)\={/ end=/\}/ keepend
 syn match pandocLaTexSectionCmd /\\\(part\|chapter\|\(sub\)\{,2}section\|\(sub\)\=paragraph\)/ contained containedin=pandocLaTexSection 
 syn match pandocLaTeXDelimiter /[[\]{}]/ contained containedin=pandocLaTexSection
-" }}}}
+" }}}
 " }}}2
 " Titleblock: {{{2
 "
@@ -525,13 +525,20 @@ endif
 syn match pandocAmpersandEscape /\v\&(#\d+|#x\x+|[[:alnum:]]+)\;/ contains=NoSpell
 " }}}
 
-" YAML: {{{2
-try
-    unlet! b:current_syntax
-    syn include @YAML syntax/yaml.vim
-catch /E484/
-endtry
-syn region pandocYAMLHeader start=/\%(\%^\|\_^\s*\n\)\@<=\_^-\{3}\ze\n.\+/ end=/^\([-.]\)\1\{2}$/ keepend contains=@YAML containedin=TOP
+" YAML: {{{3
+syn match pandocYAMLField /^\S\+:\s*.\{-}$/ contained contains=pandocYAMLFieldName,pandocYAMLFieldDelimiter,pandocYAMLFieldContents
+syn match pandocYAMLFieldName /^\S\{-}:\@=/ contained
+syn match pandocYAMLFieldDelimiter /\(^\S\{-}\)\@<=:/ contained
+syn match pandocYAMLFieldContents /\(^\S\+:\s\+\)\@<=\S.\{-}$/ contained contains=@Spell,@pandocInline
+syn match pandocYAMLFieldContents /\(^\(\t\| \{4,}\)\).\{-}$/ contained contains=@Spell,@pandocInline skipnl
+syn match pandocYAMLItem /^\s*-\s\+.\{-}$/ contained contains=pandocYAMLItemMarker,pandocYAMLItemContents
+syn match pandocYAMLItemMarker /^\s*--\@!/ contained
+syn match pandocYAMLItemContents /\(^\s*-\s*\)\@<=\S.\{-}$/ contained
+
+syntax cluster YAML contains=pandocYAMLField,pandocYAMLItem,pandocYAMLFieldContents
+
+" syn region pandocYAMLHeader start=/\%(\%^\|\_^\s*\n\)\@<=\_^-\{3}\ze\n.\+/ end=/^\([-.]\)\1\{2}$/ keepend contains=@YAML containedin=TOP
+syn region pandocYAMLHeader start=/\%(\%^\|\_^\s*\n\)\@<=\_^---\ze\n.\+/ end=/^\(---\|...\)$/ keepend contains=@YAML containedin=TOP
 "}}}
 "}}}1
 
@@ -542,7 +549,7 @@ hi link myPandocComment Special
 hi link myPandocCommentBlock Special
 hi link myPandocSpeakerBlock Special
 hi link myPandocFixme Constant
-hi myPandocHighlight guibg=Yellow ctermbg=Gray
+hi myPandocHighlight guibg=Yellow ctermbg=DarkGreen ctermfg=Black cterm=bold
 hi myPandocSmallCaps gui=underline term=underline
 hi link myPandocCommentOpen Operator
 hi link myPandocCommentClose Operator
@@ -555,6 +562,14 @@ hi link myPandocAfterQuoteMark Identifier
 hi link myPandocLinkMark Operator
 hi link myPandocIndexMark Comment
 hi link myPandocIndexText Comment
+
+" pandocYAML
+hi link pandocYAMLHeader Special
+hi link pandocYAMLFieldName Identifier
+hi link pandocYAMLFieldDelimiter PreProc
+hi link pandocYAMLFieldContents Constant
+hi link pandocYAMLItemMarker PreProc
+hi link pandocYAMLItemContents Constant
 
 hi link pandocOperator Operator
 
@@ -614,8 +629,8 @@ hi link pandocReferenceDefinitionTip Identifier
 
 hi link pandocAutomaticLink Underlined
 
-hi pandocDefinitionBlockTerm gui=bold term=bold cterm=bold
-" hi link pandocDefinitionBlockTerm Identifier
+hi link pandocDefinitionBlock Statement
+hi link pandocDefinitionBlockTerm pandocStrong
 hi link pandocDefinitionBlockMark Operator
 
 hi link pandocSimpleTableDelims Delimiter
@@ -683,7 +698,7 @@ if g:pandoc#syntax#style#underline_special == 1
     hi pandocStrikeout gui=underline term=underline cterm=underline
 endif
 hi link pandocNewLine Error
-hi link pandocHRule Delimiter
+hi link pandocHRule Underlined
 
 "}}}
 
