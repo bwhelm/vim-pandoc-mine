@@ -93,6 +93,7 @@ let s:pythonScriptDir = expand('<sfile>:p:h:h:h') . '/pythonx/conversion/'
 " Following function calls the conversion script given by a:command only if
 " another conversion is not currently running.
 function! s:MyConvertHelper(command, ...) abort
+    let l:auxCommand = a:0 == 0 ? '' : a:1
 	if empty(a:command)
 		let l:command = b:pandoc_lastConversionMethod
 	else
@@ -110,8 +111,8 @@ function! s:MyConvertHelper(command, ...) abort
 		update
 	endif
 	if !exists('b:pandoc_converting')
-		" `b:pandoc_converting` is used to keep track of whether a current .tex file
-		" is being used for conversion and so should not be overwritten.
+		" `b:pandoc_converting` is used to keep track of whether a current .tex
+		" file is being used for conversion and so should not be overwritten.
 		let b:pandoc_converting = 0
 	endif
 	" Don't change existing .tex file if currently in use
@@ -127,14 +128,14 @@ function! s:MyConvertHelper(command, ...) abort
 		if has('nvim')
 			let b:conversionJob = jobstart('/usr/bin/env python3 ' .
 					\ s:pythonScriptDir . l:command .
-					\ ' "' . l:fileName . '"',
+					\ ' "' . l:fileName . '" ' . l:auxCommand,
 					\ {'on_stdout': 'pandoc#conversion#DisplayMessages',
 					\ 'on_stderr': 'pandoc#conversion#DisplayError',
 					\ 'on_exit': 'pandoc#conversion#EndProcess'})
 		else
 			let b:conversionJob = job_start('/usr/bin/env python3 ' .
 					\ s:pythonScriptDir . l:command .
-					\ ' "' . l:fileName . '"',
+					\ ' "' . l:fileName . '" ' . l:auxCommand,
 					\ {'out_cb': 'pandoc#conversion#DisplayMessages',
 					\ 'err_cb': 'pandoc#conversion#DisplayError',
 					\ 'close_cb': 'pandoc#conversion#EndProcess'})
@@ -181,16 +182,16 @@ endfunction
 " It will also check to see if the current buffer has a filename, and if not
 " it will create a temporary .md file with the text of the current buffer and
 " run the conversion on that file.
-function! pandoc#conversion#MyConvertMappingHelper(command) abort
+function! pandoc#conversion#MyConvertMappingHelper(command, ...) abort
+    let l:auxCommand = a:0 == 0 ? '' : a:1
 	if !exists('b:pandoc_autoPDFEnabled')
 		let b:pandoc_autoPDFEnabled = 0
 	endif
 	if b:pandoc_autoPDFEnabled
 		call conversion#ToggleAutoPDF()
-		call <SID>MyConvertHelper(a:command)
+		call <SID>MyConvertHelper(a:command, l:auxCommand)
 		call conversion#ToggleAutoPDF()
 	else
-		call <SID>MyConvertHelper(a:command)
+		call <SID>MyConvertHelper(a:command, l:auxCommand)
 	endif
 endfunction
-

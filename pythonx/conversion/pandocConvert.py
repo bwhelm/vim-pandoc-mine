@@ -336,6 +336,10 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     # File will be written to new (temp) location later
 
     # Figure out command to send to pandoc
+    suppressPdfFlag = False
+    if toFormat == 'latexraw':
+        suppressPdfFlag = True
+        toFormat = 'latex'
     pandocOptions = ['--standalone',
                      '--from=markdown-fancy_lists',
                      '--mathml',
@@ -414,14 +418,16 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             if line[13:].strip():
                 mdTextSplit[lineIndex] = \
                     'bibliography: ' + \
-                    check_output(['kpsewhich', line[13:].strip()])\
+                    check_output(['kpsewhich',
+                                  line[13:].strip().strip('"').strip("'")])\
                     .decode('utf-8')
             else:
                 for i in range(lineIndex + 1, len(mdTextSplit)):
                     if mdTextSplit[i].startswith('- '):
                         mdTextSplit[i] = '- ' + \
                                 check_output(['kpsewhich',
-                                              mdTextSplit[i][2:]])[:-1]\
+                                              mdTextSplit[i][2:].strip('"')
+                                              .strip("'")])[:-1]\
                                 .decode('utf-8')
                     else:
                         break
@@ -459,7 +465,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         exit(1)
 
     endFile = baseFileName + toExtension
-    if toFormat == 'latex' and toExtension == '.tex':
+    if toFormat == 'latex' and toExtension == '.tex' and not suppressPdfFlag:
         writeMessage('Successfully created LaTeX file...')
         # Run LaTeX
         latexError = runLatex(tempPath, baseFileName, latexFormat)
@@ -475,7 +481,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             call(['open', '-a', '/Applications/Skim.app', '-g',
                   path.join(tempPath, endFile)])
     else:
-        if path.exists('/usr/bin/open'):
+        if path.exists('/usr/bin/open') and not suppressPdfFlag:
             call(['open', path.join(tempPath, endFile)])
     # If on raspberrypi, upload resulting file to dropbox.
     if platform == 'old':
@@ -483,7 +489,6 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             ['/home/bennett/Applications/dropbox-uploader/dropbox_uploader.sh',
              'upload', endFile, endFile]).decode('utf-8')[:-1]
         writeMessage(message)
-    if path.exists('/System/Library/Sounds/Morse.aiff'):
+    if path.exists('/System/Library/Sounds/Morse.aiff') \
+            and not suppressPdfFlag:
         call(['afplay', '/System/Library/Sounds/Morse.aiff'])
-
-    exit(0)

@@ -70,6 +70,18 @@ nnoremap <buffer><silent> <LocalLeader>cP :call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
 inoremap <buffer><silent> <LocalLeader>cP <C-o>:call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
+" Diff conversion against git cache -- converts diff of current file to .pdf
+nnoremap <buffer><silent> <LocalLeader>cd :call
+		\ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
+inoremap <buffer><silent> <LocalLeader>cd <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
+" Diff conversion against HEAD -- converts diff of current file to .pdf
+nnoremap <buffer><silent> <LocalLeader>cD :call
+		\ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py',
+        \ 'HEAD')<CR>
+nnoremap <buffer><silent> <LocalLeader>cD <C-o>:call
+		\ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py',
+        \ 'HEAD')<CR>
 " HTML conversion
 nnoremap <buffer><silent> <LocalLeader>ch :call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
@@ -86,9 +98,9 @@ nnoremap <buffer><silent> <LocalLeader>cb :call
 inoremap <buffer><silent> <LocalLeader>cb <C-o>:call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
 " Word .docx conversion
-nnoremap <buffer><silent> <LocalLeader>cd :call
+nnoremap <buffer><silent> <LocalLeader>cw :call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
-inoremap <buffer><silent> <LocalLeader>cd <C-o>:call
+inoremap <buffer><silent> <LocalLeader>cw <C-o>:call
 		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
 " Markdown conversion
 nnoremap <buffer><silent> <LocalLeader>cm :call
