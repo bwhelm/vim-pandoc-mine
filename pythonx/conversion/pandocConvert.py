@@ -403,16 +403,22 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             latexFormat = '-xelatex'
         elif line.startswith('geometry: ipad'):  # Special case for ipad geom
             mdTextSplit[lineIndex] = 'geometry: paperwidth=176mm,' +\
-                'paperheight=234mm,' +\
-                'top=2.5pc,' +\
-                'bottom=3pc,' +\
-                'outer=22mm,' +\
-                'inner=22mm,' +\
-                'headsep=1pc,' +\
-                'includehead,' +\
-                'includefoot,' +\
-                'centering,' +\
-                'marginparwidth=27mm'
+                'paperheight=234mm,'
+            if bookFlag:  # Specify for OUPRoyal.cls
+                mdTextSplit[lineIndex] += 'outer=22mm,' +\
+                    'top=2.5pc,' +\
+                    'bottom=3pc,' +\
+                    'headsep=1pc,' +\
+                    'includehead,' +\
+                    'includefoot,' +\
+                    'centering,' +\
+                    'inner=22mm,' +\
+                    'marginparwidth=17mm'
+            else:  # Make dimension same as default article class, letterpaper
+                mdTextSplit[lineIndex] += 'width=360.0pt,' +\
+                    'height=541.40024pt,' +\
+                    'headsep=1pc,' +\
+                    'centering'
         elif line.startswith('bibliography:'):
             # Check kpsewhich to retrieve full path to bib databases.
             if line[13:].strip():
