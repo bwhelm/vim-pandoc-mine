@@ -124,10 +124,10 @@ inoremap <buffer><silent> <LocalLeader>ca <C-o>:call pandoc#conversion#ToggleAut
 
 nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 
-" Find Comments {{{2
-" -------------
-" Note: allow remaps so that it works with vim-slash
-nmap <buffer><silent> <LocalLeader>fc /\(\[.\{-}\]{\.[a-z]\{-}}\\|<\(comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
+" Find Comments and Notes {{{2
+" -----------------------
+nnoremap <buffer><silent> <LocalLeader>fc /\(\[.\{-}\]{\.[a-z]\{-}}\\|<\(comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
+nnoremap <buffer><silent> <LocalLeader>fn /\^\[<CR>m<l%m>`<
 
 " Citations {{{2
 " ---------

@@ -56,7 +56,8 @@ oldFileBaseName, null = path.splitext(path.basename(oldFileName))
 currentFileBaseName, null = path.splitext(currentFileShortName)
 oldTexName = path.join(tempDir, oldFileBaseName + '.tex')
 newTexName = path.join(tempDir, currentFileBaseName + '.tex')
-diffContents = check_output(['latexdiff', '--type=UNDERLINE', oldTexName,
+diffContents = check_output(['latexdiff', '--type=FONTSTRIKE',
+                             '--subtype=COLOR', oldTexName,
                              newTexName]).decode('utf-8')
 pandocConvert.writeFile(newTexName, diffContents)
 
