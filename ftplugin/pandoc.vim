@@ -126,8 +126,10 @@ nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 
 " Find Comments and Notes {{{2
 " -----------------------
-nnoremap <buffer><silent> <LocalLeader>fc /\(\[.\{-}\]{\.[a-z]\{-}}\\|<\(comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
+nnoremap <buffer><silent> <LocalLeader>fc /\(\[.\{-}\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
+nnoremap <buffer><silent> <LocalLeader>fC ?\(\[.\{-}\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)?<CR>
 nnoremap <buffer><silent> <LocalLeader>fn /\^\[<CR>m<l%m>`<
+nnoremap <buffer><silent> <LocalLeader>fN ?\^\[<CR>m<l%m>`<
 
 " Citations {{{2
 " ---------
@@ -207,7 +209,7 @@ nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 " ============================================================================
 " If textobj-user plugin is loaded, ...
 if exists('*textobj#user#plugin')
-	" Create text object for deleting/changing/etc.
+	" Create text object for deleting/changing/etc. comments of various types
 		" \		'pattern': ['\[',
 		" 			\ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
 	call textobj#user#plugin('pandoccomments', {
@@ -216,6 +218,46 @@ if exists('*textobj#user#plugin')
 		\                   '</\(comment\|margin\|fixme\|highlight\|smcaps\)>'],
 		\		'select-a': 'ac',
 		\		'select-i': 'ic',
+		\	},
+		\ })
+	" Text object for foontones
+	function! FindAroundFootnote()
+		let l:curPos = getcurpos()
+		let l:found = search('\^[', 'bcW', l:curPos[1])
+		if l:found == 0
+			let l:found = search('\^[', 'cW', l:curPos[1])
+		endif
+		if l:found > 0
+			let l:beginPos = getcurpos()
+			normal! l%
+			let l:endPos = getcurpos()
+			call setpos('.', l:curPos)
+			if l:endPos != l:beginPos
+				return ['v', l:beginPos, l:endPos]
+			endif
+		endif
+		call setpos('.', l:curPos)
+		echohl WarningMsg
+		echo 'No footnote found.'
+		echohl None
+		return
+	endfunction
+	function! FindInsideFootnote()
+		try
+			let [l:type, l:begin, l:end] = FindAroundFootnote()
+			let l:begin[2] += 2
+			let l:end[2] -= 1
+			return [l:type, l:begin, l:end]
+		catch /E714/
+			return
+		endtry
+	endfunction
+	call textobj#user#plugin('pandocfootnotes', {
+		\	'footnote': {
+		\		'select-a': 'an',
+		\		'select-a-function': 'FindAroundFootnote',
+		\		'select-i': 'in',
+		\		'select-i-function': 'FindInsideFootnote',
 		\	},
 		\ })
 	" Create text object for (sub)sections
