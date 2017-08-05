@@ -7,7 +7,7 @@ if exists('b:loaded_pandoc_mine')
 endif
 let b:loaded_pandoc_mine=1
 
-" =========================================================================== }}}
+" ======================================================================= }}}
 " AutoCmd {{{1
 " ===========================================================================
 
@@ -17,7 +17,7 @@ augroup pandoc
 	autocmd BufWinEnter * lcd %:p:h
 augroup END
 
-" =========================================================================== }}}
+" ======================================================================= }}}
 " Variables for Conversions {{{1
 " ===========================================================================
 
@@ -25,7 +25,7 @@ let b:pandoc_converting = 0  " keeps track of whether currently converting or no
 let b:pandoc_autoPDFEnabled = 0  " Turn autoPDF off by default...
 let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method used for conversions
 
-" ============================================================================ }}}
+" ======================================================================== }}}
 " Key mappings {{{1
 " ============================================================================
 
@@ -204,7 +204,7 @@ nnoremap <buffer><silent> csch mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`c
 "}}}
 
-" ============================================================================ }}}
+" ======================================================================== }}}
 " TextObjects {{{1
 " ============================================================================
 " If textobj-user plugin is loaded, ...
@@ -292,22 +292,98 @@ if exists('*textobj#user#plugin')
 		\ })
 endif
 
-" ============================================================================ }}}
+" ======================================================================== }}}
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
 set omnifunc=pandoc#references#MyCompletion
 
-" ============================================================================ }}}
+" ======================================================================== }}}
 " TOC Support {{{1
 " ============================================================================
 command! TOC call pandoc#toc#ShowTOC()
 
-" ============================================================================ }}}
+" ======================================================================== }}}
+" AutoNameFile {{{1
+" ============================================================================
+function! s:RemoveDiacritics(text)
+	" This function returns text without diacritics. Modified from
+	" <http://vim.wikia.com/wiki/Remove_diacritical_signs_from_characters>.
+	let l:diacs = 'áâãàäÇçéèêëíîìïñóôõòöüúûù'  " lowercase diacritical signs
+	let l:repls = 'aaaaaCceeeeiiiinooooouuuu'  " corresponding replacements
+	let l:diacs .= toupper(l:diacs)
+	let l:repls .= toupper(l:repls)
+	return tr(a:text, l:diacs, l:repls)
+endfunction
+function! s:AutoNameFile( ... )
+	" For pandoc files, this function will generate a filename from the title
+	" field of the YAML header, replacing diacritics, stripping out
+	" non-alphabetic characters and short words, converting ',' to '-', and
+	" converting spaces to `_`.
+	let l:suffix = join(a:000, ' ')
+	let l:fileBegin = join(getline(0, 200), "\n")
+	let l:fileType = matchstr(execute('set filetype'), 'filetype=\zs.*')
+	if l:fileType ==# 'pandoc'
+		let l:title = matchstr(l:fileBegin, '\ntitle:\s\zs.\{-}\ze\n')
+		let l:extension = '.md'
+	elseif l:fileType ==# 'tex'
+		let l:title = matchstr(l:fileBegin, '\n\\title{\zs[^}]*\ze}')
+		let l:extension = '.tex'
+	endif
+	if l:title ==# ''
+		echohl WarningMsg
+		echom 'Could not find title.'
+		echohl None
+		return
+	endif
+	if !empty(l:suffix)  " Add suffix if there is one
+		let l:title = l:title . '-' . l:suffix
+	endif
+	let l:title = substitute(l:title, '[,:] ', '-', 'g')
+	let l:title = substitute(l:title, ' ', '_', 'g')
+	let l:title = <SID>RemoveDiacritics(l:title)
+	let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
+	let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
+	let l:title = substitute(l:title, '__', '_', 'g')
+	let l:title = l:title . l:extension
+	let l:currentName = expand('%:t')
+	let l:currentPath = expand('%:h') . '/'
+	if l:currentName !=# ''  "File already has a name
+		if findfile(l:currentName, '.') ==# ''  " No existing file
+			execute 'write ' . fnameescape(l:currentPath . l:title)
+		elseif l:currentName ==# l:title  " Existing file with same name
+			update
+			echohl Comment
+			echom 'Saved existing file w/o renaming.'
+			echohl None
+		else  " Existing file with different name
+			try
+				" Try using fugitive's Gmove. If fugitive is not loaded or not
+				" in a git repository, this will fail with E492; then write
+				" and delete manually. (Note that a file already saved but not
+				" added to git repository will result in an error here.
+				" Workaround is to add file and then autorename.)
+				execute 'Gmove ' . fnameescape(l:currentPath . l:title)
+			catch /E492/
+				execute 'keepalt saveas ' . fnameescape(l:currentPath . l:title)
+				echom 'File renamed to: ' . l:title
+				if delete(fnameescape(l:currentPath . l:currentName))
+					echoerr 'Could not delete ' . l:currentName
+				endif
+			endtry
+		endif
+	else  " File does not already have a name
+		execute 'write ' . l:title
+	endif
+endfunction
+command! -nargs=* AutoNameFile call <SID>AutoNameFile(<q-args>)
+cnoreabbr <buffer> anf AutoNameFile
+
+" ======================================================================== }}}
 " Folding {{{1
 " ============================================================================
 set foldtext=pandoc#fold#FoldText()
 
-" ============================================================================ }}}
+" ======================================================================== }}}
 " Other {{{1
 " ============================================================================
 " Don't want numbers displayed for pandoc documents
