@@ -347,13 +347,12 @@ function! s:AutoNameFile( ... )
 			echohl None
 		else  " Existing file with different name
 			try
-				" Try using fugitive's Gmove. If fugitive is not loaded or not
-				" in a git repository, this will fail with E492; then write
-				" and delete manually. (Note that a file already saved but not
-				" added to git repository will result in an error here.
-				" Workaround is to add file and then autorename.)
+				" Try using fugitive's Gmove. In case of error, write and
+				" delete manually. This happens (a) if fugitive is not loaded
+				" or the file is not in a git repository or (b) if the file is
+				" already saved but not yet added to git repository.
 				execute 'Gmove ' . fnameescape(l:currentPath . l:title)
-			catch /E492/
+			catch
 				execute 'keepalt saveas ' . fnameescape(l:currentPath . l:title)
 				echom 'File renamed to: ' . l:title
 				if delete(fnameescape(l:currentPath . l:currentName))
