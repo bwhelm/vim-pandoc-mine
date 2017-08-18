@@ -150,8 +150,8 @@ endif
 " Miscellaneous {{{2
 " -------------
 " In visual and normal modes, select text to be indexed and hit <ctrl-x> ("indeX")
-vnoremap <buffer><silent> <C-x> c<i <Esc>pa><Esc>mip`i
-nnoremap <buffer><silent> <C-x> ciw<i <Esc>pa><Esc>mip`i
+" vnoremap <buffer><silent> <C-x> c<i <Esc>pa><Esc>mip`i
+" nnoremap <buffer><silent> <C-x> ciw<i <Esc>pa><Esc>mip`i
 
 " Jump to corresponding line in Skim.app
 if has('nvim')
