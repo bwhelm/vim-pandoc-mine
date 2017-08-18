@@ -344,7 +344,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      '--from=markdown-fancy_lists',
                      '--mathml',
                      '--smart',
-                     '--no-wrap',
+                     '--wrap=none',
                      '--to=' + toFormat]
     pandocOptions += ['--filter',
                       path.expanduser('~/Applications/pandoc/' +
