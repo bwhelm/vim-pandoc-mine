@@ -10,7 +10,7 @@ function! pandoc#toc#ShowTOC() abort
 	" Show the TOC in location list, and allow user to jump to locations by
 	" hitting `<CR>` (closing location list) or `<C-CR>` (leaving location
 	" list open). Much of this is taken from vim-pandoc's TOC code.
-	let l:winID = win_getid()
+	let l:winID = winnr()
 	let l:pos = search('^#\{1,6}\s', 'bnW')
 	let l:currentSection = getline(l:pos)
 	try
