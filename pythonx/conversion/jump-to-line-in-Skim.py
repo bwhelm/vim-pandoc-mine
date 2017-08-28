@@ -16,7 +16,7 @@ paragraph.
 
 from os import path
 from subprocess import call, Popen, PIPE
-from sys import stdout, argv, stderr
+from sys import stdout, argv
 from re import search, sub, escape
 from pipes import quote
 import yaml
@@ -26,7 +26,7 @@ def toFormat(string, fromThis='markdown-fancy_lists', toThis='latex'):
     # Process string through pandoc to get formatted string. Is there a better
     # way?
     p1 = Popen(['echo'] + string.split(), stdout=PIPE)
-    p2 = Popen(['pandoc', '--no-wrap', '--biblatex', '-f', fromThis, '-t',
+    p2 = Popen(['pandoc', '--wrap=none', '--biblatex', '-f', fromThis, '-t',
                 toThis, '--smart', '--mathml', '--filter',
                 path.expanduser('~/Applications/pandoc/' +
                                 'Comment-Filter/pandocCommentFilter.py')] +

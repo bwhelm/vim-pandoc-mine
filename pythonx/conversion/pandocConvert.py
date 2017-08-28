@@ -480,15 +480,15 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             exit(1)
         endFile = baseFileName + '.pdf'
         if path.exists('/Applications/Skim.app'):
-            call(['open', '-a', '/Applications/Skim.app', '-g',
+            call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
                   path.join(tempPath, endFile)])
     elif toExtension == '.pdf':
         if path.exists('/Applications/Skim.app'):
-            call(['open', '-a', '/Applications/Skim.app', '-g',
+            call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
                   path.join(tempPath, endFile)])
     else:
         if path.exists('/usr/bin/open') and not suppressPdfFlag:
-            call(['open', path.join(tempPath, endFile)])
+            call(['/usr/bin/open', path.join(tempPath, endFile)])
     # If on raspberrypi, upload resulting file to dropbox.
     if platform == 'old':
         message = check_output(
@@ -497,4 +497,4 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         writeMessage(message)
     if path.exists('/System/Library/Sounds/Morse.aiff') \
             and not suppressPdfFlag:
-        call(['afplay', '/System/Library/Sounds/Morse.aiff'])
+        call(['/usr/bin/afplay', '/System/Library/Sounds/Morse.aiff'])
