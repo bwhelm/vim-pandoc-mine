@@ -198,8 +198,8 @@ endif
 " }}}
 
 " BASE:
+syntax clear
 if hostname() !=# 'iPad'
-    syntax clear
     syntax spell toplevel
     " apply extra settings: {{{1
     if g:pandoc#syntax#colorcolumn == 1
@@ -255,7 +255,7 @@ endif
 "}}}
 " Blockquotes: {{{2
 "
-syn match pandocBlockQuote /^\s\{,3}>.*\n\(.*\n\@1<!\n\)*/ contains=@Spell,@pandocInline
+syn match pandocBlockQuote /^\s\{,3}>.*\n\(.*\n\@1<!\n\)*/ contains=@pandocInline
 syn match pandocBlockQuoteMark /\_^\s\{,3}>/ contained containedin=pandocEmphasis,pandocStrong,pandocPCite,pandocSuperscript,pandocSubscript,pandocStrikeout,pandocUListItem,pandocNoFormatted
 
 " }}}
@@ -269,7 +269,7 @@ endif
 "}}}
 " Clusters: {{{2
 if hostname() !=# 'iPad'
-    syn cluster pandocInline contains=pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
+    syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
 else
     syn cluster pandocInline contains=pandocEmphasis
 endif
@@ -286,14 +286,14 @@ if hostname() !=# 'iPad'
     endif
     " let's not consider "a [label] a" as a label, remove formatting - Note: breaks implicit links
     syn match pandocNoLabel /\]\@1<!\(\s\{,3}\|^\)\[[^\[\]]\{-}\]\(\s\+\|$\)[\[(]\@!/ contains=pandocPCite
-    syn match pandocLinkTip /\s*".\{-}"/ contained containedin=pandocReferenceURL contains=@Spell,pandocAmpersandEscape display
+    syn match pandocLinkTip /\s*".\{-}"/ contained containedin=pandocReferenceURL contains=pandocAmpersandEscape display
     call s:WithConceal('image', 'syn match pandocImageIcon /!\[\@=/ display', 'conceal cchar='. s:cchars['image']) 
     " }}}
     " Definitions: {{{3
     syn region pandocReferenceDefinition start=/\[.\{-}\]:/ end=/\(\n\s*".*"$\|$\)/ keepend
     syn match pandocReferenceDefinitionLabel /\[\zs.\{-}\ze\]:/ contained containedin=pandocReferenceDefinition display
     syn match pandocReferenceDefinitionAddress /:\s*\zs.*/ contained containedin=pandocReferenceDefinition
-    syn match pandocReferenceDefinitionTip /\s*".\{-}"/ contained containedin=pandocReferenceDefinition,pandocReferenceDefinitionAddress contains=@Spell,pandocAmpersandEscape
+    syn match pandocReferenceDefinitionTip /\s*".\{-}"/ contained containedin=pandocReferenceDefinition,pandocReferenceDefinitionAddress contains=pandocAmpersandEscape
     "}}}
     " Automatic_links: {{{3
     syn match pandocAutomaticLink /<\(https\{0,1}.\{-}\|[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~.]\{-}@[A-Za-z0-9\-]\{-}\.\w\{-}\)>/ contains=NONE
@@ -303,11 +303,15 @@ endif
 " Citations: {{{2
 " parenthetical citations
 if hostname() !=# 'iPad'
-    syn match pandocPCite /\^\@<!\[[^\[\]]\{-}-\{0,1}@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*.\{-}\]/ contains=pandocCiteKey,@Spell,@pandocInline display
+    syn match pandocPCite /\^\@<!\[[^\[\]]\{-}-\{0,1}@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*.\{-}\]/ contains=@pandocInline,pandocCiteKey display
 endif
-syn match pandocPCite /\^\@<!\[[^\[\]]\{-}-\{0,1}@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*.\{-}\]/ contains=pandocEmphasis,pandocStrong,pandocLatex,pandocCiteKey,@Spell,pandocAmpersandEscape display
+if hostname() !=# 'iPad'
+    syn match pandocPCite /\^\@<!\[[^\[\]]\{-}-\{0,1}@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*.\{-}\]/ contains=pandocEmphasis,pandocStrong,pandocLatex,pandocCiteKey,pandocAmpersandEscape display
+else
+    syn match pandocPCite /\^\@<!\[[^\[\]]\{-}-\{0,1}@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*.\{-}\]/ contains=pandocCiteKey display
+endif
 " in-text citations with location
-syn match pandocICite /@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*\s\[.\{-1,}\]/ contains=pandocCiteKey,@Spell display
+syn match pandocICite /@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*\s\[.\{-1,}\]/ contains=pandocCiteKey, display
 " cite keys
 syn match pandocCiteKey /\(-\=@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*\)/ containedin=pandocPCite,pandocICite contains=@NoSpell display
 syn match pandocCiteAnchor /[-@]/ contained containedin=pandocCiteKey display
@@ -318,28 +322,28 @@ syn match pandocCiteLocator /[\[\]]/ contained containedin=pandocPCite,pandocICi
 " Emphasis: {{{3
 "
 if hostname() !=# 'iPad'
-    call s:WithConceal('block', 'syn region pandocEmphasis matchgroup=pandocOperator start=/\\\@1<!\(\_^\|\s\|[[:punct:]]\)\@<=\*\S\@=/ skip=/\(\*\*\|__\)/ end=/\*\([[:punct:]]\|\s\|\_$\)\@=/ contains=@Spell,pandocNoFormattedInEmphasis,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
-    call s:WithConceal('block', 'syn region pandocEmphasis matchgroup=pandocOperator start=/\\\@1<!\(\_^\|\s\|[[:punct:]]\)\@<=_\S\@=/ skip=/\(\*\*\|__\)/ end=/\S\@1<=_\([[:punct:]]\|\s\|\_$\)\@=/ contains=@Spell,pandocNoFormattedInEmphasis,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocEmphasis matchgroup=pandocOperator start=/\\\@1<!\(\_^\|\s\|[[:punct:]]\)\@<=\*\S\@=/ skip=/\(\*\*\|__\)/ end=/\*\([[:punct:]]\|\s\|\_$\)\@=/ contains=pandocNoFormattedInEmphasis,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocEmphasis matchgroup=pandocOperator start=/\\\@1<!\(\_^\|\s\|[[:punct:]]\)\@<=_\S\@=/ skip=/\(\*\*\|__\)/ end=/\S\@1<=_\([[:punct:]]\|\s\|\_$\)\@=/ contains=pandocNoFormattedInEmphasis,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
 else
     syn match pandocEmphasis "\*\S.\{-}\s\@<!\*" oneline
 endif
 " }}}
+" Strong: {{{3
 if hostname() !=# 'iPad'
-    " Strong: {{{3
     "
-    call s:WithConceal('block', 'syn region pandocStrong matchgroup=pandocOperator start=/\(\\\@<!\*\)\{2}/ end=/\(\\\@<!\*\)\{2}/ contains=@Spell,pandocNoFormattedInStrong,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
-    call s:WithConceal('block', 'syn region pandocStrong matchgroup=pandocOperator start=/__/ end=/__/ contains=@Spell,pandocNoFormattedInStrong,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocStrong matchgroup=pandocOperator start=/\(\\\@<!\*\)\{2}/ end=/\(\\\@<!\*\)\{2}/ contains=pandocNoFormattedInStrong,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocStrong matchgroup=pandocOperator start=/__/ end=/__/ contains=pandocNoFormattedInStrong,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
     "}}}
     " Strong Emphasis: {{{3
     "
-    call s:WithConceal('block', 'syn region pandocStrongEmphasis matchgroup=pandocOperator start=/\*\{3}\(\S[^*]*\(\*\S\|\n[^*]*\*\S\)\)\@=/ end=/\S\@<=\*\{3}/ contains=@Spell,pandocAmpersandEscape', 'concealends')
-    call s:WithConceal('block', 'syn region pandocStrongEmphasis matchgroup=pandocOperator start=/\(___\)\S\@=/ end=/\S\@<=___/ contains=@Spell,pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocStrongEmphasis matchgroup=pandocOperator start=/\*\{3}\(\S[^*]*\(\*\S\|\n[^*]*\*\S\)\)\@=/ end=/\S\@<=\*\{3}/ contains=pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocStrongEmphasis matchgroup=pandocOperator start=/\(___\)\S\@=/ end=/\S\@<=___/ contains=pandocAmpersandEscape', 'concealends')
     " }}}
     " Mixed: {{{3
-    call s:WithConceal('block', 'syn region pandocStrongInEmphasis matchgroup=pandocOperator start=/\*\*/ end=/\*\*/ contained containedin=pandocEmphasis contains=@Spell,pandocAmpersandEscape', 'concealends')
-    call s:WithConceal('block', 'syn region pandocStrongInEmphasis matchgroup=pandocOperator start=/__/ end=/__/ contained containedin=pandocEmphasis contains=@Spell,pandocAmpersandEscape', 'concealends')
-    call s:WithConceal('block', 'syn region pandocEmphasisInStrong matchgroup=pandocOperator start=/\\\@1<!\(\_^\|\s\|[[:punct:]]\)\@<=\*\S\@=/ skip=/\(\*\*\|__\)/ end=/\S\@<=\*\([[:punct:]]\|\s\|\_$\)\@=/ contained containedin=pandocStrong contains=@Spell,pandocAmpersandEscape', 'concealends')
-    call s:WithConceal('block', 'syn region pandocEmphasisInStrong matchgroup=pandocOperator start=/\\\@<!\(\_^\|\s\|[[:punct:]]\)\@<=_\S\@=/ skip=/\(\*\*\|__\)/ end=/\S\@<=_\([[:punct:]]\|\s\|\_$\)\@=/ contained containedin=pandocStrong contains=@Spell,pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocStrongInEmphasis matchgroup=pandocOperator start=/\*\*/ end=/\*\*/ contained containedin=pandocEmphasis contains=pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocStrongInEmphasis matchgroup=pandocOperator start=/__/ end=/__/ contained containedin=pandocEmphasis contains=pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocEmphasisInStrong matchgroup=pandocOperator start=/\\\@1<!\(\_^\|\s\|[[:punct:]]\)\@<=\*\S\@=/ skip=/\(\*\*\|__\)/ end=/\S\@<=\*\([[:punct:]]\|\s\|\_$\)\@=/ contained containedin=pandocStrong contains=pandocAmpersandEscape', 'concealends')
+    call s:WithConceal('block', 'syn region pandocEmphasisInStrong matchgroup=pandocOperator start=/\\\@<!\(\_^\|\s\|[[:punct:]]\)\@<=_\S\@=/ skip=/\(\*\*\|__\)/ end=/\S\@<=_\([[:punct:]]\|\s\|\_$\)\@=/ contained containedin=pandocStrong contains=pandocAmpersandEscape', 'concealends')
 
     " Inline Code: {{{3
 
@@ -362,26 +366,28 @@ if hostname() !=# 'iPad'
     call s:WithConceal('superscript', 'syn match pandocSuperscriptMark /\^/ contained containedin=pandocSuperscript', 'conceal cchar='.s:cchars['super'])
     "}}}
     " Strikeout: {{{3
-    syn region pandocStrikeout start=/\~\~/ end=/\~\~/ contains=@Spell,pandocAmpersandEscape keepend
+    syn region pandocStrikeout start=/\~\~/ end=/\~\~/ contains=pandocAmpersandEscape keepend
     call s:WithConceal('strikeout', 'syn match pandocStrikeoutMark /\~\~/ contained containedin=pandocStrikeout', 'conceal cchar='.s:cchars['strike'])
     " }}}
 endif
 " }}}
 " Headers: {{{2
 "
-syn match pandocAtxHeader /\(\%^\|<.\+>.*\n\|^\s*\n\)\@<=#\{1,6}.*\n/ contains=@Spell,@pandocInline display
+syn match pandocAtxHeader /\(\%^\|<.\+>.*\n\|^\s*\n\)\@<=#\{1,6}.*\n/ contains=@pandocInline display
 syn match pandocAtxHeaderMark /\(^#\{1,6}\|\\\@<!#\+\(\s*.*$\)\@=\)/ contained containedin=pandocAtxHeader
 call s:WithConceal('atx', 'syn match pandocAtxStart /#/ contained containedin=pandocAtxHeaderMark', 'conceal cchar='.s:cchars['atx'])
 if hostname() !=# 'iPad'
-    syn match pandocSetexHeader /^.\+\n[=]\+$/ contains=@Spell,@pandocInline
-    syn match pandocSetexHeader /^.\+\n[-]\+$/ contains=@Spell,@pandocInline
+    syn match pandocSetexHeader /^.\+\n[=]\+$/ contains=@pandocInline
+    syn match pandocSetexHeader /^.\+\n[-]\+$/ contains=@pandocInline
+    syn match pandocHeaderAttr /{.*}/ contained containedin=pandocAtxHeader,pandocSetexHeader contains=@NoSpell
+else
+    syn match pandocHeaderAttr /{.*}/ contained containedin=pandocAtxHeader contains=@NoSpell
 endif
-syn match pandocHeaderAttr /{.*}/ contained containedin=pandocAtxHeader,pandocSetexHeader contains=@NoSpell
 syn match pandocHeaderID /#[-_:.[:alpha:]]*/ contained containedin=pandocHeaderAttr
 "}}}
 " Line Blocks: {{{2
 if hostname() !=# 'iPad'
-    syn region pandocLineBlock start=/^|/ end=/\(^|\(.*\n|\@!\)\@=.*\)\@<=\n/ transparent contains=@Spell,@pandocInline
+    syn region pandocLineBlock start=/^|/ end=/\(^|\(.*\n|\@!\)\@=.*\)\@<=\n/ transparent contains=@pandocInline
     syn match pandocLineBlockDelimiter /^|/ contained containedin=pandocLineBlock
 endif
 "}}}
@@ -444,7 +450,7 @@ endif
 " }}}
 " Abbreviations: {{{2
 if hostname() !=# 'iPad'
-    syn region pandocAbbreviationDefinition start=/^\*\[.\{-}\]:\s*/ end="$" contains=pandocNoFormatted,@Spell,pandocAmpersandEscape
+    syn region pandocAbbreviationDefinition start=/^\*\[.\{-}\]:\s*/ end="$" contains=pandocNoFormatted,pandocAmpersandEscape
     call s:WithConceal('abbrev', 'syn match pandocAbbreviationSeparator /:/ contained containedin=pandocAbbreviationDefinition', 'conceal cchar='.s:cchars['abbrev'])
     syn match pandocAbbreviation /\*\[.\{-}\]/ contained containedin=pandocAbbreviationDefinition
     call s:WithConceal('abbrev', 'syn match pandocAbbreviationHead /\*\[/ contained containedin=pandocAbbreviation', 'conceal')
@@ -456,12 +462,12 @@ endif
 "
 syn match pandocFootnoteID /\[\^[^\]]\+\]/ nextgroup=pandocFootnoteDef
 "   Inline footnotes
-syn region pandocFootnoteDef start=/\^\[/ skip=/\[.\{-}]/ end=/\]/ contains=@Spell,@pandocInline keepend
+syn region pandocFootnoteDef start=/\^\[/ skip=/\[.\{-}]/ end=/\]/ contains=@pandocInline keepend
 syn match pandocFootnoteDefHead /\^\ze\[/ contained containedin=pandocFootnoteDef conceal cchar=†
 syn match pandocFootnoteDefTail /\]/ contained containedin=pandocFootnoteDef
 
 " regular footnotes
-syn region pandocFootnoteBlock start=/\[\^.\{-}\]:\s*\n*/ end=/^\n^\s\@!/ contains=pandocBlockQuote,@Spell,@pandocInline
+syn region pandocFootnoteBlock start=/\[\^.\{-}\]:\s*\n*/ end=/^\n^\s\@!/ contains=@pandocInline,pandocBlockQuote
 syn match pandocFootnoteBlockSeparator /:/ contained containedin=pandocFootnoteBlock
 syn match pandocFootnoteID /\[\^.\{-}\]/ contained containedin=pandocFootnoteBlock
 call s:WithConceal('footnote', 'syn match pandocFootnoteIDHead /\[\^/ contained containedin=pandocFootnoteID', 'conceal cchar='.s:cchars['footnote'])
@@ -470,11 +476,11 @@ call s:WithConceal('footnote', 'syn match pandocFootnoteIDTail /\]/ contained co
 " List Items: {{{2
 if hostname() !=# 'iPad'
     " Unordered lists
-    syn match pandocUListItem /^>\=\s*[*+-]\s\+-\@!.*$/ nextgroup=pandocUListItem,pandocLaTeXMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation contains=@Spell,@pandocInline skipempty display
+    syn match pandocUListItem /^>\=\s*[*+-]\s\+-\@!.*$/ nextgroup=pandocUListItem,pandocLaTeXMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation contains=@pandocInline skipempty display
     syn match pandocUListItemBullet /^>\=\s*\zs[*+-]/ contained containedin=pandocUListItem
 
     " Ordered lists
-    syn match pandocListItem /^\s*(\?\(\d\+\|\l\|\#\|@\)[.)].*$/ nextgroup=pandocListItem,pandocLaTeXMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation contains=@Spell,@pandocInline skipempty display
+    syn match pandocListItem /^\s*(\?\(\d\+\|\l\|\#\|@\)[.)].*$/ nextgroup=pandocListItem,pandocLaTeXMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation contains=@pandocInline skipempty display
     " support for roman numerals up to 'c'
     if g:pandoc#syntax#roman_lists != 0
         syn match pandocListItem /^\s*(\?x\=l\=\(i\{,3}[vx]\=\)\{,3}c\{,3}[.)].*$/ nextgroup=pandocListItem,pandocMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation,pandocAutomaticLink skipempty display 
@@ -482,30 +488,32 @@ if hostname() !=# 'iPad'
     syn match pandocListItemBullet /^(\?.\{-}[.)]/ contained containedin=pandocListItem
     syn match pandocListItemBulletId /\(\d\+\|\l\|\#\|@.\{-}\|x\=l\=\(i\{,3}[vx]\=\)\{,3}c\{,3}\)/ contained containedin=pandocListItemBullet
 
-    syn match pandocListItemContinuation /^\s\+\([-+*]\s\+\|(\?.\+[).]\)\@<!\([[:alpha:]ñäëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_"[]\|\*\S\)\@=.*$/ nextgroup=pandocLaTeXMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation,pandocListItem contains=@Spell,@pandocInline contained skipempty display
+    syn match pandocListItemContinuation /^\s\+\([-+*]\s\+\|(\?.\+[).]\)\@<!\([[:alpha:]ñäëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_"[]\|\*\S\)\@=.*$/ nextgroup=pandocLaTeXMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation,pandocListItem contains=@pandocInline contained skipempty display
     " }}}
     " Definitions: {{{2
     "
     if g:pandoc#syntax#use_definition_lists == 1
-        syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s\{0,2}[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@Spell,@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
-        syn match pandocDefinitionBlockTerm /^.*\n\(^\s*\n\)\=\(\s*[:~]\)\@=/ contained contains=@Spell,@pandocInline nextgroup=pandocDefinitionBlockMark
+        syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s\{0,2}[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
+        syn match pandocDefinitionBlockTerm /^.*\n\(^\s*\n\)\=\(\s*[:~]\)\@=/ contained contains=@pandocInline nextgroup=pandocDefinitionBlockMark
         call s:WithConceal('definition', 'syn match pandocDefinitionBlockMark /^\s*[:~]/ contained', 'conceal cchar='.s:cchars['definition'])
     endif
 endif
 " }}}
 " Comments: {{{2
-syn region myPandocCommentBlock start="^<!comment>" end="^</!comment>" contains=@Spell,@pandocInline keepend
-syn region myPandocSpeakerBlock start="^<!speaker>" end="^</!speaker>" contains=@Spell,@pandocInline keepend
-syn match myPandocHighlight "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.highlight}" contains=@Spell,@pandocInline oneline
-syn match myPandocHighlight "<highlight>.\{-}</highlight>" contains=@Spell,@pandocInline oneline
-syn match myPandocComment "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.comment}" contains=@Spell,@pandocInline oneline
-syn match myPandocComment "<comment>.\{-}</comment>" contains=@Spell,@pandocInline oneline
-syn match myPandocMargin "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.margin}" contains=@Spell,@pandocInline oneline
-syn match myPandocMargin "<margin>.\{-}</margin>" contains=@Spell,@pandocInline oneline
-syn match myPandocFixme "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.fixme}" contains=@Spell,@pandocInline oneline
-syn match myPandocFixme "<fixme>.\{-}</fixme>" contains=@Spell,@pandocInline oneline
-syn match myPandocSmallCaps "\\\@<!\[\(\(\]\)\@<!.\)\{-}\]{\.smcaps}" contains=@Spell,@pandocInline oneline
-syn match myPandocSmallCaps "<smcaps>.\{-}</smcaps>" contains=@Spell,@pandocInline oneline
+syn region myPandocCommentBlock start="^<!comment>" end="^</!comment>" contains=@pandocInline keepend
+if hostname() !=# 'iPad'
+    syn region myPandocSpeakerBlock start="^<!speaker>" end="^</!speaker>" contains=@pandocInline keepend
+    syn match myPandocHighlight "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.highlight}" contains=@pandocInline oneline
+    syn match myPandocComment "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.comment}" contains=@pandocInline oneline
+    syn match myPandocMargin "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.margin}" contains=@pandocInline oneline
+    syn match myPandocFixme "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.fixme}" contains=@pandocInline oneline
+    syn match myPandocSmallCaps "\\\@<!\[\(\(\]\)\@<!.\)\{-}\]{\.smcaps}" contains=@pandocInline oneline
+endif
+syn match myPandocHighlight "<highlight>.\{-}</highlight>" contains=@pandocInline oneline
+syn match myPandocComment "<comment>.\{-}</comment>" contains=@pandocInline oneline
+syn match myPandocMargin "<margin>.\{-}</margin>" contains=@pandocInline oneline
+syn match myPandocFixme "<fixme>.\{-}</fixme>" contains=@pandocInline oneline
+syn match myPandocSmallCaps "<smcaps>.\{-}</smcaps>" contains=@pandocInline oneline
 syn match myPandocCommentOpen "\[" contained containedin=myPandocHighlight,myPandocComment,myPandocFixme,myPandocSmallCaps conceal cchar=[
 syn match myPandocCommentClose "\]{\.\(highlight\|comment\|fixme\|smcaps\)}" contained containedin=myPandocHighlight,myPandocComment,myPandocFixme,myPandocSmallCaps conceal cchar=]
 syn match myPandocMarginOpen "\[" contained containedin=myPandocMargin conceal cchar=|
@@ -573,9 +581,9 @@ endif
 syn match pandocYAMLField /^\S\+:\s*.\{-}$/ contained contains=pandocYAMLFieldName,pandocYAMLFieldDelimiter,pandocYAMLFieldContents,pandocYAMLFieldTitleContents
 syn match pandocYAMLFieldName /^\S\{-}:\@=/ contained
 syn match pandocYAMLFieldDelimiter /\(^\S\{-}\)\@<=:/ contained
-syn match pandocYAMLFieldContents /\(^\S\+:\s\+\)\@<=\S.\{-}$/ contained contains=@Spell,@pandocInline
-syn match pandocYAMLFieldContents /\(^\(\t\| \{4,}\)\).\{-}$/ contained contains=@Spell,@pandocInline skipnl
-syn match pandocYAMLFieldTitleContents /\%(^title:\s\+\)\@<=.\{-}$/ contained contains=@Spell,@pandocInline
+syn match pandocYAMLFieldContents /\(^\S\+:\s\+\)\@<=\S.\{-}$/ contained contains=@pandocInline
+syn match pandocYAMLFieldContents /\(^\(\t\| \{4,}\)\).\{-}$/ contained contains=@pandocInline skipnl
+syn match pandocYAMLFieldTitleContents /\%(^title:\s\+\)\@<=.\{-}$/ contained contains=@pandocInline
 syn match pandocYAMLItem /^\s*-\s\+.\{-}$/ contained contains=pandocYAMLItemMarker,pandocYAMLItemContents
 syn match pandocYAMLItemMarker /^\s*--\@!/ contained
 syn match pandocYAMLItemContents /\(^\s*-\s*\)\@<=\S.\{-}$/ contained
