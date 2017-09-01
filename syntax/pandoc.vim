@@ -199,17 +199,15 @@ endif
 
 " BASE:
 syntax clear
-if hostname() !=# 'iPad'
-    syntax spell toplevel
-    " apply extra settings: {{{1
-    if g:pandoc#syntax#colorcolumn == 1
-        exe 'setlocal colorcolumn='.string(&textwidth+5)
-    elseif g:pandoc#syntax#colorcolumn == 2
-        exe 'setlocal colorcolumn='.join(range(&textwidth+5, 2*&columns), ',')
-    endif
-    if g:pandoc#syntax#conceal#use != 0
-        setlocal conceallevel=2
-    endif
+syntax spell toplevel
+" apply extra settings: {{{1
+if g:pandoc#syntax#colorcolumn == 1
+    exe 'setlocal colorcolumn='.string(&textwidth+5)
+elseif g:pandoc#syntax#colorcolumn == 2
+    exe 'setlocal colorcolumn='.join(range(&textwidth+5, 2*&columns), ',')
+endif
+if g:pandoc#syntax#conceal#use != 0
+    setlocal conceallevel=2
 endif
 "}}}1
 
@@ -271,7 +269,7 @@ endif
 if hostname() !=# 'iPad'
     syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
 else
-    syn cluster pandocInline contains=pandocEmphasis
+    syn cluster pandocInline contains=@Spell,pandocEmphasis
 endif
 "}}}
 " Links: {{{2
