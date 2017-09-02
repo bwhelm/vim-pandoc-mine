@@ -11,7 +11,7 @@ function! s:JumpToReference(searchString) abort
 	endif
 	" Search for it. (This puts cursor at beginning of line.)
 	try
-		call execute(l:commandString)
+		execute l:commandString
 		" Visually select matched string, switch to front end, and return to
 		" normal mode. (Note: this must be in double-quotes!)
 		execute "normal! gno\<Esc>"
@@ -218,10 +218,18 @@ endfunction
 
 function! s:GetBibData()
     " Read data from .bib files
-    let l:file = system('kpsewhich Bibdatabase-new.bib')[:-2]
+    if hostname() == 'iPad'
+        let l:file = fnamemodify('~/Bibdatabase-new.bib', ':p')
+    else
+        let l:file = system('kpsewhich Bibdatabase-new.bib')[:-2]
+    endif
     let l:bibText = join(readfile(l:file), "\n")
-    let l:file = system('kpsewhich Bibdatabase-helm-new.bib')[:-2]
-    let l:bibText .= join(readfile(system('kpsewhich Bibdatabase-helm-new.bib')[:-2]), "\n")
+    if hostname() == 'iPad'
+        let l:file = fnamemodify('~/Bibdatabase-helm-new.bib', ':p')
+    else
+        let l:file = system('kpsewhich Bibdatabase-helm-new.bib')[:-2]
+    endif
+    let l:bibText .= join(readfile(l:file), "\n")
     return l:bibText
 endfunction
 
