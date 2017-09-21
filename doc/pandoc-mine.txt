@@ -9,6 +9,6 @@ Some quick notes on my setup, which might need to be modified when moving to a d
 3. I assume `Skim.app` is used for viewing `.pdfs`. Its location is assumed to be `/Applications/Skim.app`.
 
 4. I assume two pandoc filters are available: <bwhelm/pandoc-reference-filter> and <bwhelm/Pandoc-Comment-Filter>. These are assumed to be at `~/Applications/pandoc/pandoc-reference-filter/internalreferences.py` and at `~/Applications/pandoc/Comment-Filter/pandocCommentFilter.py`, respectively.
-	- Keybindings/textobjects are provided for working with Pandoc-Comment-Filter's various comments.
+    - Keybindings/textobjects are provided for working with Pandoc-Comment-Filter's various comments.
 
 5. I assume some CSL files are available: `~/.pandoc/chicago-fullnote-bibliography.csl` and `~/.pandoc/chicago-manual-of-style-16th-edition-full-in-text.csl`.

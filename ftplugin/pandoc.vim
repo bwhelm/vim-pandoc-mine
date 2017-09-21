@@ -3,7 +3,7 @@ scriptencoding utf-8
 " My settings that should apply only to files with filetype=pandoc.
 
 if exists('b:loaded_pandoc_mine')
-	finish
+    finish
 endif
 let b:loaded_pandoc_mine=1
 
@@ -22,18 +22,18 @@ let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method us
 " Jumping to Headings {{{2
 " -------------------
 function! s:JumpToHeader(direction)
-	let l:jumpLine = search('^#\{1,6}\s.*', a:direction . 'nW')
-	if l:jumpLine > 0
-		execute l:jumpLine
-	else
-		echohl Error
-		if a:direction ==# 'b'
-			echo 'No previous header'
-		else
-			echo 'No next header'
-		endif
-		echohl None
-	endif
+    let l:jumpLine = search('^#\{1,6}\s.*', a:direction . 'nW')
+    if l:jumpLine > 0
+        execute l:jumpLine
+    else
+        echohl Error
+        if a:direction ==# 'b'
+            echo 'No previous header'
+        else
+            echo 'No next header'
+        endif
+        echohl None
+    endif
 endfunction
 noremap <buffer><silent> ]] :call <SID>JumpToHeader('')<CR>
 noremap <buffer><silent> [[ :call <SID>JumpToHeader('b')<CR>
@@ -53,51 +53,51 @@ nnoremap <buffer><silent> <LocalLeader>cc :call pandoc#conversion#MyConvertMappi
 inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvertMappingHelper("")<CR>
 " PDF conversion
 nnoremap <buffer><silent> <LocalLeader>cp :call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
 inoremap <buffer><silent> <LocalLeader>cp <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
 nnoremap <buffer><silent> <LocalLeader>cP :call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
 inoremap <buffer><silent> <LocalLeader>cP <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
 " Diff conversion against git cache -- converts diff of current file to .pdf
 nnoremap <buffer><silent> <LocalLeader>cd :call
-		\ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
 inoremap <buffer><silent> <LocalLeader>cd <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
 " Diff conversion against HEAD -- converts diff of current file to .pdf
 nnoremap <buffer><silent> <LocalLeader>cD :call
-		\ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py',
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py',
         \ 'HEAD')<CR>
 nnoremap <buffer><silent> <LocalLeader>cD <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py',
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py',
         \ 'HEAD')<CR>
 " HTML conversion
 nnoremap <buffer><silent> <LocalLeader>ch :call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
 inoremap <buffer><silent> <LocalLeader>ch <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
 " RevealJS conversion
 nnoremap <buffer><silent> <LocalLeader>cr :call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
 inoremap <buffer><silent> <LocalLeader>cr <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
 " LaTeX Beamer conversion
 nnoremap <buffer><silent> <LocalLeader>cb :call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
 inoremap <buffer><silent> <LocalLeader>cb <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
 " Word .docx conversion
 nnoremap <buffer><silent> <LocalLeader>cw :call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
 inoremap <buffer><silent> <LocalLeader>cw <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
 " Markdown conversion
 nnoremap <buffer><silent> <LocalLeader>cm :call
-		\ pandoc#conversion#MyConvertMappingHelper("convert-to-markdown.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("convert-to-markdown.py")<CR>
 nnoremap <buffer><silent> <LocalLeader>cM :call pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
 inoremap <buffer><silent> <LocalLeader>cM <C-o>:call
-		\ pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
 " Kill current conversion
 nnoremap <buffer><silent> <LocalLeader>ck :call pandoc#conversion#KillProcess()<CR>
 
@@ -105,8 +105,8 @@ nnoremap <buffer><silent> <LocalLeader>ck :call pandoc#conversion#KillProcess()<
 " `~/.vim/plugged/vim-pandoc-mine/pythonx/conversion/`)
 let s:pythonScriptDir = expand('<sfile>:p:h:h') . '/pythonx/conversion/'
 command! RemoveAuxFiles :execute '!'
-			\ . s:pythonScriptDir . 'remove-aux-files.py'
-			\ . ' ' . fnameescape(expand('%:p'))
+            \ . s:pythonScriptDir . 'remove-aux-files.py'
+            \ . ' ' . fnameescape(expand('%:p'))
 nnoremap <buffer><silent> <LocalLeader>cK :RemoveAuxFiles<CR>
 
 nnoremap <buffer><silent> <LocalLeader>ca :call pandoc#conversion#ToggleAutoPDF()<CR>
@@ -143,8 +143,8 @@ imap <buffer><silent> ; ;<C-G>u
 " Start with listmode on by default ... but don't toggle list mode if the
 " buffer has already been loaded.
 if !exists('b:listmode')
-	let b:listmode=1
-	call listmode#ListModeOn(0)
+    let b:listmode=1
+    call listmode#ListModeOn(0)
 endif
 
 " Miscellaneous {{{2
@@ -155,15 +155,15 @@ endif
 
 " Jump to corresponding line in Skim.app
 if has('nvim')
-	command! JumpToPDF silent call jobstart("/usr/bin/env python3 " .
-				\ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-				\ ' "' . expand('%:p') . '" ' . line("."), {"on_stdout":
-				\ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
+    command! JumpToPDF silent call jobstart("/usr/bin/env python3 " .
+                \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
+                \ ' "' . expand('%:p') . '" ' . line("."), {"on_stdout":
+                \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
 else  " normal vim
-	command! JumpToPDF silent call job_start("/usr/bin/env python3 " .
-				\ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-				\ ' "' . expand('%:p') . '" ' . line("."), {"out_cb":
-				\ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
+    command! JumpToPDF silent call job_start("/usr/bin/env python3 " .
+                \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
+                \ ' "' . expand('%:p') . '" ' . line("."), {"out_cb":
+                \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
 " nnoremap <buffer><silent> <LocalLeader>j :call system('python ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
@@ -199,87 +199,87 @@ nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 " ============================================================================
 " If textobj-user plugin is loaded, ...
 if exists('*textobj#user#plugin')
-	" Create text object for deleting/changing/etc. comments of various types
-		" \		'pattern': ['\[',
-		" 			\ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
-	call textobj#user#plugin('pandoccomments', {
-		\	'comment': {
-		\ 		'pattern': ['<\(comment\|margin\|fixme\|highlight\|smcaps\)>',
-		\                   '</\(comment\|margin\|fixme\|highlight\|smcaps\)>'],
-		\		'select-a': 'ac',
-		\		'select-i': 'ic',
-		\	},
-		\ })
-	" Text object for foontones
-	function! FindAroundFootnote()
-		let l:curPos = getcurpos()
-		let l:found = search('\^[', 'bcW', l:curPos[1])
-		if l:found == 0
-			let l:found = search('\^[', 'cW', l:curPos[1])
-		endif
-		if l:found > 0
-			let l:beginPos = getcurpos()
-			normal! l%
-			let l:endPos = getcurpos()
-			call setpos('.', l:curPos)
-			if l:endPos != l:beginPos
-				return ['v', l:beginPos, l:endPos]
-			endif
-		endif
-		call setpos('.', l:curPos)
-		echohl WarningMsg
-		echo 'No footnote found.'
-		echohl None
-		return
-	endfunction
-	function! FindInsideFootnote()
-		try
-			let [l:type, l:begin, l:end] = FindAroundFootnote()
-			let l:begin[2] += 2
-			let l:end[2] -= 1
-			return [l:type, l:begin, l:end]
-		catch /E714/
-			return
-		endtry
-	endfunction
-	call textobj#user#plugin('pandocfootnotes', {
-		\	'footnote': {
-		\		'select-a': 'an',
-		\		'select-a-function': 'FindAroundFootnote',
-		\		'select-i': 'in',
-		\		'select-i-function': 'FindInsideFootnote',
-		\	},
-		\ })
-	" Create text object for (sub)sections
-	function! FindAroundSection()
-		let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
-		return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
-	endfunction
-	function! FindInsideSection()
-		let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
-		let l:eof = line('$')
-		while l:startLine < l:eof
-			let l:startLine = l:startLine + 1
-			if getline(l:startLine) =~# '\S'
-				break
-			endif
-		endwhile
-		while l:endLine > l:startLine
-			if getline(l:endLine) =~# '\S'
-				break
-			endif
-			let l:endLine = l:endLine - 1
-		endwhile
-		return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
-	endfunction
-	call textobj#user#plugin('pandocmine', {
-		\ 'section': {
-		\		'select-a': 'a#',
-		\ 		'select-a-function': 'FindAroundSection',
-		\		'select-i': 'i#',
-		\ 		'select-i-function': 'FindInsideSection',
-		\	},
-		\ })
+    " Create text object for deleting/changing/etc. comments of various types
+        " \        'pattern': ['\[',
+        "             \ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
+    call textobj#user#plugin('pandoccomments', {
+        \    'comment': {
+        \         'pattern': ['<\(comment\|margin\|fixme\|highlight\|smcaps\)>',
+        \                   '</\(comment\|margin\|fixme\|highlight\|smcaps\)>'],
+        \        'select-a': 'ac',
+        \        'select-i': 'ic',
+        \    },
+        \ })
+    " Text object for foontones
+    function! FindAroundFootnote()
+        let l:curPos = getcurpos()
+        let l:found = search('\^[', 'bcW', l:curPos[1])
+        if l:found == 0
+            let l:found = search('\^[', 'cW', l:curPos[1])
+        endif
+        if l:found > 0
+            let l:beginPos = getcurpos()
+            normal! l%
+            let l:endPos = getcurpos()
+            call setpos('.', l:curPos)
+            if l:endPos != l:beginPos
+                return ['v', l:beginPos, l:endPos]
+            endif
+        endif
+        call setpos('.', l:curPos)
+        echohl WarningMsg
+        echo 'No footnote found.'
+        echohl None
+        return
+    endfunction
+    function! FindInsideFootnote()
+        try
+            let [l:type, l:begin, l:end] = FindAroundFootnote()
+            let l:begin[2] += 2
+            let l:end[2] -= 1
+            return [l:type, l:begin, l:end]
+        catch /E714/
+            return
+        endtry
+    endfunction
+    call textobj#user#plugin('pandocfootnotes', {
+        \    'footnote': {
+        \        'select-a': 'an',
+        \        'select-a-function': 'FindAroundFootnote',
+        \        'select-i': 'in',
+        \        'select-i-function': 'FindInsideFootnote',
+        \    },
+        \ })
+    " Create text object for (sub)sections
+    function! FindAroundSection()
+        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
+        return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
+    endfunction
+    function! FindInsideSection()
+        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
+        let l:eof = line('$')
+        while l:startLine < l:eof
+            let l:startLine = l:startLine + 1
+            if getline(l:startLine) =~# '\S'
+                break
+            endif
+        endwhile
+        while l:endLine > l:startLine
+            if getline(l:endLine) =~# '\S'
+                break
+            endif
+            let l:endLine = l:endLine - 1
+        endwhile
+        return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
+    endfunction
+    call textobj#user#plugin('pandocmine', {
+        \ 'section': {
+        \        'select-a': 'a#',
+        \         'select-a-function': 'FindAroundSection',
+        \        'select-i': 'i#',
+        \         'select-i-function': 'FindInsideSection',
+        \    },
+        \ })
 endif
 
 " ======================================================================== }}}
@@ -296,72 +296,72 @@ command! TOC call pandoc#toc#ShowTOC()
 " AutoNameFile {{{1
 " ============================================================================
 function! s:RemoveDiacritics(text)
-	" This function returns text without diacritics. Modified from
-	" <http://vim.wikia.com/wiki/Remove_diacritical_signs_from_characters>.
-	let l:diacs = 'áâãàäÇçéèêëíîìïñóôõòöüúûù'  " lowercase diacritical signs
-	let l:repls = 'aaaaaCceeeeiiiinooooouuuu'  " corresponding replacements
-	let l:diacs .= toupper(l:diacs)
-	let l:repls .= toupper(l:repls)
-	return tr(a:text, l:diacs, l:repls)
+    " This function returns text without diacritics. Modified from
+    " <http://vim.wikia.com/wiki/Remove_diacritical_signs_from_characters>.
+    let l:diacs = 'áâãàäÇçéèêëíîìïñóôõòöüúûù'  " lowercase diacritical signs
+    let l:repls = 'aaaaaCceeeeiiiinooooouuuu'  " corresponding replacements
+    let l:diacs .= toupper(l:diacs)
+    let l:repls .= toupper(l:repls)
+    return tr(a:text, l:diacs, l:repls)
 endfunction
 function! s:AutoNameFile( ... )
-	" For pandoc files, this function will generate a filename from the title
-	" field of the YAML header, replacing diacritics, stripping out
-	" non-alphabetic characters and short words, converting ',' to '-', and
-	" converting spaces to `_`.
-	let l:suffix = join(a:000, ' ')
-	let l:fileBegin = join(getline(0, 200), "\n")
-	if &filetype ==# 'pandoc'
-		let l:title = matchstr(l:fileBegin, '\ntitle:\s\zs.\{-}\ze\n')
-		let l:extension = '.md'
-	elseif &filetype ==# 'tex'
-		let l:title = matchstr(l:fileBegin, '\n\\title{\zs[^}]*\ze}')
-		let l:extension = '.tex'
-	endif
-	if l:title ==# ''
-		echohl WarningMsg
-		echom 'Could not find title.'
-		echohl None
-		return
-	endif
-	if !empty(l:suffix)  " Add suffix if there is one
-		let l:title = l:title . '-' . l:suffix
-	endif
-	let l:title = substitute(l:title, '[,:] ', '-', 'g')
-	let l:title = substitute(l:title, ' ', '_', 'g')
-	let l:title = <SID>RemoveDiacritics(l:title)
-	let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
-	let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
-	let l:title = substitute(l:title, '__', '_', 'g')
-	let l:title = l:title . l:extension
-	let l:currentName = expand('%:t')
-	let l:currentPath = expand('%:h') . '/'
-	if l:currentName !=# ''  "File already has a name
-		if findfile(l:currentName, '.') ==# ''  " No existing file
-			execute 'write ' . fnameescape(l:currentPath . l:title)
-		elseif l:currentName ==# l:title  " Existing file with same name
-			update
-			echohl Comment
-			echom 'Saved existing file w/o renaming.'
-			echohl None
-		else  " Existing file with different name
-			try
-				" Try using fugitive's Gmove. In case of error, write and
-				" delete manually. This happens (a) if fugitive is not loaded
-				" or the file is not in a git repository or (b) if the file is
-				" already saved but not yet added to git repository.
-				execute 'Gmove ' . fnameescape(l:currentPath . l:title)
-			catch
-				execute 'keepalt saveas ' . fnameescape(l:currentPath . l:title)
-				echom 'File renamed to: ' . l:title
-				if delete(fnameescape(l:currentPath . l:currentName))
-					echoerr 'Could not delete ' . l:currentName
-				endif
-			endtry
-		endif
-	else  " File does not already have a name
-		execute 'write ' . l:title
-	endif
+    " For pandoc files, this function will generate a filename from the title
+    " field of the YAML header, replacing diacritics, stripping out
+    " non-alphabetic characters and short words, converting ',' to '-', and
+    " converting spaces to `_`.
+    let l:suffix = join(a:000, ' ')
+    let l:fileBegin = join(getline(0, 200), "\n")
+    if &filetype ==# 'pandoc'
+        let l:title = matchstr(l:fileBegin, '\ntitle:\s\zs.\{-}\ze\n')
+        let l:extension = '.md'
+    elseif &filetype ==# 'tex'
+        let l:title = matchstr(l:fileBegin, '\n\\title{\zs[^}]*\ze}')
+        let l:extension = '.tex'
+    endif
+    if l:title ==# ''
+        echohl WarningMsg
+        echom 'Could not find title.'
+        echohl None
+        return
+    endif
+    if !empty(l:suffix)  " Add suffix if there is one
+        let l:title = l:title . '-' . l:suffix
+    endif
+    let l:title = substitute(l:title, '[,:] ', '-', 'g')
+    let l:title = substitute(l:title, ' ', '_', 'g')
+    let l:title = <SID>RemoveDiacritics(l:title)
+    let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
+    let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
+    let l:title = substitute(l:title, '__', '_', 'g')
+    let l:title = l:title . l:extension
+    let l:currentName = expand('%:t')
+    let l:currentPath = expand('%:h') . '/'
+    if l:currentName !=# ''  "File already has a name
+        if findfile(l:currentName, '.') ==# ''  " No existing file
+            execute 'write ' . fnameescape(l:currentPath . l:title)
+        elseif l:currentName ==# l:title  " Existing file with same name
+            update
+            echohl Comment
+            echom 'Saved existing file w/o renaming.'
+            echohl None
+        else  " Existing file with different name
+            try
+                " Try using fugitive's Gmove. In case of error, write and
+                " delete manually. This happens (a) if fugitive is not loaded
+                " or the file is not in a git repository or (b) if the file is
+                " already saved but not yet added to git repository.
+                execute 'Gmove ' . fnameescape(l:currentPath . l:title)
+            catch
+                execute 'keepalt saveas ' . fnameescape(l:currentPath . l:title)
+                echom 'File renamed to: ' . l:title
+                if delete(fnameescape(l:currentPath . l:currentName))
+                    echoerr 'Could not delete ' . l:currentName
+                endif
+            endtry
+        endif
+    else  " File does not already have a name
+        execute 'write ' . l:title
+    endif
 endfunction
 command! -nargs=* AutoNameFile call <SID>AutoNameFile(<q-args>)
 cnoreabbr <buffer> anf AutoNameFile

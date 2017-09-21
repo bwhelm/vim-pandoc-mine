@@ -40,35 +40,35 @@ endif
 " utf-8 defaults (preferred)
 if &encoding ==# 'utf-8'
     let s:cchars = { 
-		\'newline': '↵', 
-		\'image': '▨', 
-		\'super': 'ⁿ', 
-		\'sub': 'ₙ', 
-		\'strike': 'x̶', 
-		\'atx': '§',  
-		\'codelang': 'λ',
-		\'codeend': '—',
-		\'abbrev': '→',
-		\'footnote': '†',
-		\'definition': ' ',
-		\'li': '•',
+        \'newline': '↵', 
+        \'image': '▨', 
+        \'super': 'ⁿ', 
+        \'sub': 'ₙ', 
+        \'strike': 'x̶', 
+        \'atx': '§',  
+        \'codelang': 'λ',
+        \'codeend': '—',
+        \'abbrev': '→',
+        \'footnote': '†',
+        \'definition': ' ',
+        \'li': '•',
         \'html_c_s': '‹',
         \'html_c_e': '›'}
 else
     " ascii defaults
     let s:cchars = { 
-		\'newline': ' ', 
-		\'image': 'i', 
-		\'super': '^', 
-		\'sub': '_', 
-		\'strike': '~', 
-		\'atx': '#',  
-		\'codelang': 'l',
-		\'codeend': '-',
-		\'abbrev': 'a',
-		\'footnote': 'f',
-		\'definition': ' ',
-		\'li': '*',
+        \'newline': ' ', 
+        \'image': 'i', 
+        \'super': '^', 
+        \'sub': '_', 
+        \'strike': '~', 
+        \'atx': '#',  
+        \'codelang': 'l',
+        \'codeend': '-',
+        \'abbrev': 'a',
+        \'footnote': 'f',
+        \'definition': ' ',
+        \'li': '*',
         \'html_c_s': '+',
         \'html_c_e': '+'}
 endif
@@ -181,9 +181,9 @@ endif
 function! s:WithConceal(rule_group, rule, conceal_rule)
     let l:rule_tail = ''
     if g:pandoc#syntax#conceal#use != 0
-	if index(g:pandoc#syntax#conceal#blacklist, a:rule_group) == -1
-	    let l:rule_tail = ' ' . a:conceal_rule
-	endif
+    if index(g:pandoc#syntax#conceal#blacklist, a:rule_group) == -1
+        let l:rule_tail = ' ' . a:conceal_rule
+    endif
     endif
     execute a:rule . l:rule_tail
 endfunction
