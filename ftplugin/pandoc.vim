@@ -311,11 +311,10 @@ function! s:AutoNameFile( ... )
 	" converting spaces to `_`.
 	let l:suffix = join(a:000, ' ')
 	let l:fileBegin = join(getline(0, 200), "\n")
-	let l:fileType = matchstr(execute('set filetype'), 'filetype=\zs.*')
-	if l:fileType ==# 'pandoc'
+	if &filetype ==# 'pandoc'
 		let l:title = matchstr(l:fileBegin, '\ntitle:\s\zs.\{-}\ze\n')
 		let l:extension = '.md'
-	elseif l:fileType ==# 'tex'
+	elseif &filetype ==# 'tex'
 		let l:title = matchstr(l:fileBegin, '\n\\title{\zs[^}]*\ze}')
 		let l:extension = '.tex'
 	endif
