@@ -372,6 +372,22 @@ cnoreabbr <buffer> anf AutoNameFile
 set foldtext=pandoc#fold#FoldText()
 
 " ======================================================================== }}}
+" Tidy Up Pandoc Documents {{{1
+" ============================================================================
+function! s:TidyPandoc() abort
+    " Tidy up pandoc documents
+    " 1. Convert tabs to spaces at beginnings of lines
+    setlocal tabstop=4
+    retab
+    " 2. Remove extra blank lines between list items
+    silent! global/\(^\s*\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s[^\n]*$\n\)\@<=\n\ze\s\+\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s\+/d
+    " (b) removing extra spaces after list identifiers
+    silent! %substitute /^\(\s*\)\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s\s\+/\1\2 /
+    " TODO: 3. remove excess escaping
+endfunction
+command! TidyPandoc call <SID>TidyPandoc()
+
+" ======================================================================== }}}
 " Other {{{1
 " ============================================================================
 " Don't want numbers displayed for pandoc documents
