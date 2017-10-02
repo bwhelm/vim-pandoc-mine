@@ -353,6 +353,7 @@ function! s:AutoNameFile( ... )
                 execute 'Gmove ' . fnameescape(l:currentPath . l:title)
             catch
                 execute 'keepalt saveas ' . fnameescape(l:currentPath . l:title)
+                execute 'bwipeout ' . l:currentName
                 echom 'File renamed to: ' . l:title
                 if delete(fnameescape(l:currentPath . l:currentName))
                     echoerr 'Could not delete ' . l:currentName
