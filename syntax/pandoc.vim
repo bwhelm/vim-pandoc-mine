@@ -14,7 +14,7 @@ scriptencoding utf-8
 " Check operating system
 try
     " This should be either 'Darwin' (Mac) or 'Linux' (Raspberry Pi)
-    let b:system = system('uname')[:-2]
+    silent let b:system = system('uname')[:-2]
 catch  " Not on a unix system: must be ios
     let b:system = 'ios'
 endtry
