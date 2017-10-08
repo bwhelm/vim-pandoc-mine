@@ -1,4 +1,13 @@
 scriptencoding utf-8
+" Identify os
+try
+    " This should be either 'Darwin' (Mac) or 'Linux' (Raspberry Pi)
+    let b:system = system('uname')[:-2]
+catch  " Not on a unix system: must be ios
+    let b:system = 'ios'
+endtry
+
+
 " Following creates tag-like jumps for cross-references
 function! s:JumpToReference(searchString) abort
     " Construct string to search for relevant label (whether a
@@ -34,7 +43,7 @@ function! s:JumpToReference(searchString) abort
         " citation is much faster, and probably accurate enough for most
         " purposes.
         "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/Bibdatabase-new.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/Bibdatabase-helm-new.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
-        if hostname() ==# 'iPad'  " if on iPad, need to use vim rather than python
+        if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
             let l:biblio = s:constructOneEntry(a:searchString)
         else  " if not on iPad, python is faster
             python import references
@@ -178,7 +187,7 @@ function! s:FindHeaderID(base)
 endfunction
 
 function! pandoc#references#GetBibEntries(base)
-    if hostname() ==# 'iPad'  " if on iPad, need to use vim rather than python
+    if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
         return s:createBibList(a:base)
     else  " if not on iPad, python is faster
         python import references
@@ -228,13 +237,13 @@ endfunction
 
 function! s:GetBibData()
     " Read data from .bib files
-    if hostname() == 'iPad'
+    if b:system == 'ios'
         let l:file = fnamemodify('~/Bibdatabase-new.bib', ':p')
     else
         let l:file = system('kpsewhich Bibdatabase-new.bib')[:-2]
     endif
     let l:bibText = join(readfile(l:file), "\n")
-    if hostname() == 'iPad'
+    if b:system == 'ios'
         let l:file = fnamemodify('~/Bibdatabase-helm-new.bib', ':p')
     else
         let l:file = system('kpsewhich Bibdatabase-helm-new.bib')[:-2]

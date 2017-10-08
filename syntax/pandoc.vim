@@ -11,10 +11,18 @@ scriptencoding utf-8
 " OriginalAuthor: Jeremy Schultz <taozhyn@gmail.com>
 " Version: 5.0
 
+" Check operating system
+try
+    " This should be either 'Darwin' (Mac) or 'Linux' (Raspberry Pi)
+    let b:system = system('uname')[:-2]
+catch  " Not on a unix system: must be ios
+    let b:system = 'ios'
+endtry
+
 " Configuration: {{{1
 "
 " use conceal? {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     if !exists('g:pandoc#syntax#conceal#use')
         if v:version < 703
         let g:pandoc#syntax#conceal#use = 0
@@ -147,7 +155,7 @@ endif
 
 " Functions: {{{1
 " EnableEmbedsforCodeblocksWithLang {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     function! EnableEmbedsforCodeblocksWithLang(entry)
         try
             let s:langname = matchstr(a:entry, '^[^=]*')
@@ -191,7 +199,7 @@ endfunction
 "}}}1
 
 " Commands: {{{1
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     command! -buffer -nargs=1 -complete=syntax PandocHighlight call EnableEmbedsforCodeblocksWithLang(<f-args>)
     command! -buffer -nargs=1 -complete=syntax PandocUnhighlight call DisableEmbedsforCodeblocksWithLang(<f-args>)
 endif
@@ -215,7 +223,7 @@ endif
 " Embeds: {{{2
 " HTML: {{{3
 " Set embedded HTML highlighting
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn include @HTML syntax/html.vim
     syn match pandocHTML /<\/\?\a.\{-}>/ contains=@HTML
     " Support HTML multi line comments
@@ -245,7 +253,7 @@ endif
 " }}}2
 " Titleblock: {{{2
 "
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn region pandocTitleBlock start=/\%^%/ end=/\n\n/ contains=pandocReferenceLabel,pandocReferenceURL,pandocNewLine 
     call s:WithConceal('titleblock', 'syn match pandocTitleBlockMark /%\ / contained containedin=pandocTitleBlock,pandocTitleBlockTitle', 'conceal')
     syn match pandocTitleBlockTitle /\%^%.*\n/ contained containedin=pandocTitleBlock
@@ -258,7 +266,7 @@ syn match pandocBlockQuoteMark /\_^\s\{,3}>/ contained containedin=pandocEmphasi
 
 " }}}
 " Code Blocks: {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     if g:pandoc#syntax#protect#codeblocks == 1
         syn match pandocCodeblock /\([ ]\{4}\|\t\).*$/
     endif
@@ -266,14 +274,14 @@ if hostname() !=# 'iPad'
 endif
 "}}}
 " Clusters: {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
 else
     syn cluster pandocInline contains=@Spell,pandocEmphasis
 endif
 "}}}
 " Links: {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     "
     " Base: {{{3
     syn region pandocReferenceLabel matchgroup=pandocOperator start=/!\{,1}\\\@<!\^\@<!\[/ skip=/\(\\\@<!\]\]\@=\|`.*\\\@<!].*`\)/ end=/\\\@<!\]/ keepend display
@@ -300,10 +308,10 @@ endif
 "}}}
 " Citations: {{{2
 " parenthetical citations
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn match pandocPCite /\^\@<!\[[^\[\]]\{-}-\{0,1}@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*.\{-}\]/ contains=@pandocInline,pandocCiteKey display
 endif
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn match pandocPCite /\^\@<!\[[^\[\]]\{-}-\{0,1}@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*.\{-}\]/ contains=pandocEmphasis,pandocStrong,pandocLatex,pandocCiteKey,pandocAmpersandEscape display
 else
     syn match pandocPCite /\^\@<!\[[^\[\]]\{-}-\{0,1}@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~\/]*.\{-}\]/ contains=pandocCiteKey display
@@ -319,7 +327,7 @@ syn match pandocCiteLocator /[\[\]]/ contained containedin=pandocPCite,pandocICi
 
 " Emphasis: {{{3
 "
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     call s:WithConceal('block', 'syn region pandocEmphasis matchgroup=pandocOperator start=/\\\@1<!\(\_^\|\s\|[[:punct:]]\)\@<=\*\S\@=/ skip=/\(\*\*\|__\)/ end=/\*\([[:punct:]]\|\s\|\_$\)\@=/ contains=pandocNoFormattedInEmphasis,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
     call s:WithConceal('block', 'syn region pandocEmphasis matchgroup=pandocOperator start=/\\\@1<!\(\_^\|\s\|[[:punct:]]\)\@<=_\S\@=/ skip=/\(\*\*\|__\)/ end=/\S\@1<=_\([[:punct:]]\|\s\|\_$\)\@=/ contains=pandocNoFormattedInEmphasis,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
 else
@@ -327,7 +335,7 @@ else
 endif
 " }}}
 " Strong: {{{3
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     "
     call s:WithConceal('block', 'syn region pandocStrong matchgroup=pandocOperator start=/\(\\\@<!\*\)\{2}/ end=/\(\\\@<!\*\)\{2}/ contains=pandocNoFormattedInStrong,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
     call s:WithConceal('block', 'syn region pandocStrong matchgroup=pandocOperator start=/__/ end=/__/ contains=pandocNoFormattedInStrong,pandocLatexInlineMath,pandocAmpersandEscape', 'concealends')
@@ -374,7 +382,7 @@ endif
 syn match pandocAtxHeader /\(\%^\|<.\+>.*\n\|^\s*\n\)\@<=#\{1,6}.*\n/ contains=@pandocInline display
 syn match pandocAtxHeaderMark /\(^#\{1,6}\|\\\@<!#\+\(\s*.*$\)\@=\)/ contained containedin=pandocAtxHeader
 call s:WithConceal('atx', 'syn match pandocAtxStart /#/ contained containedin=pandocAtxHeaderMark', 'conceal cchar='.s:cchars['atx'])
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn match pandocSetexHeader /^.\+\n[=]\+$/ contains=@pandocInline
     syn match pandocSetexHeader /^.\+\n[-]\+$/ contains=@pandocInline
     syn match pandocHeaderAttr /{.*}/ contained containedin=pandocAtxHeader,pandocSetexHeader contains=@NoSpell
@@ -384,13 +392,13 @@ endif
 syn match pandocHeaderID /#[-_:.[:alpha:]]*/ contained containedin=pandocHeaderAttr
 "}}}
 " Line Blocks: {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn region pandocLineBlock start=/^|/ end=/\(^|\(.*\n|\@!\)\@=.*\)\@<=\n/ transparent contains=@pandocInline
     syn match pandocLineBlockDelimiter /^|/ contained containedin=pandocLineBlock
 endif
 "}}}
 " Tables: {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     " Simple: {{{3
 
     syn region pandocSimpleTable start=/\%#=2\(^.*[[:graph:]].*\n\)\@<!\(^.*[[:graph:]].*\n\)\(-\{2,}\s*\)\+\n\n\@!/ end=/\n\n/ containedin=ALLBUT,pandocDelimitedCodeBlock,pandocYAMLHeader keepend
@@ -421,7 +429,7 @@ if hostname() !=# 'iPad'
 endif
 " }}}2
 " Delimited Code Blocks: {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     " this is here because we can override strikeouts and subscripts
     syn region pandocDelimitedCodeBlock start=/^\(>\s\)\?\z(\([ ]\{4,}\|\t\)\=\~\{3,}\~*\)/ end=/^\z1\~*/ skipnl contains=pandocDelimitedCodeBlockStart,pandocDelimitedCodeBlockEnd keepend
     syn region pandocDelimitedCodeBlock start=/^\(>\s\)\?\z(\([ ]\{4,}\|\t\)\=`\{3,}`*\)/ end=/^\z1`*/ skipnl contains=pandocDelimitedCodeBlockStart,pandocDelimitedCodeBlockEnd keepend
@@ -447,7 +455,7 @@ if hostname() !=# 'iPad'
 endif
 " }}}
 " Abbreviations: {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn region pandocAbbreviationDefinition start=/^\*\[.\{-}\]:\s*/ end="$" contains=pandocNoFormatted,pandocAmpersandEscape
     call s:WithConceal('abbrev', 'syn match pandocAbbreviationSeparator /:/ contained containedin=pandocAbbreviationDefinition', 'conceal cchar='.s:cchars['abbrev'])
     syn match pandocAbbreviation /\*\[.\{-}\]/ contained containedin=pandocAbbreviationDefinition
@@ -472,7 +480,7 @@ call s:WithConceal('footnote', 'syn match pandocFootnoteIDHead /\[\^/ contained 
 call s:WithConceal('footnote', 'syn match pandocFootnoteIDTail /\]/ contained containedin=pandocFootnoteID', 'conceal')
 " }}}
 " List Items: {{{2
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     " Unordered lists
     syn match pandocUListItem /^>\=\s*[*+-]\s\+-\@!.*$/ nextgroup=pandocUListItem,pandocLaTeXMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation contains=@pandocInline skipempty display
     syn match pandocUListItemBullet /^>\=\s*\zs[*+-]/ contained containedin=pandocUListItem
@@ -499,7 +507,7 @@ endif
 " }}}
 " Comments: {{{2
 syn region myPandocCommentBlock start="^<!comment>" end="^</!comment>" contains=@pandocInline keepend
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     syn region myPandocSpeakerBlock start="^<!speaker>" end="^</!speaker>" contains=@pandocInline keepend
     syn match myPandocHighlight "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.highlight}" contains=@pandocInline oneline
     syn match myPandocComment "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.comment}" contains=@pandocInline oneline
@@ -540,7 +548,7 @@ if g:pandoc#syntax#newlines == 1
     call s:WithConceal('newline', 'syn match pandocNewLine /\(  \|\\\)$/ display containedin=pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocStrongInEmphasis,pandocEmphasisInStrong', 'conceal cchar='.s:cchars['newline'])
 endif
 "}}}
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     " Emdashes: {{{3
     if &encoding ==# 'utf-8'
       call s:WithConceal('emdashes', 'syn match pandocEllipses /\([^-]\)\@<=---\([^-]\)\@=/ display', 'conceal cchar=—')
@@ -565,7 +573,7 @@ endif
 " Hrule: {{{3
 syn match pandocHRule /^\s*\([*\-_]\)\s*\%(\1\s*\)\{2,}$/ display
 " Backslashes: {{{3
-if hostname() !=# 'iPad'
+if b:system !=# 'ios'
     if g:pandoc#syntax#conceal#backslash == 1
         syn match pandocBackslash /\v\\@<!\\((re)?newcommand)@!/ containedin=ALLBUT,pandocCodeblock,pandocCodeBlockInsideIndent,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocDelimitedCodeBlock,pandocLineBlock,pandocYAMLHeader conceal
     endif
