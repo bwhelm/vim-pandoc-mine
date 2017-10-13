@@ -499,9 +499,10 @@ if b:system !=# 'ios'
     " Definitions: {{{2
     "
     if g:pandoc#syntax#use_definition_lists == 1
-        syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s\{0,2}[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
+        " syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s\{0,2}[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
+        syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s*[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
         syn match pandocDefinitionBlockTerm /^.*\n\(^\s*\n\)\=\(\s*[:~]\)\@=/ contained contains=@pandocInline nextgroup=pandocDefinitionBlockMark
-        call s:WithConceal('definition', 'syn match pandocDefinitionBlockMark /^\s*[:~]/ contained', 'conceal cchar='.s:cchars['definition'])
+        call s:WithConceal('definition', 'syn match pandocDefinitionBlockMark /^\s*\zs[:~]/ contained', 'conceal cchar='.s:cchars['definition'])
     endif
 endif
 " }}}
