@@ -336,6 +336,17 @@ function! s:AutoNameFile( ... )
     let l:title = l:title . l:extension
     let l:currentName = expand('%:t')
     let l:currentPath = expand('%:h') . '/'
+    if l:title !=# l:currentName && findfile(l:title, l:currentPath) !=# ''
+        echohl WarningMsg
+        echom 'Destination file already exists. Overwrite? (y/N)'
+        if getchar() != 121  " ('y')
+            echom 'Aborting...'
+            echohl None
+            return
+        endif
+        echom 'Overwriting...'
+        echohl None
+    endif
     if l:currentName !=# ''  "File already has a name
         if findfile(l:currentName, '.') ==# ''  " No existing file
             execute 'write ' . fnameescape(l:currentPath . l:title)
@@ -350,18 +361,18 @@ function! s:AutoNameFile( ... )
                 " delete manually. This happens (a) if fugitive is not loaded
                 " or the file is not in a git repository or (b) if the file is
                 " already saved but not yet added to git repository.
-                execute 'Gmove ' . fnameescape(l:currentPath . l:title)
+                execute 'Gmove! ' . fnameescape(l:currentPath . l:title)
             catch
-                execute 'keepalt saveas ' . fnameescape(l:currentPath . l:title)
-                execute 'bwipeout ' . l:currentName
+                execute 'keepalt saveas! ' . fnameescape(l:currentPath . l:title)
+                execute 'bwipeout ' . fnameescape(l:currentName)
                 echom 'File renamed to: ' . l:title
-                if delete(fnameescape(l:currentPath . l:currentName))
-                    echoerr 'Could not delete ' . l:currentName
+                if delete(l:currentPath . l:currentName)
+                    echoerr 'Could not delete ' . l:currentPath . l:currentName
                 endif
             endtry
         endif
     else  " File does not already have a name
-        execute 'write ' . l:title
+        execute 'write! ' . l:title
     endif
 endfunction
 command! -nargs=* AutoNameFile call <SID>AutoNameFile(<q-args>)
