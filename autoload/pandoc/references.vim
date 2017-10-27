@@ -178,7 +178,7 @@ function! s:FindHeaderID(base)
     return l:completionList
 endfunction
 
-function! pandoc#references#GetBibEntries(base)
+function! s:GetBibEntries(base)
     if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
         return s:createBibList(a:base)
     else  " if not on iPad, python is faster
@@ -207,7 +207,7 @@ function! pandoc#references#MyCompletion(findstart, base)
         " Find matching header IDs...
         let l:completionList = <SID>FindHeaderID(a:base)
         " Add in bibliographic matches...
-        let l:bibMatches = pandoc#references#GetBibEntries(a:base)
+        let l:bibMatches = <SID>GetBibEntries(a:base)
         if len(l:bibMatches) == 1 && a:base == l:bibMatches[0]['word']
             " If it's the only match and it's already complete in the text,
             " don't pop-up a menu.
