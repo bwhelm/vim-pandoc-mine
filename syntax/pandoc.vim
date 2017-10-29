@@ -50,8 +50,8 @@ if &encoding ==# 'utf-8'
     let s:cchars = { 
         \'newline': '↵', 
         \'image': '▨', 
-        \'super': 'ⁿ', 
-        \'sub': 'ₙ', 
+        \'super': '⇡', 
+        \'sub': '⇣', 
         \'strike': 'x̶', 
         \'atx': '§',  
         \'codelang': 'λ',

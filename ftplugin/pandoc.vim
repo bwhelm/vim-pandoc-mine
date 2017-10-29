@@ -340,9 +340,9 @@ try
         let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
         let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
         let l:title = substitute(l:title, '__', '_', 'g')
-        let l:title = l:title . l:extension
-        let l:currentName = expand('%:t')
-        let l:currentPath = expand('%:h') . '/'
+        let l:title = fnameescape(l:title . l:extension)
+        let l:currentName = fnameescape(expand('%:t'))
+        let l:currentPath = fnameescape(getcwd() . '/' . expand('%:h') . '/')
         if l:title !=? l:currentName && findfile(l:title, l:currentPath) !=# ''
             " Note: if l:title merely modifies the case of l:currentName, this
             " will not throw up a warning. In most cases this is what I want,
@@ -350,7 +350,7 @@ try
             " current file, this could be problematic. I won't worry about
             " this possibility.
             echohl WarningMsg
-            echom 'Destination file already exists. Overwrite? (y/N)'
+            echom 'Destination file (' . l:title . ') already exists. Overwrite? (y/N)'
             if getchar() != 121  " ('y')
                 echom 'Aborting...'
                 echohl None
@@ -359,11 +359,11 @@ try
             echom 'Overwriting...'
             echohl None
         endif
-        let l:oldPath = getcwd()
+        let l:oldPath = fnameescape(getcwd())
         if l:currentName !=# ''  "File already has a name
             execute 'cd ' . l:currentPath
             if findfile(l:currentName, '.') ==# ''  " No existing file
-                execute 'write ' . fnameescape(l:title)
+                execute 'write ' . l:title
             elseif l:currentName ==# l:title  " Existing file with same name
                 update
                 echohl Comment
@@ -376,25 +376,25 @@ try
                     " or the file is not in a git repository or (b) if the file is
                     " already saved but not yet added to git repository.
                     execute 'Gmove! ' . l:title
-                    execute 'bwipeout ' . fnameescape(l:currentName)
+                    execute 'bwipeout ' . l:currentName
                         " Next line is needed when l:title only modifies the
                         " case of l:currentName: bwipeout will kill the
                         " current buffer, and so it needs to be reloaded. (In
                         " other cases, `edit` will do nothing.)
-                        execute 'edit ' . fnameescape(l:title)
+                        execute 'edit ' . l:currentPath . l:title
                 catch
-                    if rename(fnameescape(l:currentName), fnameescape(l:title))
+                    if rename(l:currentName, l:title)
                         echohl Error
-                        echom 'Error renaming file ' . fnameescape(l:currentName) . ' to ' . fnameescape(l:title)
+                        echom 'Error renaming file ' . l:currentName . ' to ' . l:title
                         echohl None
                     else
                         echom 'File renamed to: ' . l:title
-                        execute 'bwipeout ' . fnameescape(l:currentName)
+                        execute 'bwipeout ' . l:currentName
                         " Next line is needed when l:title only modifies the
                         " case of l:currentName: bwipeout will kill the
                         " current buffer, and so it needs to be reloaded. (In
                         " other cases, `edit` will do nothing.)
-                        execute 'edit ' . fnameescape(l:title)
+                        execute 'edit ' . l:currentPath . l:title
                     endif
                 endtry
             endif
