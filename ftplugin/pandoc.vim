@@ -329,7 +329,7 @@ try
             let l:title = l:title . '-' . l:suffix
         else
             " Try to guess a suffix: if presentation, name it that!
-            if search('aspectratio', 's', 30) "|| search(
+            if search('aspectratio', 's', 30) || search('theme:', 's', 30)
                 let l:title .= '-Presentation'
                 echo 'Identified as presentation.'
             endif
@@ -341,8 +341,9 @@ try
         let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
         let l:title = substitute(l:title, '__', '_', 'g')
         let l:title = fnameescape(l:title . l:extension)
-        let l:currentName = fnameescape(expand('%:t'))
-        let l:currentPath = fnameescape(getcwd() . '/' . expand('%:h') . '/')
+        " let l:currentName = fnameescape(expand('%:t'))
+        let l:currentName = expand('%:t')
+        let l:currentPath = getcwd() . '/' . expand('%:h') . '/'
         if l:title !=? l:currentName && findfile(l:title, l:currentPath) !=# ''
             " Note: if l:title merely modifies the case of l:currentName, this
             " will not throw up a warning. In most cases this is what I want,
