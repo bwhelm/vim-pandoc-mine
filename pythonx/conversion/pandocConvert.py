@@ -343,9 +343,8 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     pandocOptions = ['--standalone',
                      '--from=markdown-fancy_lists',
                      '--mathml',
-                     '--smart',
                      '--wrap=none',
-                     '--to=' + toFormat]
+                     '--to=' + toFormat + '+smart']
     pandocOptions += ['--filter',
                       path.expanduser('~/Applications/pandoc/' +
                                       'Comment-Filter/' +

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-#coding: utf-8
 
 '''
 This aims to locate the current paragraph in the .pdf file by taking the
@@ -27,7 +26,7 @@ def toFormat(string, fromThis='markdown-fancy_lists', toThis='latex'):
     # way?
     p1 = Popen(['echo'] + string.split(), stdout=PIPE)
     p2 = Popen(['pandoc', '--wrap=none', '--biblatex', '-f', fromThis, '-t',
-                toThis, '--smart', '--mathml', '--filter',
+                toThis + '+smart', '--mathml', '--filter',
                 path.expanduser('~/Applications/pandoc/' +
                                 'Comment-Filter/pandocCommentFilter.py')] +
                pandocOptions, stdin=p1.stdout, stdout=PIPE)

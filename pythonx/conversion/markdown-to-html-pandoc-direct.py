@@ -15,9 +15,9 @@ toFormat = 'html5'
 toExtension = '.html'
 # extraOptions = '--latexmathml'
 extraOptions = '--mathjax'
-bookOptions = '--toc --smart --css=' +\
+bookOptions = '--toc --css=' +\
         path.expanduser('~/Applications/pandoc/buttondown.css')
-articleOptions = '--smart --css=' +\
+articleOptions = '--css=' +\
         path.expanduser('~/Applications/pandoc/buttondown.css')
 addedFilter = find_executable('pandoc-citeproc')
 imageFormat = '.png'

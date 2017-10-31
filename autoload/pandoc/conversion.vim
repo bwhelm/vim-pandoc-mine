@@ -45,17 +45,19 @@ function! pandoc#conversion#DisplayError(PID, text, ...) abort
     echohl None
 endfunction
 
-function! s:removePIDFromLists(PID)
-    let [l:buffer, l:winnum, l:error] = g:pandocRunPID[a:PID]
-    call remove(g:pandocRunPID, a:PID)
-    let l:PIDList = g:pandocRunBuf[l:buffer]
-    for l:item in range(len(l:PIDList))
-        if l:PIDList[l:item] == a:PID
-            call remove(l:PIDList, l:item)
-            let g:pandocRunBuf[l:buffer] = l:PIDList
-            break
-        endif
-    endfor
+function! s:removePIDFromLists(PID) abort
+    if has_key(g:pandocRunPID, a:PID)
+        let [l:buffer, l:winnum, l:error] = g:pandocRunPID[a:PID]
+        call remove(g:pandocRunPID, a:PID)
+        let l:PIDList = g:pandocRunBuf[l:buffer]
+        for l:item in range(len(l:PIDList))
+            if l:PIDList[l:item] == a:PID
+                call remove(l:PIDList, l:item)
+                let g:pandocRunBuf[l:buffer] = l:PIDList
+                break
+            endif
+        endfor
+    endif
 endfunction
 
 function! pandoc#conversion#EndProcess(PID, text, ...)
