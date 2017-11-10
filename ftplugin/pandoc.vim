@@ -316,7 +316,8 @@ try
             let l:title = matchstr(l:fileBegin, '\ntitle:\s\zs.\{-}\ze\n')
             let l:extension = '.md'
         elseif &filetype ==# 'tex'
-            let l:title = matchstr(l:fileBegin, '\n\\title{\zs[^}]*\ze}')
+            let l:title = matchstr(l:fileBegin,
+                \ '\ntitle:\s\+\zs.\{-}\ze\s*\(\^\[\|\n\)')
             let l:extension = '.tex'
         endif
         if l:title ==# ''
