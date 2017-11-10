@@ -14,9 +14,9 @@ import pandocConvert
 toFormat = 'docx'
 toExtension = '.docx'
 extraOptions = ''
-bookOptions = '--reference-docx=' +\
+bookOptions = '--reference-doc=' +\
         path.expanduser('~/.pandoc/default-chapter-styles.docx') + ' '
-articleOptions = '--reference-docx=' +\
+articleOptions = '--reference-doc=' +\
         path.expanduser('~/.pandoc/default-styles.docx') + ' '
 addedFilter = find_executable('pandoc-citeproc')
 imageFormat = '.png'

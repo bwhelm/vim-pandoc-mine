@@ -310,10 +310,15 @@ try
         " field of the YAML header, replacing diacritics, stripping out
         " non-alphabetic characters and short words, converting ',' to '-', and
         " converting spaces to `_`.
+        try
+            update
+        catch
+        endtry
         let l:suffix = join(a:000, ' ')
         let l:fileBegin = join(getline(0, 200), "\n")
         if &filetype ==# 'pandoc'
-            let l:title = matchstr(l:fileBegin, '\ntitle:\s\zs.\{-}\ze\n')
+            let l:title = matchstr(l:fileBegin,
+                \ '\ntitle:\s\+\zs.\{-}\ze\s*\(\^\[\|\n\)')
             let l:extension = '.md'
         elseif &filetype ==# 'tex'
             let l:title = matchstr(l:fileBegin, '\n\\title{\zs[^}]*\ze}')
@@ -443,7 +448,7 @@ command! TidyPandoc call <SID>TidyPandoc()
 setlocal spell spelllang=en_us
 " Turn off checking for capitalization errors
 "setlocal spellcapcheck=
-setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs\ --normalize
+setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs
 " Allow wrapping past BOL and EOL when using `h` and `l`
 set whichwrap+=h,l
 " List of characters that can cause a line break; don't want breaking at '@',
