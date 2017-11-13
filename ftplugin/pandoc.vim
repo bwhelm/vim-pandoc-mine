@@ -125,6 +125,8 @@ nnoremap <buffer><silent> <LocalLeader>fN ?\^\[<CR>m<l%m>`<
 " ---------
 " Find page references needing complete citations
 noremap <buffer><silent> <LocalLeader>fr /(\(\d\+f\{0,2}\(, \d\+f\{0,2}\\|--\d\+\)\?\))<CR>
+" Copy citation into `r` register
+inoremap <buffer> <LocalLeader>y <Esc>myF@"ryf `ya
 
 " To break undo sequence automatically {{{2
 " ------------------------------------
