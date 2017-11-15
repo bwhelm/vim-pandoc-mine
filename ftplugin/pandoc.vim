@@ -332,7 +332,7 @@ try
             let l:title = l:title . '-' . l:suffix
         else
             " Try to guess a suffix: if presentation, name it that!
-            if search('aspectratio', 's', 30) || search('theme:', 's', 30)
+            if l:fileBegin =~ '\n- aspectratio' || l:fileBegin =~ '\ntheme'
                 let l:title .= '-Presentation'
                 echo 'Identified as presentation.'
             endif
