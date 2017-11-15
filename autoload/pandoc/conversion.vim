@@ -30,10 +30,10 @@ function! pandoc#conversion#DisplayError(PID, text, ...) abort
     " To write to messages
     " let l:winWidth = winwidth(0)
     echohl Comment
-    if has('nvim')
-        let l:text = a:text
-    else
+    if type(a:text) != 3  " If it's not a list, make it one!
         let l:text = [a:text]
+    else
+        let l:text = a:text
     endif
     call filter(l:text, 'v:val !=# ""')
     for l:line in l:text
@@ -238,9 +238,9 @@ function! pandoc#conversion#MyConvertMappingHelper(command, ...) abort
         let b:pandoc_autoPDFEnabled = 0
     endif
     if b:pandoc_autoPDFEnabled
-        call conversion#ToggleAutoPDF()
+        call pandoc#conversion#ToggleAutoPDF()
         call <SID>MyConvertHelper(a:command, l:auxCommand)
-        call conversion#ToggleAutoPDF()
+        call pandoc#conversion#ToggleAutoPDF()
     else
         call <SID>MyConvertHelper(a:command, l:auxCommand)
     endif
