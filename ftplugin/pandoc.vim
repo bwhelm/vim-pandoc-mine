@@ -212,6 +212,14 @@ if exists('*textobj#user#plugin')
         \        'select-i': 'ic',
         \    },
         \ })
+    call textobj#user#plugin('pandoccomments', {
+        \    'comment': {
+        \         'pattern': ['<!comment>\n\n',
+        \                   '\n\n<\/!comment>'],
+        \        'select-a': 'aC',
+        \        'select-i': 'iC',
+        \    },
+        \ })
     " Text object for foontones
     function! FindAroundFootnote()
         let l:curPos = getcurpos()
