@@ -25,7 +25,7 @@ function! s:JumpToReference(searchString) abort
             if l:line =~# '^#\{1,6}\s'
                 if a:searchString[1:] ==# <SID>GenerateHeaderID(l:line)
                     let l:line = substitute(l:line, '/', '\\/', 'g')
-                    call execute('/' . l:line)
+                    execute '/' . l:line
                     execute "normal! gno\<Esc>"
                     return
                 endif
