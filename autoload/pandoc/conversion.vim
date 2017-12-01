@@ -219,7 +219,7 @@ function! pandoc#conversion#ToggleAutoPDF() abort
         let b:pandoc_autoPDFEnabled = 1
         augroup AutoPDFConvert
             autocmd!
-            autocmd BufWritePost <buffer> :call <SID>MyConvertHelper("markdown-to-PDF-LaTeX.py")
+            autocmd BufWritePost <buffer> :call <SID>MyConvertHelper('')
         augroup END
         echohl Comment
         echom 'Auto PDF On...'
