@@ -169,11 +169,6 @@ def copyImage(image, myPath, imagePath, imageFormat):
         # writeMessage("IMAGE: " + path.basename(image))
         # Don't need escaped filenames
         unescapedImage = image.replace('\\\\', '')
-
-        # # For some reason, Texts substitutes '%20' for '\ '; need to correct
-        # # for it here, assuming that it won't otherwise be in the fileName
-        # unescapedImage = unescapedImage.replace('%20', '\\\\ ')
-
         # Add new path and change spaces to '-'
         imageFile = path.join(imagePath,
                               path.basename(unescapedImage).replace(' ', '-'))
@@ -470,7 +465,8 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         exit(1)
 
     endFile = baseFileName + toExtension
-    if toFormat == 'latex' and toExtension == '.tex' and not suppressPdfFlag:
+    if (toFormat == 'latex' and toExtension == '.tex'
+            and not suppressPdfFlag) or toFormat == 'beamer':
         writeMessage('Successfully created LaTeX file...')
         # Run LaTeX
         latexError = runLatex(tempPath, baseFileName, latexFormat)
