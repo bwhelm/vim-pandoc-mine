@@ -55,8 +55,8 @@ thisLine, lineNumber = findNextLine(lineNumber)
 
 # Get info from YAML header. Need this to determine whether `draft: true` is
 # set, which will effect what output is produced.
+yheader = ''
 if document[0] == '---':
-    yheader = ''
     yamlLine = 1
     try:
         while document[yamlLine] not in ['---', '...'] and\
@@ -69,17 +69,14 @@ if document[0] == '---':
         yheader = 'yamlHeader: false'
 yamlHeader = yaml.load(yheader.replace('\t', '  '))
 pandocOptions = []
+book = False
 try:
     if yamlHeader['draft']:
         pandocOptions.append('--metadata=draft')
-except KeyError:
-    pass
-book = False
-try:
     if yamlHeader['book']:
         pandocOptions.append('--chapters')
         book = True
-except KeyError:
+except:
     pass
 
 # This strips off some initial markdown formatting -- lists, quotations -- that
