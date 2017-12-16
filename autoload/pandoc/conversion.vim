@@ -2,7 +2,7 @@
 " Helper Functions for Pandoc {{{1
 " ============================================================================
 
-function! pandoc#conversion#DisplayMessages(PID, text, ...)
+function! pandoc#conversion#DisplayMessages(PID, text, ...) abort
     " To write to location list. Note that `...` is there because neovim
     " will include `stdout` and `stderr` as part of its arguments; I can
     " simply ignore those.

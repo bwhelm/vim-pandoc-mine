@@ -536,9 +536,12 @@ syn match myPandocMarginClose "</margin>" contained containedin=myPandocMargin c
 syn match myPandocAfterQuoteMark /^\s\{-}< /
 " }}}3
 " Links: {{{3
-syn match myPandocLinkMark /<\(l\|r\|rp\) .\{-}>/
+syn match myPandocLinkMark /<\(l\|r\|rp\) .\{-}>/ contains=myPandocIndexText
+syn match myPandocLinkMark /\[[^]]\+\]{\.\(l\|r\|rp\)}/ contains=myPandocIndexText
 syn match myPandocIndexMark /<i[ \n]\+.\{-}>/ contains=myPandocIndexText
+syn match myPandocIndexMark /\[[^]]\+\]{\.i}/ contains=myPandocIndexText
 syn match myPandocIndexText /<i\zs[ \n]\+.\{-}\ze>/ contained containedin=myPandocIndexMark conceal
+syn match myPandocIndexText /\[[^]]\+\]\ze{\.\(i\|l\|r\|rp\)}/ contained containedin=myPandocIndexMark conceal
 " }}}3
 " FixMe: {{{3
 syn keyword myFixme XXX[XXX]
