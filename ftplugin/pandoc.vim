@@ -433,6 +433,8 @@ cnoreabbr <buffer> anf AutoNameFile
 " Folding {{{1
 " ============================================================================
 set foldtext=pandoc#fold#FoldText()
+set fillchars=vert:│
+set fillchars+=fold:·
 
 " ======================================================================== }}}
 " Tidy Up Pandoc Documents {{{1

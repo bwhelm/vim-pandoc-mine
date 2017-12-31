@@ -4,7 +4,7 @@ scriptencoding utf-8
 
 function! pandoc#fold#FoldText()
     let l:text = getline(v:foldstart)
-    let l:numLines = ' (' . string(v:foldend - v:foldstart + 1) . ' lines)'
+    let l:numLines = ' [' . string(v:foldend - v:foldstart + 1) . ' ℓ]'
     if l:text ==# '---'
         " There seems to be a weird interaction between using the `search()`
         " function and `incsearch`: the latter won't work if I use the former
