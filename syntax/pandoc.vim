@@ -508,13 +508,20 @@ endif
 " }}}
 " Comments: {{{2
 syn region myPandocCommentBlock start="^<!comment>" end="^</!comment>" contains=@pandocInline keepend
+syn region myPandocCommentBlock start="^:\{3,}\s*comment" end="^:\{3,}" contains=@pandocInline keepend
 if b:system !=# 'ios'
     syn region myPandocSpeakerBlock start="^<!speaker>" end="^</!speaker>" contains=@pandocInline keepend
-    syn match myPandocHighlight "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.highlight}" contains=@pandocInline oneline
-    syn match myPandocComment "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.comment}" contains=@pandocInline oneline
-    syn match myPandocMargin "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.margin}" contains=@pandocInline oneline
-    syn match myPandocFixme "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.fixme}" contains=@pandocInline oneline
-    syn match myPandocSmallCaps "\\\@<!\[\(\(\]\)\@<!.\)\{-}\]{\.smcaps}" contains=@pandocInline oneline
+    syn region myPandocSpeakerBlock start="^:\{3,}\s*speaker" end="^:\{3,}" contains=@pandocInline keepend
+    " syn match myPandocHighlight "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.highlight}" contains=@pandocInline oneline
+    syn match myPandocHighlight "\\\@<!\[\([^[]*\)\]{\.highlight}" contains=@pandocInline oneline
+    " syn match myPandocComment "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.comment}" contains=@pandocInline oneline
+    syn match myPandocComment "\\\@<!\[\([^[]*\)\]{\.comment}" contains=@pandocInline oneline
+    " syn match myPandocMargin "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.margin}" contains=@pandocInline oneline
+    syn match myPandocMargin "\\\@<!\[\([^[]*\)\]{\.margin}" contains=@pandocInline oneline
+    " syn match myPandocFixme "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.fixme}" contains=@pandocInline oneline
+    syn match myPandocFixme "\\\@<!\[\([^[]*\)\]{\.fixme}" contains=@pandocInline oneline
+    " syn match myPandocSmallCaps "\\\@<!\[\(\(\]\)\@<!.\)\{-}\]{\.smcaps}" contains=@pandocInline oneline
+    syn match myPandocSmallCaps "\\\@<!\[\([^[]*\)\]{\.smcaps}" contains=@pandocInline oneline
 endif
 syn match myPandocHighlight "<highlight>.\{-}</highlight>" contains=@pandocInline oneline
 syn match myPandocComment "<comment>.\{-}</comment>" contains=@pandocInline oneline
@@ -537,7 +544,7 @@ syn match myPandocAfterQuoteMark /^\s\{-}< /
 " }}}3
 " Links: {{{3
 syn match myPandocLinkMark /<\(l\|r\|rp\) .\{-}>/ contains=myPandocIndexText
-syn match myPandocLinkMark /\[[^]]\+\]{\.\(l\|r\|rp\)}/ contains=myPandocIndexText
+syn match myPandocLinkMark /\[\S\+\]{\.\(l\|r\|rp\)}/ "contains=myPandocIndexText
 syn match myPandocIndexMark /<i[ \n]\+.\{-}>/ contains=myPandocIndexText
 syn match myPandocIndexMark /\[[^]]\+\]{\.i}/ contains=myPandocIndexText
 syn match myPandocIndexText /<i\zs[ \n]\+.\{-}\ze>/ contained containedin=myPandocIndexMark conceal
@@ -619,7 +626,7 @@ hi link myPandocMargin Special
 hi link myPandocMarginOpen Operator
 hi link myPandocMarginClose Operator
 hi link myPandocAfterQuoteMark Identifier
-hi link myPandocLinkMark Operator
+hi link myPandocLinkMark Comment
 hi link myPandocIndexMark Comment
 hi link myPandocIndexText Comment
 

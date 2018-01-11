@@ -116,8 +116,8 @@ nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 
 " Find Comments and Notes {{{2
 " -----------------------
-nnoremap <buffer><silent> <LocalLeader>fc /\(\[.\{-}\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
-nnoremap <buffer><silent> <LocalLeader>fC ?\(\[.\{-}\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)?<CR>
+nnoremap <buffer><silent> <LocalLeader>fc /\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
+nnoremap <buffer><silent> <LocalLeader>fC ?\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)?<CR>
 nnoremap <buffer><silent> <LocalLeader>fn /\^\[<CR>m<l%m>`<
 nnoremap <buffer><silent> <LocalLeader>fN ?\^\[<CR>m<l%m>`<
 
@@ -203,20 +203,22 @@ nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 " If textobj-user plugin is loaded, ...
 if exists('*textobj#user#plugin')
     " Create text object for deleting/changing/etc. comments of various types
-        " \        'pattern': ['\[',
-        "             \ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
+        " For tag-style inline comments:
+        " \         'pattern': ['<\(comment\|margin\|fixme\|highlight\|smcaps\)>',
+        " \                   '</\(comment\|margin\|fixme\|highlight\|smcaps\)>'],
+        " For tag-style block Comments:
+        " \         'pattern': ['<!comment>\n\n',
+        " \                   '\n\n<\/!comment>'],
     call textobj#user#plugin('pandoccomments', {
-        \    'comment': {
-        \         'pattern': ['<\(comment\|margin\|fixme\|highlight\|smcaps\)>',
-        \                   '</\(comment\|margin\|fixme\|highlight\|smcaps\)>'],
+        \    'inlinecomment': {
+        \        'pattern': ['\[',
+                    \ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
         \        'select-a': 'ac',
         \        'select-i': 'ic',
         \    },
-        \ })
-    call textobj#user#plugin('pandoccomments', {
-        \    'comment': {
-        \         'pattern': ['<!comment>\n\n',
-        \                   '\n\n<\/!comment>'],
+        \    'blockcomment': {
+        \         'pattern': ['^::: comment\n',
+        \                   '\n:::$'],
         \        'select-a': 'aC',
         \        'select-i': 'iC',
         \    },
