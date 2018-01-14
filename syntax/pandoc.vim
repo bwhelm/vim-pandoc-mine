@@ -500,7 +500,8 @@ if b:system !=# 'ios'
     "
     if g:pandoc#syntax#use_definition_lists == 1
         " syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s\{0,2}[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
-        syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s*[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
+        " syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s*[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
+        syn region pandocDefinitionBlock start=/^.*\n\(^\s*\n\)\=\s*[:~]\s/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
         syn match pandocDefinitionBlockTerm /^.*\n\(^\s*\n\)\=\(\s*[:~]\)\@=/ contained contains=@pandocInline nextgroup=pandocDefinitionBlockMark
         call s:WithConceal('definition', 'syn match pandocDefinitionBlockMark /^\s*\zs[:~]/ contained', 'conceal cchar='.s:cchars['definition'])
     endif
@@ -508,18 +509,26 @@ endif
 " }}}
 " Comments: {{{2
 syn region myPandocCommentBlock start="^<!comment>" end="^</!comment>" contains=@pandocInline keepend
-syn region myPandocCommentBlock start="^:\{3,}\s*comment" end="^:\{3,}" contains=@pandocInline keepend
+syn region myPandocCommentBlock start="^\n:\{3,}\s*comment\n" end="^:\{3,}\n\n" contains=@pandocInline keepend
 if b:system !=# 'ios'
     syn region myPandocSpeakerBlock start="^<!speaker>" end="^</!speaker>" contains=@pandocInline keepend
     syn region myPandocSpeakerBlock start="^:\{3,}\s*speaker" end="^:\{3,}" contains=@pandocInline keepend
     " syn match myPandocHighlight "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.highlight}" contains=@pandocInline oneline
-    syn match myPandocHighlight "\\\@<!\[\([^[]*\)\]{\.highlight}" contains=@pandocInline oneline
+    syn match myPandocHighlight "\\\@<!\[[^\[\]]*\]{\.highlight}" contains=@pandocInline oneline
+    syn match myPandocHighlight "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.highlight}\)\@<![^\[\]]*\]{\.highlight}" contains=@pandocInline oneline
+    syn match myPandocHighlight "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.highlight}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.highlight}\)\@<![^\[\]]*\]{\.highlight}" contains=@pandocInline oneline
     " syn match myPandocComment "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.comment}" contains=@pandocInline oneline
-    syn match myPandocComment "\\\@<!\[\([^[]*\)\]{\.comment}" contains=@pandocInline oneline
+    syn match myPandocComment "\\\@<!\[[^\[\]]*\]{\.comment}" contains=@pandocInline oneline
+    syn match myPandocComment "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.comment}\)\@<![^\[\]]*\]{\.comment}" contains=@pandocInline oneline
+    syn match myPandocComment "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.comment}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.comment}\)\@<![^\[\]]*\]{\.comment}" contains=@pandocInline oneline
     " syn match myPandocMargin "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.margin}" contains=@pandocInline oneline
-    syn match myPandocMargin "\\\@<!\[\([^[]*\)\]{\.margin}" contains=@pandocInline oneline
+    syn match myPandocMargin "\\\@<!\[[^\[\]]*\]{\.margin}" contains=@pandocInline oneline
+    syn match myPandocMargin "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.margin}\)\@<![^\[\]]*\]{\.margin}" contains=@pandocInline oneline
+    syn match myPandocMargin "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.margin}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.margin}\)\@<![^\[\]]*\]{\.margin}" contains=@pandocInline oneline
     " syn match myPandocFixme "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.fixme}" contains=@pandocInline oneline
-    syn match myPandocFixme "\\\@<!\[\([^[]*\)\]{\.fixme}" contains=@pandocInline oneline
+    syn match myPandocFixme "\\\@<!\[[^\[\]]*\]{\.fixme}" contains=@pandocInline oneline
+    syn match myPandocFixme "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\]{\.fixme}" contains=@pandocInline oneline
+    syn match myPandocFixme "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\]{\.fixme}" contains=@pandocInline oneline
     " syn match myPandocSmallCaps "\\\@<!\[\(\(\]\)\@<!.\)\{-}\]{\.smcaps}" contains=@pandocInline oneline
     syn match myPandocSmallCaps "\\\@<!\[\([^[]*\)\]{\.smcaps}" contains=@pandocInline oneline
 endif

@@ -340,10 +340,10 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      '--mathml',
                      '--wrap=none',
                      '--to=' + toFormat + '+smart']
-    pandocOptions += ['--filter',
+    pandocOptions += ['--lua-filter',
                       path.expanduser('~/Applications/pandoc/' +
                                       'Comment-Filter/' +
-                                      'pandocCommentFilter.py')]
+                                      'pandocCommentFilter.lua')]
     pandocOptions += ['--filter',
                       path.expanduser('~/Applications/pandoc/' +
                                       'pandoc-reference-filter/' +
@@ -356,6 +356,8 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         if isinstance(addedFilter, str):
             addedFilter = [addedFilter]
         for myFilter in addedFilter:
+            # TODO: Need to check on file extension of addedFilter to see
+            # whether to use `--lua-filter` or `--filter`.
             pandocOptions = pandocOptions + ['--filter', myFilter]
 
     # Check to see if we need to use chapters or sections for 1st-level heading

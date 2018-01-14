@@ -57,6 +57,7 @@ function! s:removePIDFromLists(PID) abort
                 break
             endif
         endfor
+        return l:winnum
     endif
 endfunction
 
@@ -75,7 +76,21 @@ function! pandoc#conversion#EndProcess(PID, text, ...)
         echom 'Conversion Complete'
         echohl None
     endif
-    call <SID>removePIDFromLists(a:PID)
+    let l:winnum = <SID>removePIDFromLists(a:PID)
+    " Retrieve wordcount from location list, and display as message.
+    let l:locList = getloclist(l:winnum)
+    let l:wordcount = ""
+    for l:dict in l:locList
+        if l:dict['text'] =~ "^Words:"
+            let l:wordcount = dict['text']
+            break
+        endif
+    endfor
+    if l:wordcount != ""
+        echohl Comment
+        echom l:wordcount
+        echohl None
+    endif
 endfunction
 
 function! pandoc#conversion#KillProcess(...) abort
