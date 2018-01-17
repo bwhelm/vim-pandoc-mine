@@ -501,8 +501,8 @@ if b:system !=# 'ios'
     if g:pandoc#syntax#use_definition_lists == 1
         " syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s\{0,2}[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
         " syn region pandocDefinitionBlock start=/^\%(\_^\s*\([`~]\)\1\{2,}\)\@!.*\n\(^\s*\n\)\=\s*[:~]\(\~\{2,}\~*\)\@!/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
-        syn region pandocDefinitionBlock start=/^.*\n\(^\s*\n\)\=\s*[:~]\s/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
-        syn match pandocDefinitionBlockTerm /^.*\n\(^\s*\n\)\=\(\s*[:~]\)\@=/ contained contains=@pandocInline nextgroup=pandocDefinitionBlockMark
+        syn region pandocDefinitionBlock start=/^.*\n\(\s*\n\)\=\s*[:~]\s/ skip=/\n\n\zs\s/ end=/\n\n/ contains=@pandocInline,pandocDefinitionBlockMark,pandocDefinitionBlockTerm,pandocCodeBlockInsideIndent,pandocLaTeXMathBlock,pandocFootnoteBlock,pandocFootnoteID,pandocListItem,PandocUListItem
+        syn match pandocDefinitionBlockTerm /^.*\n\(^\s*\n\)\=\(\s*[:~]\s\)\@=/ contained contains=@pandocInline nextgroup=pandocDefinitionBlockMark
         call s:WithConceal('definition', 'syn match pandocDefinitionBlockMark /^\s*\zs[:~]/ contained', 'conceal cchar='.s:cchars['definition'])
     endif
 endif
@@ -510,6 +510,8 @@ endif
 " Comments: {{{2
 syn region myPandocCommentBlock start="^<!comment>" end="^</!comment>" contains=@pandocInline keepend
 syn region myPandocCommentBlock start="^\n:\{3,}\s*comment\n" end="^:\{3,}\n\n" contains=@pandocInline keepend
+syn region myPandocBoxBlock start="^\n:\{3,}\s*box\n" end="^:\{3,}\n\n" contains=@pandocInline keepend
+syn region myPandocCenterBlock start="^\n:\{3,}\s*center\n" end="^:\{3,}\n\n" contains=@pandocInline keepend
 if b:system !=# 'ios'
     syn region myPandocSpeakerBlock start="^<!speaker>" end="^</!speaker>" contains=@pandocInline keepend
     syn region myPandocSpeakerBlock start="^:\{3,}\s*speaker" end="^:\{3,}" contains=@pandocInline keepend
@@ -625,6 +627,8 @@ syn region pandocYAMLHeader start=/\%(\%^\|\_^\s*\n\)\@<=\_^---\ze\n.\+/ end=/^\
 hi myFixme guibg=Red guifg=Black ctermbg=Red ctermfg=Black gui=bold term=bold cterm=bold
 hi link myPandocComment Special
 hi link myPandocCommentBlock Special
+hi link myPandocBoxBlock Identifier
+hi link myPandocCenterBlock Constant
 hi link myPandocSpeakerBlock Special
 hi link myPandocFixme Constant
 hi myPandocHighlight guibg=Yellow ctermbg=DarkGreen ctermfg=Black cterm=bold
