@@ -30,18 +30,8 @@ from tempfile import mkdtemp
 from hashlib import sha1
 
 
-def removeOldFiles(directory, time):
-    """
-    Remove old files from `directory`, but not `reveal.js` symlink
-    """
-    modTime = 60 * 60 * 24 * 4  # max number of seconds to keep aux files
-    for file in listdir(directory):
-        if time - path.getmtime(path.join(directory, file)) > modTime and\
-           file != 'reveal.js':
-            try:
-                remove(path.join(directory, file))
-            except OSError:
-                pass
+TEMP_PATH = path.expanduser('~/tmp/pandoc/')
+IMAGE_PATH = path.join(TEMP_PATH, 'Figures')
 
 
 """
@@ -69,6 +59,20 @@ def writeMessage(message):
     stderr.write(message + '\n')
     stderr.flush()
     return
+
+
+def removeOldFiles(directory, time):
+    """
+    Remove old files from `directory`, but not `reveal.js` symlink
+    """
+    modTime = 60 * 60 * 24 * 4  # max number of seconds to keep aux files
+    for file in listdir(directory):
+        if time - path.getmtime(path.join(directory, file)) > modTime and\
+           file != 'reveal.js':
+            try:
+                remove(path.join(directory, file))
+            except OSError:
+                pass
 
 
 def readFile(fileName):
@@ -99,13 +103,13 @@ def needsUpdating(originalFile, tempFile):
         return False
 
 
-def generateTeXImage(texFile, imagePath):
+def generateTeXImage(texFile, IMAGE_PATH):
     """
     This will generate a .pdf image from a .tex file if needed. Returns the
     (new) fileName.
     """
     name = sha1(texFile.encode('utf-8')).hexdigest()
-    imageFile = path.join(imagePath, name + '.pdf')
+    imageFile = path.join(IMAGE_PATH, name + '.pdf')
     if needsUpdating(texFile, imageFile):
         tmpdir = mkdtemp()
         chdir(tmpdir)
@@ -122,7 +126,7 @@ def generateTeXImage(texFile, imagePath):
     return imageFile
 
 
-def convertImage(imageFile, imageFormat, imagePath):
+def convertImage(imageFile, imageFormat, IMAGE_PATH):
     """
     Checks to see if image needs to be converted and, if so, converts
     it. Otherwise, touches the existing file. Returns the (new)
@@ -133,7 +137,7 @@ def convertImage(imageFile, imageFormat, imagePath):
         return imageFile
     else:
         oldImageFile = imageFile
-        imageFile = path.join(imagePath, name + imageFormat)
+        imageFile = path.join(IMAGE_PATH, name + imageFormat)
         if needsUpdating(oldImageFile, imageFile):
             imageError = run(['convert', '-density', '300', oldImageFile,
                              '-quality', '100', imageFile], stdout=PIPE)
@@ -146,22 +150,22 @@ def convertImage(imageFile, imageFormat, imagePath):
         return imageFile
 
 
-def copyImage(image, myPath, imagePath, imageFormat):
+def copyImage(image, myPath, IMAGE_PATH, imageFormat):
     """
     Takes an image and a path to .md file that image is embedded in, and
-    copies the image from there to imagePath only if necessary. Returns
+    copies the image from there to IMAGE_PATH only if necessary. Returns
     the (new) fileName.
     """
     if image.startswith(('http://', 'https://')):
-        # It's an online image; need to download to imagePath
-        imageFile = path.join(imagePath,
+        # It's an online image; need to download to IMAGE_PATH
+        imageFile = path.join(IMAGE_PATH,
                               path.basename(image).replace(' ', '-'))
         if path.isfile(imageFile):
-            imageFile = convertImage(imageFile, imageFormat, imagePath)
+            imageFile = convertImage(imageFile, imageFormat, IMAGE_PATH)
         else:
             urlretrieve(image, imageFile)  # otherwise retrieve it
             writeMessage('Retrieved ' + path.basename(image) + ' from web.')
-            imageFile = convertImage(imageFile, imageFormat, imagePath)
+            imageFile = convertImage(imageFile, imageFormat, IMAGE_PATH)
 
     else:  # Local image
         if not path.isabs(image):  # If we have a relative path....
@@ -170,27 +174,27 @@ def copyImage(image, myPath, imagePath, imageFormat):
         # Don't need escaped filenames
         unescapedImage = image.replace('\\\\', '')
         # Add new path and change spaces to '-'
-        imageFile = path.join(imagePath,
+        imageFile = path.join(IMAGE_PATH,
                               path.basename(unescapedImage).replace(' ', '-'))
         name, extension = path.splitext(imageFile)
         if extension == '.tex':  # We have a tikz figure; need to typeset
-            imageFile = generateTeXImage(unescapedImage, imagePath)
+            imageFile = generateTeXImage(unescapedImage, IMAGE_PATH)
             extension = '.pdf'
-            imageFile = convertImage(imageFile, imageFormat, imagePath)
+            imageFile = convertImage(imageFile, imageFormat, IMAGE_PATH)
         else:  # Not a .tex file, so just need to copy to new location.
             if needsUpdating(unescapedImage, imageFile):
                 copyfile(unescapedImage, imageFile)
                 writeMessage("Copied image: " + path.basename(image))
-            imageFile = convertImage(imageFile, imageFormat, imagePath)
+            imageFile = convertImage(imageFile, imageFormat, IMAGE_PATH)
 
     return imageFile
 
 
-def processImages(text, filePath, imagePath, imageFormat):
+def processImages(text, filePath, IMAGE_PATH, imageFormat):
     """
     Locate all standard images in the file and processes them: generating
     the image from a .tex file if necessary, and copying the image to
-    imagePath, updating the markdown file with new locations.
+    IMAGE_PATH, updating the markdown file with new locations.
     """
     found = finditer(r'(!\[.*?\]\()(.*?)(\s+(["\']).*?\4)?\)', text)
     for item in found:
@@ -199,7 +203,7 @@ def processImages(text, filePath, imagePath, imageFormat):
             title = ''
         if imageOrig:
             image = imageOrig.strip()
-            newImage = copyImage(image, filePath, imagePath, imageFormat)
+            newImage = copyImage(image, filePath, IMAGE_PATH, imageFormat)
             # Now need doubly escaped search strings...
             imageFound = item.group(0).replace('\\\\', '\\\\\\\\')
             imageReplace = item.group(1) + newImage + title + ')'
@@ -210,7 +214,7 @@ def processImages(text, filePath, imagePath, imageFormat):
     return text
 
 
-def processTransclusion(text, myPath, imagePath, imageFormat):
+def processTransclusion(text, myPath, IMAGE_PATH, imageFormat):
     """
     Recursively searches given text for transcluded files, retrieving their
     contents, processing for images (which need to be relative to the
@@ -255,10 +259,10 @@ def processTransclusion(text, myPath, imagePath, imageFormat):
             elif line != '':
                 break
         newText = '\n' + '\n'.join(newText) + '\n'
-        newText = processImages(newText, path.dirname(theFile), imagePath,
+        newText = processImages(newText, path.dirname(theFile), IMAGE_PATH,
                                 imageFormat)
         newText = processTransclusion(newText, path.dirname(theFile),
-                                      imagePath, imageFormat)
+                                      IMAGE_PATH, imageFormat)
         oldText = item.group(0).replace('\\\\', '\\\\\\\\')
         text = text.replace(oldText, newText)
         writeMessage("... " + theFile + " transcluded.")
@@ -282,22 +286,29 @@ def removeAuxFiles(latexPath, baseFilename):
 
 def runLatex(latexPath, baseFileName, latexFormat):
     # Need to produce .pdf file, which will be opened by runLatex script...
-    chdir(latexPath)
+    # chdir(latexPath)
     environ['PATH'] = environ['PATH'] + ':/Library/TeX/texbin'
 
     texCommand = ['latexmk', latexFormat, '-f', '-synctex=1',
+                  '-auxdir=' + TEMP_PATH, '-outdir=' + TEMP_PATH,
                   path.join(latexPath, baseFileName + '.tex')]
     latexError = call(texCommand, stdout=stdout)
     if latexError:
         removeAuxFiles(latexPath, baseFileName)
         writeError('LaTeX Error!: ' + str(latexError))
         return True  # Error
-    return False  # No error
+    return False     # No error
 
 
 def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
               articleOptions, addedFilter, imageFormat):
     writeMessage('Starting conversion to ' + toExtension)
+
+    # Make sure temporary path exists for LaTeX compilation
+    try:
+        makedirs(path.join(TEMP_PATH, 'Figures'))
+    except OSError:
+        pass
 
     pandocVersion = check_output(['/usr/bin/env', 'pandoc', '--version']) \
         .decode('utf-8').split('\n')[0].split(' ')[1].split('.')
@@ -306,36 +317,24 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     else:
         platform = 'new'
 
-    tempPath = path.expanduser('~/tmp/pandoc/')
-    imagePath = path.join(tempPath, 'Figures')
-
-    # Make sure temporary path exists for LaTeX compilation
-    try:
-        makedirs(path.join(tempPath, 'Figures'))
-    except OSError:
-        pass
-    chdir(tempPath)
+    # Remove old files in TEMP_PATH folder...
     now = time()
-    removeOldFiles(tempPath, now)
-    removeOldFiles(path.join(tempPath, 'Figures'), now)
+    removeOldFiles(TEMP_PATH, now)
+    removeOldFiles(path.join(TEMP_PATH, 'Figures'), now)
 
     filePath, fileName = path.split(myFile)
     baseFileName, fileExtension = path.splitext(fileName)
     if fileExtension != '.md':
         writeError('Need to provide a .md file!')
         exit(1)
-    newFilePath = path.join(tempPath, baseFileName + fileExtension)
     mdText = readFile(myFile)
-
-    mdText = processImages(mdText, filePath, imagePath, imageFormat)
-    mdText = processTransclusion(mdText, filePath, imagePath, imageFormat)
-    # File will be written to new (temp) location later
 
     # Figure out command to send to pandoc
     suppressPdfFlag = False
     if toFormat == 'latexraw':
         suppressPdfFlag = True
         toFormat = 'latex'
+
     pandocOptions = ['--standalone',
                      '--from=markdown-fancy_lists',
                      '--mathml',
@@ -369,10 +368,10 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     latexFormat = '-pdf'
 
     # Process YAML header into pandocOptions
-    intextCSL = '--csl=' + path.expanduser(
-            '~/.pandoc/chicago-manual-of-style-16th-edition-full-in-text.csl')
-    notesCSL = '--csl=' + path.expanduser(
-            '~/.pandoc/chicago-fullnote-bibliography.csl')
+    # intextCSL = '--csl=' + path.expanduser(
+    #         '~/.pandoc/chicago-manual-of-style-16th-edition-full-in-text.csl')
+    # notesCSL = '--csl=' + path.expanduser(
+    #         '~/.pandoc/chicago-fullnote-bibliography.csl')
 
     mdTextSplit = mdText.splitlines()
     for lineIndex in range(len(mdTextSplit)):
@@ -386,65 +385,23 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                 bookFlag = "chapter"
         elif line.startswith('biblatex: true') and toExtension == '.tex':
             pandocOptions.append('--biblatex')
-        elif line.startswith('bibinline: true') and toExtension != '.tex':
-            pandocOptions.append(intextCSL)
-        elif line.startswith('biboptions: notes') and toExtension != '.tex':
-            pandocOptions.append(notesCSL)
-        elif line.startswith('csl:') and toExtension != '.tex':
-            mdTextSplit[lineIndex] = 'csl: ' + path.expanduser(line[5:])
+        # elif line.startswith('bibinline: true') and toExtension != '.tex':
+        #     pandocOptions.append(intextCSL)
+        # elif line.startswith('biboptions: notes') and toExtension != '.tex':
+        #     pandocOptions.append(notesCSL)
         elif line.startswith('htmltoc: true') and toExtension == '.html':
             pandocOptions.append('--toc')
         elif line.startswith('lualatex: true'):
             latexFormat = '-lualatex'
         elif line.startswith('xelatex: true'):
             latexFormat = '-xelatex'
-        elif line.startswith('geometry: ipad'):  # Special case for ipad geom
-            mdTextSplit[lineIndex] = 'geometry: paperwidth=176mm,' +\
-                'paperheight=234mm,'
-            if bookFlag:  # Specify for OUPRoyal.cls
-                mdTextSplit[lineIndex] += 'outer=22mm,' +\
-                    'top=2.5pc,' +\
-                    'bottom=3pc,' +\
-                    'headsep=1pc,' +\
-                    'includehead,' +\
-                    'includefoot,' +\
-                    'centering,' +\
-                    'inner=22mm,' +\
-                    'marginparwidth=17mm'
-            else:  # Make dimension same as default article class, letterpaper
-                mdTextSplit[lineIndex] += 'width=360.0pt,' +\
-                    'height=541.40024pt,' +\
-                    'headsep=1pc,' +\
-                    'centering'
-        elif line.startswith('bibliography:'):
-            # Check kpsewhich to retrieve full path to bib databases.
-            if line[13:].strip():
-                mdTextSplit[lineIndex] = \
-                    'bibliography: ' + \
-                    check_output(['kpsewhich',
-                                  line[13:].strip().strip('"').strip("'")])\
-                    .decode('utf-8')
-            else:
-                for i in range(lineIndex + 1, len(mdTextSplit)):
-                    if mdTextSplit[i].startswith('- '):
-                        mdTextSplit[i] = '- ' + \
-                                check_output(['kpsewhich',
-                                              mdTextSplit[i][2:].strip('"')
-                                              .strip("'")])[:-1]\
-                                .decode('utf-8')
-                    else:
-                        break
         elif line[:3] in ('...', '---') and lineIndex != 0:
             break
 
-    # Write modified mdText to new (temp) location
-    mdText = "\n".join(mdTextSplit)
-    writeFile(newFilePath, mdText)
-
     # Need to clean up .csl: I only want 1 csl, and it should be full-in-text
     # first.
-    if intextCSL in pandocOptions and notesCSL in pandocOptions:
-        pandocOptions.remove(notesCSL)
+    # if intextCSL in pandocOptions and notesCSL in pandocOptions:
+    #     pandocOptions.remove(notesCSL)
 
     if bookFlag:
         pandocOptions.append('--top-level-division=' + bookFlag)
@@ -452,9 +409,12 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     else:
         pandocOptions = pandocOptions + articleOptions.split()
 
-    pandocCommandList = ['/usr/bin/env', 'pandoc', newFilePath, '-o',
-                         path.join(tempPath, baseFileName + toExtension)] +\
-        pandocOptions
+    # pandocCommandList = ['/usr/bin/env', 'pandoc', newFilePath, '-o',
+    #                      path.join(TEMP_PATH, baseFileName + toExtension)] +\
+    #     pandocOptions
+    outFile = path.join(filePath, baseFileName + toExtension)
+    pandocCommandList = ['/usr/bin/env', 'pandoc', myFile, '-o',
+                         outFile] + pandocOptions
 
     # Run pandoc
     if platform == 'old':
@@ -472,21 +432,21 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             and not suppressPdfFlag) or toFormat == 'beamer':
         writeMessage('Successfully created LaTeX file...')
         # Run LaTeX
-        latexError = runLatex(tempPath, baseFileName, latexFormat)
+        latexError = runLatex(filePath, baseFileName, latexFormat)
         if latexError:
             writeError('Error running LaTeX.')
             exit(1)
         endFile = baseFileName + '.pdf'
         if path.exists('/Applications/Skim.app'):
             call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
-                  path.join(tempPath, endFile)])
+                  path.join(TEMP_PATH, endFile)])
     elif toExtension == '.pdf':
         if path.exists('/Applications/Skim.app'):
             call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
-                  path.join(tempPath, endFile)])
+                  path.join(TEMP_PATH, endFile)])
     else:
         if path.exists('/usr/bin/open') and not suppressPdfFlag:
-            call(['/usr/bin/open', path.join(tempPath, endFile)])
+            call(['/usr/bin/open', path.join(TEMP_PATH, endFile)])
     # If on raspberrypi, upload resulting file to dropbox.
     if platform == 'old':
         message = check_output(
