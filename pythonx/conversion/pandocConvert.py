@@ -261,7 +261,7 @@ def processTransclusion(text, myPath, imagePath, imageFormat):
                                       imagePath, imageFormat)
         oldText = item.group(0).replace('\\\\', '\\\\\\\\')
         text = text.replace(oldText, newText)
-    writeMessage("... " + theFile + " transcluded.")
+        writeMessage("... " + theFile + " transcluded.")
     return text
 
 
