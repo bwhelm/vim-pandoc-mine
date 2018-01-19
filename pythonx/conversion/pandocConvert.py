@@ -19,15 +19,10 @@ Here's what each of these are (read from stdin):
     * imageFormat: the format of any images to be produced
 """
 
-from os import makedirs, chdir, listdir, environ, path, remove
-from subprocess import run, check_output, PIPE, call
+from os import makedirs, listdir, environ, path, remove, rename
+from subprocess import run, check_output, call
 from sys import stdout, stderr
-from re import match, finditer, MULTILINE
-from shutil import copyfile
 from time import time
-from urllib.request import urlretrieve
-from tempfile import mkdtemp
-from hashlib import sha1
 
 
 TEMP_PATH = path.expanduser('~/tmp/pandoc/')
@@ -103,172 +98,6 @@ def needsUpdating(originalFile, tempFile):
         return False
 
 
-def generateTeXImage(texFile, IMAGE_PATH):
-    """
-    This will generate a .pdf image from a .tex file if needed. Returns the
-    (new) fileName.
-    """
-    name = sha1(texFile.encode('utf-8')).hexdigest()
-    imageFile = path.join(IMAGE_PATH, name + '.pdf')
-    if needsUpdating(texFile, imageFile):
-        tmpdir = mkdtemp()
-        chdir(tmpdir)
-        tempTexFile = path.join(tmpdir, name + '.tex')
-        newImageFile = path.join(tmpdir, name + '.pdf')
-        copyfile(texFile, tempTexFile)
-        imageError = run(['pdflatex', tempTexFile], stdout=PIPE)
-        if imageError.returncode:
-            writeError('Error creating ' + newImageFile + ': ' +
-                       imageError.returncode)
-            exit(1)
-        copyfile(newImageFile, imageFile)
-        writeMessage('Created ' + path.basename(texFile)[:-3] + 'pdf')
-    return imageFile
-
-
-def convertImage(imageFile, imageFormat, IMAGE_PATH):
-    """
-    Checks to see if image needs to be converted and, if so, converts
-    it. Otherwise, touches the existing file. Returns the (new)
-    fileName.
-    """
-    name, extension = path.splitext(imageFile)
-    if extension == imageFormat:  # No need to convert
-        return imageFile
-    else:
-        oldImageFile = imageFile
-        imageFile = path.join(IMAGE_PATH, name + imageFormat)
-        if needsUpdating(oldImageFile, imageFile):
-            imageError = run(['convert', '-density', '300', oldImageFile,
-                             '-quality', '100', imageFile], stdout=PIPE)
-            if imageError.returncode:
-                writeError('Error converting ' + oldImageFile + ' to ' +
-                           imageFile + ':' + imageError.returncode)
-                exit(1)
-            writeMessage('Converted image from ' + extension + ' to ' +
-                         imageFormat + '...')
-        return imageFile
-
-
-def copyImage(image, myPath, IMAGE_PATH, imageFormat):
-    """
-    Takes an image and a path to .md file that image is embedded in, and
-    copies the image from there to IMAGE_PATH only if necessary. Returns
-    the (new) fileName.
-    """
-    if image.startswith(('http://', 'https://')):
-        # It's an online image; need to download to IMAGE_PATH
-        imageFile = path.join(IMAGE_PATH,
-                              path.basename(image).replace(' ', '-'))
-        if path.isfile(imageFile):
-            imageFile = convertImage(imageFile, imageFormat, IMAGE_PATH)
-        else:
-            urlretrieve(image, imageFile)  # otherwise retrieve it
-            writeMessage('Retrieved ' + path.basename(image) + ' from web.')
-            imageFile = convertImage(imageFile, imageFormat, IMAGE_PATH)
-
-    else:  # Local image
-        if not path.isabs(image):  # If we have a relative path....
-            image = path.abspath(path.join(myPath, image))
-        # writeMessage("IMAGE: " + path.basename(image))
-        # Don't need escaped filenames
-        unescapedImage = image.replace('\\\\', '')
-        # Add new path and change spaces to '-'
-        imageFile = path.join(IMAGE_PATH,
-                              path.basename(unescapedImage).replace(' ', '-'))
-        name, extension = path.splitext(imageFile)
-        if extension == '.tex':  # We have a tikz figure; need to typeset
-            imageFile = generateTeXImage(unescapedImage, IMAGE_PATH)
-            extension = '.pdf'
-            imageFile = convertImage(imageFile, imageFormat, IMAGE_PATH)
-        else:  # Not a .tex file, so just need to copy to new location.
-            if needsUpdating(unescapedImage, imageFile):
-                copyfile(unescapedImage, imageFile)
-                writeMessage("Copied image: " + path.basename(image))
-            imageFile = convertImage(imageFile, imageFormat, IMAGE_PATH)
-
-    return imageFile
-
-
-def processImages(text, filePath, IMAGE_PATH, imageFormat):
-    """
-    Locate all standard images in the file and processes them: generating
-    the image from a .tex file if necessary, and copying the image to
-    IMAGE_PATH, updating the markdown file with new locations.
-    """
-    found = finditer(r'(!\[.*?\]\()(.*?)(\s+(["\']).*?\4)?\)', text)
-    for item in found:
-        imageOrig, title = item.group(2, 3)
-        if not title:
-            title = ''
-        if imageOrig:
-            image = imageOrig.strip()
-            newImage = copyImage(image, filePath, IMAGE_PATH, imageFormat)
-            # Now need doubly escaped search strings...
-            imageFound = item.group(0).replace('\\\\', '\\\\\\\\')
-            imageReplace = item.group(1) + newImage + title + ')'
-
-            # Replace only the first occurrence, since there may be multiple
-            # figures with the same image file.
-            text = text.replace(imageFound, imageReplace, 1)
-    return text
-
-
-def processTransclusion(text, myPath, IMAGE_PATH, imageFormat):
-    """
-    Recursively searches given text for transcluded files, retrieving their
-    contents, processing for images (which need to be relative to the
-    transcluded file's path) and for further transcluded files. Substitutes
-    these contents into original text and returns it. Normally this will strip
-    out YAML headers, but if the attribute given is "!" it will not.
-    """
-    found = finditer(r'^\s*@\[(.*?)\]\((.+)\)(\{.*?\})?', text, MULTILINE)
-    if not found:
-        return text
-    for item in found:
-        caption, theFile, attributes = item.group(1, 2, 3)
-        theFile = path.abspath(path.join(myPath, theFile))
-        writeMessage("Transcluding " + theFile)
-        newText = readFile(theFile).splitlines()
-        # Need to strip any YAML header
-        if newText[0] == '---' and attributes != "{!}":
-            writeMessage("Stripping YAML header...")
-            counter = 0
-            for line in newText[1:]:
-                counter += 1
-                if line[:3] in ('...', '---'):
-                    break
-            if counter < len(newText):
-                newText = newText[counter + 1:]
-        for index in range(len(newText)):
-            """
-            If the first non-blank line of transcluded file starts with "~~~",
-            try to preserve attributes from transclusion line
-            """
-            line = newText[index]
-            if line[:3] == '~~~':
-                oldAttr = match('([^{]*){#(\S*)\s+([^}]*)}', line)
-                if oldAttr:
-                    initial, tag, oldAttributes = oldAttr.group(1, 2, 3)
-                    line = initial + '{#' + tag + ' ' + oldAttributes + \
-                        ' ' + attributes[1:-1] + '}'
-                else:
-                    line = '~~~ {' + attributes[1:-1] + '}'
-                newText[index] = line
-                break
-            elif line != '':
-                break
-        newText = '\n' + '\n'.join(newText) + '\n'
-        newText = processImages(newText, path.dirname(theFile), IMAGE_PATH,
-                                imageFormat)
-        newText = processTransclusion(newText, path.dirname(theFile),
-                                      IMAGE_PATH, imageFormat)
-        oldText = item.group(0).replace('\\\\', '\\\\\\\\')
-        text = text.replace(oldText, newText)
-        writeMessage("... " + theFile + " transcluded.")
-    return text
-
-
 def runPandoc(pandocCommandList):
     # writeError(str(pandocOptions))
     return run(pandocCommandList, shell=False).returncode
@@ -288,11 +117,14 @@ def runLatex(latexPath, baseFileName, latexFormat):
     # Need to produce .pdf file, which will be opened by runLatex script...
     # chdir(latexPath)
     environ['PATH'] = environ['PATH'] + ':/Library/TeX/texbin'
+    latexFile = path.join(latexPath, baseFileName + '.tex')
 
     texCommand = ['latexmk', latexFormat, '-f', '-synctex=1',
                   '-auxdir=' + TEMP_PATH, '-outdir=' + TEMP_PATH,
-                  path.join(latexPath, baseFileName + '.tex')]
+                  latexFile]
     latexError = call(texCommand, stdout=stdout)
+    # Move file from directory of original .md doc to TEMP_PATH
+    rename(latexFile, path.join(TEMP_PATH, baseFileName + '.tex'))
     if latexError:
         removeAuxFiles(latexPath, baseFileName)
         writeError('LaTeX Error!: ' + str(latexError))
@@ -356,22 +188,18 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         if isinstance(addedFilter, str):
             addedFilter = [addedFilter]
         for myFilter in addedFilter:
-            # TODO: Need to check on file extension of addedFilter to see
-            # whether to use `--lua-filter` or `--filter`.
-            pandocOptions = pandocOptions + ['--filter', myFilter]
+            if myFilter[-3:] == 'lua':
+                pandocOptions = pandocOptions + ['--lua-filter', myFilter]
+            else:
+                pandocOptions = pandocOptions + ['--filter', myFilter]
 
     # Check to see if we need to use chapters or sections for 1st-level heading
     bookFlag = False
 
-    # If toExtension = '.tex', this determines how latexmk creates a pdf file
-    # (whether using pdflatex, lualatex, or xelatex). Default is pdflatex.
+    # When toExtension == '.tex', latexFormat determines how latexmk creates a
+    # pdf file (whether using pdflatex, lualatex, or xelatex). Default is
+    # pdflatex (= '-pdf').
     latexFormat = '-pdf'
-
-    # Process YAML header into pandocOptions
-    # intextCSL = '--csl=' + path.expanduser(
-    #         '~/.pandoc/chicago-manual-of-style-16th-edition-full-in-text.csl')
-    # notesCSL = '--csl=' + path.expanduser(
-    #         '~/.pandoc/chicago-fullnote-bibliography.csl')
 
     mdTextSplit = mdText.splitlines()
     for lineIndex in range(len(mdTextSplit)):
@@ -385,10 +213,6 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                 bookFlag = "chapter"
         elif line.startswith('biblatex: true') and toExtension == '.tex':
             pandocOptions.append('--biblatex')
-        # elif line.startswith('bibinline: true') and toExtension != '.tex':
-        #     pandocOptions.append(intextCSL)
-        # elif line.startswith('biboptions: notes') and toExtension != '.tex':
-        #     pandocOptions.append(notesCSL)
         elif line.startswith('htmltoc: true') and toExtension == '.html':
             pandocOptions.append('--toc')
         elif line.startswith('lualatex: true'):
@@ -398,20 +222,12 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         elif line[:3] in ('...', '---') and lineIndex != 0:
             break
 
-    # Need to clean up .csl: I only want 1 csl, and it should be full-in-text
-    # first.
-    # if intextCSL in pandocOptions and notesCSL in pandocOptions:
-    #     pandocOptions.remove(notesCSL)
-
     if bookFlag:
         pandocOptions.append('--top-level-division=' + bookFlag)
         pandocOptions = pandocOptions + bookOptions.split()
     else:
         pandocOptions = pandocOptions + articleOptions.split()
 
-    # pandocCommandList = ['/usr/bin/env', 'pandoc', newFilePath, '-o',
-    #                      path.join(TEMP_PATH, baseFileName + toExtension)] +\
-    #     pandocOptions
     outFile = path.join(filePath, baseFileName + toExtension)
     pandocCommandList = ['/usr/bin/env', 'pandoc', myFile, '-o',
                          outFile] + pandocOptions
@@ -440,13 +256,18 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         if path.exists('/Applications/Skim.app'):
             call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
                   path.join(TEMP_PATH, endFile)])
-    elif toExtension == '.pdf':
-        if path.exists('/Applications/Skim.app'):
-            call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
-                  path.join(TEMP_PATH, endFile)])
     else:
-        if path.exists('/usr/bin/open') and not suppressPdfFlag:
-            call(['/usr/bin/open', path.join(TEMP_PATH, endFile)])
+        # Move file from directory of original .md doc to TEMP_PATH
+        writeMessage("Moving " + endFile + " to " + path.join(TEMP_PATH,
+                     endFile))
+        rename(endFile, path.join(TEMP_PATH, endFile))
+        if toExtension == '.pdf':
+            if path.exists('/Applications/Skim.app'):
+                call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
+                      path.join(TEMP_PATH, endFile)])
+        else:
+            if path.exists('/usr/bin/open') and not suppressPdfFlag:
+                call(['/usr/bin/open', path.join(TEMP_PATH, endFile)])
     # If on raspberrypi, upload resulting file to dropbox.
     if platform == 'old':
         message = check_output(
