@@ -79,25 +79,6 @@ def readFile(fileName):
     return text
 
 
-def writeFile(fileName, text):
-    """
-    Write text to file on disk.
-    """
-    with open(fileName, 'w', encoding='utf-8') as f:
-        f.write(text)
-
-
-def needsUpdating(originalFile, tempFile):
-    """
-    Returns True if tempFile needs to be updated from original.
-    """
-    if not path.isfile(tempFile) or\
-       path.getmtime(tempFile) < path.getmtime(originalFile):
-        return True
-    else:
-        return False
-
-
 def runPandoc(pandocCommandList):
     # writeError(str(pandocOptions))
     return run(pandocCommandList, shell=False).returncode
@@ -113,18 +94,24 @@ def removeAuxFiles(latexPath, baseFilename):
             pass
 
 
-def runLatex(latexPath, baseFileName, latexFormat):
+def runLatex(latexPath, baseFileName, latexFormat, bookFlag):
     # Need to produce .pdf file, which will be opened by runLatex script...
     # chdir(latexPath)
     environ['PATH'] = environ['PATH'] + ':/Library/TeX/texbin'
+    # Note that `makeidx` is unhappy with my setting TEMP_PATH outside the
+    # document directory out of security concerns. According to documentation
+    # for latexmk, 'One way of [getting around] this is to temporarily set an
+    # operating system environment variable openout_any to "a" (as in "all"),
+    # to override the default "paranoid" setting.' I'll turn it on only if a
+    # book is being typeset.
+    if bookFlag:
+        environ['openout_any'] = 'a'
     latexFile = path.join(latexPath, baseFileName + '.tex')
 
     texCommand = ['latexmk', latexFormat, '-f', '-synctex=1',
                   '-auxdir=' + TEMP_PATH, '-outdir=' + TEMP_PATH,
                   latexFile]
     latexError = call(texCommand, stdout=stdout)
-    # Move file from directory of original .md doc to TEMP_PATH
-    rename(latexFile, path.join(TEMP_PATH, baseFileName + '.tex'))
     if latexError:
         removeAuxFiles(latexPath, baseFileName)
         writeError('LaTeX Error!: ' + str(latexError))
@@ -174,12 +161,16 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      '--to=' + toFormat + '+smart']
     pandocOptions += ['--lua-filter',
                       path.expanduser('~/Applications/pandoc/' +
+                                      'fixYAMLFilter/' +
+                                      'fixYAML.lua')]
+    pandocOptions += ['--lua-filter',
+                      path.expanduser('~/Applications/pandoc/' +
                                       'Comment-Filter/' +
                                       'pandocCommentFilter.lua')]
-    pandocOptions += ['--filter',
+    pandocOptions += ['--lua-filter',
                       path.expanduser('~/Applications/pandoc/' +
                                       'pandoc-reference-filter/' +
-                                      'internalreferences.py')]
+                                      'internalreferences.lua')]
     pandocOptions += extraOptions.split()
 
     # addedFilter might be a String, a List, or None. This will add all to
@@ -244,11 +235,16 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         exit(1)
 
     endFile = baseFileName + toExtension
+    # Move file from directory of original .md doc to TEMP_PATH
+    writeMessage("Moving " + endFile + " to " + path.join(TEMP_PATH,
+                 endFile))
+    rename(path.join(filePath, endFile), path.join(TEMP_PATH, endFile))
+
     if (toFormat == 'latex' and toExtension == '.tex'
             and not suppressPdfFlag) or toFormat == 'beamer':
         writeMessage('Successfully created LaTeX file...')
         # Run LaTeX
-        latexError = runLatex(filePath, baseFileName, latexFormat)
+        latexError = runLatex(TEMP_PATH, baseFileName, latexFormat, bookFlag)
         if latexError:
             writeError('Error running LaTeX.')
             exit(1)
@@ -257,10 +253,6 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
             call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
                   path.join(TEMP_PATH, endFile)])
     else:
-        # Move file from directory of original .md doc to TEMP_PATH
-        writeMessage("Moving " + endFile + " to " + path.join(TEMP_PATH,
-                     endFile))
-        rename(endFile, path.join(TEMP_PATH, endFile))
         if toExtension == '.pdf':
             if path.exists('/Applications/Skim.app'):
                 call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
