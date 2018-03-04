@@ -17,7 +17,7 @@ baseFileName, fileExtension = path.splitext(fileName)
 outputFile = baseFileName + '.tex'
 
 toFormat = 'beamer'
-toExtension = '.pdf'
+toExtension = '.tex'
 # The following will have pandoc create a LaTeX beamer file, which
 # pandocConvert will run through LaTeX to produce .pdf slides. This way,
 # LaTeX's aux files are saved in ~/tmp/pandoc/, and subsequent runs are much
@@ -25,7 +25,9 @@ toExtension = '.pdf'
 extraOptions = '--output=' + outputFile
 articleOptions = ''
 bookOptions = articleOptions
-addedFilter = find_executable('pandoc-citeproc')
+addedFilter = [find_executable('pandoc-citeproc'),
+               find_executable('pandocBeamerFilter.lua')]
+
 imageFormat = '.pdf'
 
 pandocConvert.convertMd(theFile, toFormat, toExtension, extraOptions,

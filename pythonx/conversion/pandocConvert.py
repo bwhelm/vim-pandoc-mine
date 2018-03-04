@@ -19,6 +19,7 @@ Here's what each of these are (read from stdin):
     * imageFormat: the format of any images to be produced
 """
 
+from distutils.spawn import find_executable
 from os import makedirs, listdir, environ, path, remove, rename
 from subprocess import run, check_output, call
 from sys import stdout, stderr
@@ -54,6 +55,14 @@ def writeMessage(message):
     stderr.write(message + '\n')
     stderr.flush()
     return
+
+
+def writeFile(fileName, text):
+    """
+    Write text to file on disk.
+    """
+    with open(fileName, 'w', encoding='utf-8') as f:
+        f.write(text)
 
 
 def removeOldFiles(directory, time):
@@ -97,7 +106,7 @@ def removeAuxFiles(latexPath, baseFilename):
 def runLatex(latexPath, baseFileName, latexFormat, bookFlag):
     # Need to produce .pdf file, which will be opened by runLatex script...
     # chdir(latexPath)
-    environ['PATH'] = environ['PATH'] + ':/Library/TeX/texbin'
+    environ['PATH'] = '/Library/TeX/texbin:' + environ['PATH']
     # Note that `makeidx` is unhappy with my setting TEMP_PATH outside the
     # document directory out of security concerns. According to documentation
     # for latexmk, 'One way of [getting around] this is to temporarily set an
@@ -160,17 +169,11 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
                      '--wrap=none',
                      '--to=' + toFormat + '+smart']
     pandocOptions += ['--lua-filter',
-                      path.expanduser('~/Applications/pandoc/' +
-                                      'fixYAMLFilter/' +
-                                      'fixYAML.lua')]
+                      find_executable('fixYAML.lua')]
     pandocOptions += ['--lua-filter',
-                      path.expanduser('~/Applications/pandoc/' +
-                                      'Comment-Filter/' +
-                                      'pandocCommentFilter.lua')]
+                      find_executable('pandocCommentFilter.lua')]
     pandocOptions += ['--lua-filter',
-                      path.expanduser('~/Applications/pandoc/' +
-                                      'pandoc-reference-filter/' +
-                                      'internalreferences.lua')]
+                      find_executable('internalreferences.lua')]
     pandocOptions += extraOptions.split()
 
     # addedFilter might be a String, a List, or None. This will add all to

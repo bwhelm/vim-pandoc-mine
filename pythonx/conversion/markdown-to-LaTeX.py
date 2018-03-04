@@ -63,7 +63,12 @@ pandocConvert.writeFile(newTexName, diffContents)
 
 # Convert to PDF
 pandocConvert.writeMessage('Converting to .pdf...')
-latexError = pandocConvert.runLatex(tempDir, currentFileBaseName, '-pdf')
+# Note: The `False` below is `bookFlag`, which is used in runLatex to determine
+# whether makeidx will be run, and so to set an enviroment flag accordingly.
+# Setting it False here will preserve security, when I don't care whether the
+# index is being produced.
+latexError = pandocConvert.runLatex(tempDir, currentFileBaseName,
+                                    '-pdf', False)
 if latexError:
     pandocConvert.writeError('Error running LaTeX.')
     exit(1)
