@@ -20,7 +20,7 @@ Here's what each of these are (read from stdin):
 """
 
 from distutils.spawn import find_executable
-from os import makedirs, listdir, environ, path, remove, rename
+from os import chdir, makedirs, listdir, environ, path, remove, rename
 from subprocess import run, check_output, call
 from sys import stdout, stderr
 from time import time
@@ -151,6 +151,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     removeOldFiles(path.join(TEMP_PATH, 'Figures'), now)
 
     filePath, fileName = path.split(myFile)
+    chdir(filePath)  # This is needed to be able to pick up relative paths
     baseFileName, fileExtension = path.splitext(fileName)
     if fileExtension != '.md':
         writeError('Need to provide a .md file!')

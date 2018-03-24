@@ -22,7 +22,8 @@ toExtension = '.tex'
 # pandocConvert will run through LaTeX to produce .pdf slides. This way,
 # LaTeX's aux files are saved in ~/tmp/pandoc/, and subsequent runs are much
 # faster.
-extraOptions = '--output=' + outputFile
+# extraOptions = '--output=' + outputFile
+extraOptions = ''
 articleOptions = ''
 bookOptions = articleOptions
 addedFilter = [find_executable('pandoc-citeproc'),
