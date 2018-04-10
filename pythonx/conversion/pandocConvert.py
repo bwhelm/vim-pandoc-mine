@@ -134,7 +134,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
 
     # Make sure temporary path exists for LaTeX compilation
     try:
-        makedirs(path.join(TEMP_PATH, 'Figures'))
+        makedirs(IMAGE_PATH)
     except OSError:
         pass
 
@@ -148,7 +148,7 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     # Remove old files in TEMP_PATH folder...
     now = time()
     removeOldFiles(TEMP_PATH, now)
-    removeOldFiles(path.join(TEMP_PATH, 'Figures'), now)
+    removeOldFiles(IMAGE_PATH, now)
 
     filePath, fileName = path.split(myFile)
     chdir(filePath)  # This is needed to be able to pick up relative paths
