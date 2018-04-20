@@ -298,7 +298,7 @@ endif
 " ======================================================================== }}}
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
-set omnifunc=pandoc#references#MyCompletion
+setlocal omnifunc=pandoc#references#MyCompletion
 
 " ======================================================================== }}}
 " TOC Support {{{1
@@ -435,9 +435,9 @@ cnoreabbr <buffer> anf AutoNameFile
 " ======================================================================== }}}
 " Folding {{{1
 " ============================================================================
-set foldtext=pandoc#fold#FoldText()
-set fillchars=vert:│
-set fillchars+=fold:·
+setlocal foldtext=pandoc#fold#FoldText()
+setlocal fillchars=vert:│
+setlocal fillchars+=fold:·
 
 " ======================================================================== }}}
 " Tidy Up Pandoc Documents {{{1
@@ -467,7 +467,7 @@ setlocal spell spelllang=en_us
 "setlocal spellcapcheck=
 setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs
 " Allow wrapping past BOL and EOL when using `h` and `l`
-set whichwrap+=h,l
+setlocal whichwrap+=h,l
 " List of characters that can cause a line break; don't want breaking at '@',
 " since this marks citations/cross-references.
-set breakat-=@
+setlocal breakat-=@
