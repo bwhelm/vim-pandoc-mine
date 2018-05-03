@@ -52,6 +52,7 @@ MAX_YAML_LINES = 50
 
 file = argv[1].strip('"')
 lineNumber = int(argv[2]) - 1
+jumpCommand = argv[3]
 
 with open(file, 'r', encoding='utf-8') as f:
     document = f.read().splitlines()
@@ -142,10 +143,13 @@ with open(texFile, 'r', encoding='utf-8') as f:
 line_number = str(num)
 # debug(line_number)
 
-sync_command = ("'{}/Contents/SharedSupport/displayline' -g "
-                .format(PATH_TO_VIEWER) + "{} {} {}"
-                .format(line_number, quote(pdfFile), quote(texFile)))
-
-stdout.write(sync_command)
-
-call(sync_command, shell=True)
+if jumpCommand == 'pdf':
+    script = ("'{}/Contents/SharedSupport/displayline' -g "
+              .format(PATH_TO_VIEWER) + "{} {} {}"
+              .format(line_number, quote(pdfFile), quote(texFile)))
+    # debug(script)
+    call(script, shell=True)
+elif jumpCommand == '.tex':
+    stdout.write(str(line_number))
+elif jumpCommand == '.log':
+    stdout.write(str(line_number))

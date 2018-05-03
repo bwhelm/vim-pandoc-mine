@@ -160,12 +160,12 @@ endif
 if has('nvim')
     command! JumpToPDF silent call jobstart("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '" ' . line("."), {"on_stdout":
+                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"on_stdout":
                 \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
 else  " normal vim
     command! JumpToPDF silent call job_start("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '" ' . line("."), {"out_cb":
+                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"out_cb":
                 \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
@@ -195,6 +195,30 @@ nnoremap <buffer><silent> cscm mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 nnoremap <buffer><silent> cscf mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwfixme<Esc>`c
 nnoremap <buffer><silent> csch mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwhighlight<Esc>`c
 nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`c
+" Jump to .tex file in tmp dir
+function! s:JumpToTex(filetype) abort
+    let l:fileroot = expand("%:t:r")
+    if l:fileroot ==# ''
+        let l:fileroot = 'temp'
+    endif
+    let l:filename = fnamemodify("~/tmp/pandoc/" . l:fileroot . a:filetype, ":p")
+    if filereadable(l:filename)
+        let l:linenum = "0"
+        if a:filetype ==# "\.tex"
+            let l:linenum = system("/usr/bin/env python3 " .
+                        \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
+                        \ ' "' . expand('%:p') . '" ' . line(".") . " " . a:filetype)
+        endif
+        execute "tabedit " . l:filename
+        execute l:linenum
+    else
+        echohl Error
+        echom "Corresponding .tex file does not exist."
+        echohl None
+    endif
+endfunction
+nnoremap <buffer> <LocalLeader>ft :call <SID>JumpToTex(".tex")<CR>
+nnoremap <buffer> <LocalLeader>fl :call <SID>JumpToTex(".log")<CR>
 "}}}
 
 " ======================================================================== }}}
@@ -471,3 +495,4 @@ setlocal whichwrap+=h,l
 " List of characters that can cause a line break; don't want breaking at '@',
 " since this marks citations/cross-references.
 setlocal breakat-=@
+" }}}

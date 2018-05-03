@@ -61,7 +61,7 @@ function! s:removePIDFromLists(PID) abort
     endif
 endfunction
 
-function! pandoc#conversion#EndProcess(PID, text, ...)
+function! pandoc#conversion#EndProcess(PID, ...)
     try
         let [l:buffer, l:winnum, l:errorFlag] = g:pandocRunPID[a:PID]
     catch /E716/  " Key not in Dict -- will happen if user kills process
