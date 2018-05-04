@@ -1,6 +1,13 @@
+#!/usr/bin/env python3
+
 from re import findall, match, search, sub, IGNORECASE
+from sys import stdout
 from subprocess import check_output
 # from vim import eval
+
+
+def debug(message):
+    stdout.write(message + '\n')
 
 
 def readFile(fileName):

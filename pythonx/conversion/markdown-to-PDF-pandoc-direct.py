@@ -14,8 +14,8 @@ toExtension = '.pdf'
 extraOptions = ''
 bookOptions = ''
 articleOptions = ''
-# addedFilter = '/usr/local/bin/pandoc-citeproc'
-addedFilter = ''
+addedFilter = '/usr/local/bin/pandoc-citeproc'
+# addedFilter = ''
 imageFormat = '.pdf'
 
 theFile = argv[1].strip('"')

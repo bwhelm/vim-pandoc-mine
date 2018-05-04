@@ -169,9 +169,9 @@ else  " normal vim
                 \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
-" nnoremap <buffer><silent> <LocalLeader>j :call system('python ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
+" nnoremap <buffer><silent> <LocalLeader>j :call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
 " FIXME: Should the next line be mapped to :JumpToPDF?
-inoremap <buffer><silent> <LocalLeader>j <C-o>:call system('python ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
+inoremap <buffer><silent> <LocalLeader>j <C-o>:call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
 " Open Dictionary.app with word under cursor
 nnoremap <buffer><silent> K :!open dict:///<cword><CR><CR>
 " Faster mapping to bibliography/cross-reference completion
