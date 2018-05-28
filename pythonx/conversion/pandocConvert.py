@@ -26,7 +26,7 @@ from sys import stdout, stderr
 from time import time
 
 
-TEMP_PATH = path.expanduser('~/tmp/pandoc/')
+TEMP_PATH = path.expanduser('~/tmp/pandoc')
 IMAGE_PATH = path.join(TEMP_PATH, 'Figures')
 
 

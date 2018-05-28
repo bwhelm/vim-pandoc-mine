@@ -13,7 +13,9 @@ function! pandoc#conversion#DisplayMessages(PID, text, ...) abort
     endif
     echohl WarningMsg
     for l:item in l:text
-        laddexpr l:item
+        if l:item !=# ''
+            laddexpr l:item
+        endif
         if l:item[0] ==# '!'
             echom 'ERROR: ' . l:item
             call pandoc#conversion#KillProcess(a:PID, 'silent')

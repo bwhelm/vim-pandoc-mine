@@ -213,12 +213,12 @@ function! s:JumpToTex(filetype) abort
         execute l:linenum
     else
         echohl Error
-        echom "Corresponding .tex file does not exist."
+        echo "Corresponding " . a:filetype . " file does not exist."
         echohl None
     endif
 endfunction
-nnoremap <buffer> <LocalLeader>ft :call <SID>JumpToTex(".tex")<CR>
-nnoremap <buffer> <LocalLeader>fl :call <SID>JumpToTex(".log")<CR>
+nnoremap <silent><buffer> <LocalLeader>ft :call <SID>JumpToTex(".tex")<CR>
+nnoremap <silent><buffer> <LocalLeader>fl :call <SID>JumpToTex(".log")<CR>
 "}}}
 
 " ======================================================================== }}}
