@@ -12,10 +12,10 @@ function! s:JumpToReference(searchString) abort
     endif
     " Search for it. (This puts cursor at beginning of line.)
     try
-        execute l:commandString
+        silent execute l:commandString
         " Visually select matched string, switch to front end, and return to
         " normal mode. (Note: this must be in double-quotes!)
-        execute "normal! gno\<Esc>"
+        silent execute "normal! gno\<Esc>"
         return
     catch /E486/  " If search string not found ...
         " ... Need to find all headers in document, create header IDs for
@@ -25,8 +25,8 @@ function! s:JumpToReference(searchString) abort
             if l:line =~# '^#\{1,6}\s'
                 if a:searchString[1:] ==# <SID>GenerateHeaderID(l:line)
                     let l:line = substitute(l:line, '/', '\\/', 'g')
-                    execute '/' . l:line
-                    execute "normal! gno\<Esc>"
+                    silent execute '/' . l:line
+                    silent execute "normal! gno\<Esc>"
                     return
                 endif
             endif
@@ -38,8 +38,8 @@ function! s:JumpToReference(searchString) abort
         if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
             let l:biblio = s:constructOneEntry(a:searchString)
         else  " if not on iPad, python is faster
-            python import references
-            let l:biblio = pyeval("references.constructOneEntry('" . a:searchString . "')")
+            pythonx import references
+            let l:biblio = pyxeval("references.constructOneEntry('" . a:searchString . "')")
         endif
         if l:biblio !=# ''
             new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference\ filetype=pandoc
@@ -182,8 +182,8 @@ function! s:GetBibEntries(base)
     if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
         return s:createBibList(a:base)
     else  " if not on iPad, python is faster
-        python import references
-        return pyeval("references.createBibList('" . a:base . "')")
+        pythonx import references
+        return pyxeval("references.createBibList('" . a:base . "')")
     endif
 endfunction
 

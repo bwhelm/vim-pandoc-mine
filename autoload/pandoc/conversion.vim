@@ -120,8 +120,8 @@ function! pandoc#conversion#KillProcess(...) abort
         let [l:buffer, l:winnum, l:error] = g:pandocRunPID[l:PID]
         if has('nvim')
             call jobstop(str2nr(l:PID))
-        else
-            call job_stop(str2nr(l:PID))
+        else  " for vim
+            call job_stop(l:PID)
         endif
     catch /E900\|E716/  " This may happen if job has just stopped on its own.
     endtry
@@ -176,7 +176,18 @@ function! s:MyConvertHelper(command, ...) abort
     let l:buffer = bufnr("%")
     " l:pandoc_converting will be > 0 only if a conversion is ongoing.
     if has_key(g:pandocRunBuf, l:buffer)
-        let l:pandoc_converting = len(g:pandocRunBuf[l:buffer])
+        if has('nvim')
+            let l:pandoc_converting = len(g:pandocRunBuf[l:buffer])
+        elseif g:pandocRunBuf[l:buffer][0] =~ 'dead'
+            " If using vim, the job ID will change from 'run' to 'dead' when
+            " the job ends. Catch this, and remove it from lists.
+            let l:pandoc_converting = 0
+            let l:PID = matchstr(g:pandocRunBuf[l:buffer][0], '\d\+')
+            unlet g:pandocRunBuf[l:buffer][0]
+            unlet g:pandocRunPID['process ' . l:PID . ' run']
+        else
+            let l:pandoc_converting = 1
+        endif
     else
         let l:pandoc_converting = 0
     endif
