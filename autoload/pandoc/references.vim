@@ -38,8 +38,13 @@ function! s:JumpToReference(searchString) abort
         if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
             let l:biblio = s:constructOneEntry(a:searchString)
         else  " if not on iPad, python is faster
-            pythonx import references
-            let l:biblio = pyxeval("references.constructOneEntry('" . a:searchString . "')")
+            if has('nvim')
+                python3 import references
+                let l:biblio = py3eval("references.constructOneEntry('" . a:searchString . "')")
+            else
+                pythonx import references
+                let l:biblio = pyxeval("references.constructOneEntry('" . a:searchString . "')")
+            endif
         endif
         if l:biblio !=# ''
             new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference\ filetype=pandoc
@@ -182,8 +187,13 @@ function! s:GetBibEntries(base)
     if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
         return s:createBibList(a:base)
     else  " if not on iPad, python is faster
-        pythonx import references
-        return pyxeval("references.createBibList('" . a:base . "')")
+        if has('nvim')
+            python3 import references
+            return py3eval("references.createBibList('" . a:base . "')")
+        else
+            pythonx import references
+            return pyxeval("references.createBibList('" . a:base . "')")
+        endif
     endif
 endfunction
 

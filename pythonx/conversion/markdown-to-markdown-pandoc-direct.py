@@ -7,6 +7,7 @@ the pandocConvert.py script to complete the conversion.
 """
 
 from sys import argv
+from os import path
 from distutils.spawn import find_executable
 import pandocConvert
 
@@ -19,6 +20,9 @@ addedFilter = find_executable('pandoc-citeproc')
 imageFormat = ''
 
 theFile = argv[1].strip('"')
+pandocTempDir = path.expanduser(argv[2])
+pdfApp = path.expanduser(argv[3])
 
-pandocConvert.convertMd(theFile, toFormat, toExtension, extraOptions,
-                        bookOptions, articleOptions, addedFilter, imageFormat)
+pandocConvert.convertMd(pdfApp, pandocTempDir, theFile, toFormat, toExtension,
+                        extraOptions, bookOptions, articleOptions,
+                        addedFilter, imageFormat)

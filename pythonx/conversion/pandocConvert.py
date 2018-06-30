@@ -26,10 +26,6 @@ from sys import stdout, stderr
 from time import time
 
 
-TEMP_PATH = path.expanduser('~/tmp/pandoc')
-IMAGE_PATH = path.join(TEMP_PATH, 'Figures')
-
-
 """
 Note: latexmk sends messages to stderr by default. I don't want that. So in
 autoload/pandoc/conversion.vim, I'm sending stderr to vim messages and
@@ -89,7 +85,7 @@ def readFile(fileName):
 
 
 def runPandoc(pandocCommandList):
-    # writeError(str(pandocOptions))
+    # writeError(str(pandocCommandList))
     return run(pandocCommandList, shell=False).returncode
 
 
@@ -107,7 +103,7 @@ def runLatex(latexPath, baseFileName, latexFormat, bookFlag):
     # Need to produce .pdf file, which will be opened by runLatex script...
     # chdir(latexPath)
     environ['PATH'] = '/Library/TeX/texbin:' + environ['PATH']
-    # Note that `makeidx` is unhappy with my setting TEMP_PATH outside the
+    # Note that `makeidx` is unhappy with my setting pandocTempDir outside the
     # document directory out of security concerns. According to documentation
     # for latexmk, 'One way of [getting around] this is to temporarily set an
     # operating system environment variable openout_any to "a" (as in "all"),
@@ -118,7 +114,7 @@ def runLatex(latexPath, baseFileName, latexFormat, bookFlag):
     latexFile = path.join(latexPath, baseFileName + '.tex')
 
     texCommand = ['latexmk', latexFormat, '-f', '-synctex=1',
-                  '-auxdir=' + TEMP_PATH, '-outdir=' + TEMP_PATH,
+                  '-auxdir=' + latexPath, '-outdir=' + latexPath,
                   latexFile]
     latexError = call(texCommand, stdout=stdout)
     if latexError:
@@ -128,13 +124,16 @@ def runLatex(latexPath, baseFileName, latexFormat, bookFlag):
     return False     # No error
 
 
-def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
-              articleOptions, addedFilter, imageFormat):
+def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
+              extraOptions, bookOptions, articleOptions, addedFilter,
+              imageFormat):
     writeMessage('Starting conversion to ' + toExtension)
+
+    pandocTempDirImages = path.join(pandocTempDir, 'Figures')
 
     # Make sure temporary path exists for LaTeX compilation
     try:
-        makedirs(IMAGE_PATH)
+        makedirs(pandocTempDirImages)
     except OSError:
         pass
 
@@ -145,10 +144,10 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
     else:
         platform = 'new'
 
-    # Remove old files in TEMP_PATH folder...
+    # Remove old files in pandocTempDir folder...
     now = time()
-    removeOldFiles(TEMP_PATH, now)
-    removeOldFiles(IMAGE_PATH, now)
+    removeOldFiles(pandocTempDir, now)
+    removeOldFiles(pandocTempDirImages, now)
 
     filePath, fileName = path.split(myFile)
     chdir(filePath)  # This is needed to be able to pick up relative paths
@@ -193,7 +192,8 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
 
     # When toExtension == '.tex', latexFormat determines how latexmk creates a
     # pdf file (whether using pdflatex, lualatex, or xelatex). Default is
-    # pdflatex (= '-pdf').
+    # pdflatex (= '-pdf'). When toExtension == '.pdf', latexFormat determines
+    # how pandoc creates the pdf.
     latexFormat = '-pdf'
 
     mdTextSplit = mdText.splitlines()
@@ -217,6 +217,13 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         elif line[:3] in ('...', '---') and lineIndex != 0:
             break
 
+    if toFormat == 'latex' and toExtension == '.pdf':
+        # Set `--pdf-engine` for pandoc conversion direct to .pdf
+        latexEngine = {'-pdf': 'pdflatex',
+                       '-lualatex': 'lualatex',
+                       '-xelatex': 'xelatex'}
+        pandocOptions.append('--pdf-engine=' + latexEngine[latexFormat])
+
     if bookFlag:
         pandocOptions.append('--top-level-division=' + bookFlag)
         pandocOptions = pandocOptions + bookOptions.split()
@@ -239,31 +246,32 @@ def convertMd(myFile, toFormat, toExtension, extraOptions, bookOptions,
         exit(1)
 
     endFile = baseFileName + toExtension
-    # Move file from directory of original .md doc to TEMP_PATH
-    writeMessage("Moving " + endFile + " to " + path.join(TEMP_PATH,
+    # Move file from directory of original .md doc to pandocTempDir
+    writeMessage("Moving " + endFile + " to " + path.join(pandocTempDir,
                  endFile))
-    rename(path.join(filePath, endFile), path.join(TEMP_PATH, endFile))
+    rename(path.join(filePath, endFile), path.join(pandocTempDir, endFile))
 
     if (toFormat == 'latex' and toExtension == '.tex'
             and not suppressPdfFlag) or toFormat == 'beamer':
         writeMessage('Successfully created LaTeX file...')
         # Run LaTeX
-        latexError = runLatex(TEMP_PATH, baseFileName, latexFormat, bookFlag)
+        latexError = runLatex(pandocTempDir, baseFileName, latexFormat,
+                              bookFlag)
         if latexError:
             writeError('Error running LaTeX.')
             exit(1)
         endFile = baseFileName + '.pdf'
         if path.exists('/Applications/Skim.app'):
             call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
-                  path.join(TEMP_PATH, endFile)])
+                  path.join(pandocTempDir, endFile)])
     else:
         if toExtension == '.pdf':
             if path.exists('/Applications/Skim.app'):
                 call(['/usr/bin/open', '-a', '/Applications/Skim.app', '-g',
-                      path.join(TEMP_PATH, endFile)])
+                      path.join(pandocTempDir, endFile)])
         else:
             if path.exists('/usr/bin/open') and not suppressPdfFlag:
-                call(['/usr/bin/open', path.join(TEMP_PATH, endFile)])
+                call(['/usr/bin/open', path.join(pandocTempDir, endFile)])
     # If on raspberrypi, upload resulting file to dropbox.
     if platform == 'old':
         message = check_output(

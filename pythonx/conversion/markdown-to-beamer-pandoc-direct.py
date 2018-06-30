@@ -16,6 +16,9 @@ filePath, fileName = path.split(theFile)
 baseFileName, fileExtension = path.splitext(fileName)
 outputFile = baseFileName + '.tex'
 
+pandocTempDir = path.expanduser(argv[2])
+pdfApp = path.expanduser(argv[3])
+
 toFormat = 'beamer'
 toExtension = '.tex'
 # The following will have pandoc create a LaTeX beamer file, which
@@ -31,5 +34,6 @@ addedFilter = [find_executable('pandoc-citeproc'),
 
 imageFormat = '.pdf'
 
-pandocConvert.convertMd(theFile, toFormat, toExtension, extraOptions,
-                        bookOptions, articleOptions, addedFilter, imageFormat)
+pandocConvert.convertMd(pdfApp, pandocTempDir, theFile, toFormat, toExtension,
+                        extraOptions, bookOptions, articleOptions,
+                        addedFilter, imageFormat)
