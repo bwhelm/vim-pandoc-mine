@@ -126,8 +126,8 @@ nnoremap <buffer><silent> <LocalLeader>fN ?\^\[<CR>m<l%m>`<
 " Find page references needing complete citations
 noremap <buffer><silent> <LocalLeader>fr /(\(\d\+f\{0,2}\(, \d\+f\{0,2}\\|--\d\+\)\?\))<CR>
 " Copy citation into `r` register
-inoremap <buffer> <LocalLeader>y <Esc>mz?@[A-Z0-9]<CR>"ryf `za
-nnoremap <buffer> <LocalLeader>y mz?@[A-Z0-9]<CR>"ryf `z
+inoremap <buffer> <LocalLeader>y <Esc>mz?@[A-z]<CR>"ryf `za
+nnoremap <buffer> <LocalLeader>y mz?@[A-z]<CR>"ryf `z
 
 " To break undo sequence automatically {{{2
 " ------------------------------------
@@ -160,18 +160,18 @@ endif
 if has('nvim')
     command! JumpToPDF silent call jobstart("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '" ' . line("."), {"on_stdout":
+                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"on_stdout":
                 \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
 else  " normal vim
     command! JumpToPDF silent call job_start("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '" ' . line("."), {"out_cb":
+                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"out_cb":
                 \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
-" nnoremap <buffer><silent> <LocalLeader>j :call system('python ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
+" nnoremap <buffer><silent> <LocalLeader>j :call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
 " FIXME: Should the next line be mapped to :JumpToPDF?
-inoremap <buffer><silent> <LocalLeader>j <C-o>:call system('python ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
+inoremap <buffer><silent> <LocalLeader>j <C-o>:call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
 " Open Dictionary.app with word under cursor
 nnoremap <buffer><silent> K :!open dict:///<cword><CR><CR>
 " Faster mapping to bibliography/cross-reference completion
@@ -195,6 +195,30 @@ nnoremap <buffer><silent> cscm mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 nnoremap <buffer><silent> cscf mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwfixme<Esc>`c
 nnoremap <buffer><silent> csch mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwhighlight<Esc>`c
 nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`c
+" Jump to .tex file in tmp dir
+function! s:JumpToTex(filetype) abort
+    let l:fileroot = expand("%:t:r")
+    if l:fileroot ==# ''
+        let l:fileroot = 'temp'
+    endif
+    let l:filename = fnamemodify("~/tmp/pandoc/" . l:fileroot . a:filetype, ":p")
+    if filereadable(l:filename)
+        let l:linenum = "0"
+        if a:filetype ==# "\.tex"
+            let l:linenum = system("/usr/bin/env python3 " .
+                        \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
+                        \ ' "' . expand('%:p') . '" ' . line(".") . " " . a:filetype)
+        endif
+        execute "tabedit " . l:filename
+        execute l:linenum
+    else
+        echohl Error
+        echo "Corresponding " . a:filetype . " file does not exist."
+        echohl None
+    endif
+endfunction
+nnoremap <silent><buffer> <LocalLeader>ft :call <SID>JumpToTex(".tex")<CR>
+nnoremap <silent><buffer> <LocalLeader>fl :call <SID>JumpToTex(".log")<CR>
 "}}}
 
 " ======================================================================== }}}
@@ -298,7 +322,7 @@ endif
 " ======================================================================== }}}
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
-set omnifunc=pandoc#references#MyCompletion
+setlocal omnifunc=pandoc#references#MyCompletion
 
 " ======================================================================== }}}
 " TOC Support {{{1
@@ -348,7 +372,8 @@ try
             let l:title = l:title . '-' . l:suffix
         else
             " Try to guess a suffix: if presentation, name it that!
-            if l:fileBegin =~ '\n- aspectratio' || l:fileBegin =~ '\ntheme'
+            if l:fileBegin =~ '\n- aspectratio' || l:fileBegin =~ '\ntheme' ||
+                        \ l:fileBegin =~ '\nbeamerarticle'
                 let l:title .= '-Presentation'
                 echo 'Identified as presentation.'
             endif
@@ -359,12 +384,13 @@ try
         let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
         let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
         let l:title = substitute(l:title, '__', '_', 'g')
-        let l:title = fnameescape(l:title . l:extension)
+        let l:newName = fnameescape(l:title . l:extension)
         " let l:currentName = fnameescape(expand('%:t'))
         let l:currentName = expand('%:t')
-        let l:currentPath = getcwd() . '/' . expand('%:h') . '/'
-        if l:title !=? l:currentName && findfile(l:title, l:currentPath) !=# ''
-            " Note: if l:title merely modifies the case of l:currentName, this
+        " let l:currentPath = getcwd() . '/' . expand('%:h') . '/'
+        let l:currentPath = fnameescape(expand('%:h') . '/')
+        if l:newName !=? l:currentName && findfile(l:newName, l:currentPath) !=# ''
+            " Note: if l:newName merely modifies the case of l:currentName, this
             " will not throw up a warning. In most cases this is what I want,
             " but if there is another file that is a case variant of the
             " current file, this could be problematic. I won't worry about
@@ -383,8 +409,8 @@ try
         if l:currentName !=# ''  "File already has a name
             execute 'cd ' . l:currentPath
             if findfile(l:currentName, '.') ==# ''  " No existing file
-                execute 'write ' . l:title
-            elseif l:currentName ==# l:title  " Existing file with same name
+                execute 'write ' . l:newName
+            elseif l:currentName ==# l:newName  " Existing file with same name
                 update
                 echohl Comment
                 echom 'Updated existing file w/o renaming.'
@@ -395,31 +421,31 @@ try
                     " delete manually. This happens (a) if fugitive is not loaded
                     " or the file is not in a git repository or (b) if the file is
                     " already saved but not yet added to git repository.
-                    execute 'Gmove! ' . l:title
+                    execute 'Gmove! ' . l:newName
                     execute 'bwipeout ' . l:currentName
-                        " Next line is needed when l:title only modifies the
+                        " Next line is needed when l:newName only modifies the
                         " case of l:currentName: bwipeout will kill the
                         " current buffer, and so it needs to be reloaded. (In
                         " other cases, `edit` will do nothing.)
-                        execute 'edit ' . l:currentPath . l:title
+                        execute 'edit ' . l:currentPath . l:newName
                 catch
-                    if rename(l:currentName, l:title)
+                    if rename(l:currentName, l:newName)
                         echohl Error
                         echom 'Error renaming file ' . l:currentName . ' to ' . l:title
                         echohl None
                     else
                         echom 'File renamed to: ' . l:title
                         execute 'bwipeout ' . l:currentName
-                        " Next line is needed when l:title only modifies the
+                        " Next line is needed when l:newName only modifies the
                         " case of l:currentName: bwipeout will kill the
                         " current buffer, and so it needs to be reloaded. (In
                         " other cases, `edit` will do nothing.)
-                        execute 'edit ' . l:currentPath . l:title
+                        execute 'edit ' . l:currentPath . l:newName
                     endif
                 endtry
             endif
         else  " File does not already have a name
-            execute 'write! ' . l:title
+            execute 'write! ' . l:newName
         endif
         execute 'cd ' . l:oldPath
     endfunction
@@ -434,9 +460,9 @@ cnoreabbr <buffer> anf AutoNameFile
 " ======================================================================== }}}
 " Folding {{{1
 " ============================================================================
-set foldtext=pandoc#fold#FoldText()
-set fillchars=vert:│
-set fillchars+=fold:·
+setlocal foldtext=pandoc#fold#FoldText()
+setlocal fillchars=vert:│
+setlocal fillchars+=fold:·
 
 " ======================================================================== }}}
 " Tidy Up Pandoc Documents {{{1
@@ -466,7 +492,8 @@ setlocal spell spelllang=en_us
 "setlocal spellcapcheck=
 setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs
 " Allow wrapping past BOL and EOL when using `h` and `l`
-set whichwrap+=h,l
+setlocal whichwrap+=h,l
 " List of characters that can cause a line break; don't want breaking at '@',
 " since this marks citations/cross-references.
-set breakat-=@
+setlocal breakat-=@
+" }}}
