@@ -12,10 +12,10 @@ function! s:JumpToReference(searchString) abort
     endif
     " Search for it. (This puts cursor at beginning of line.)
     try
-        execute l:commandString
+        silent execute l:commandString
         " Visually select matched string, switch to front end, and return to
         " normal mode. (Note: this must be in double-quotes!)
-        execute "normal! gno\<Esc>"
+        silent execute "normal! gno\<Esc>"
         return
     catch /E486/  " If search string not found ...
         " ... Need to find all headers in document, create header IDs for
@@ -25,8 +25,8 @@ function! s:JumpToReference(searchString) abort
             if l:line =~# '^#\{1,6}\s'
                 if a:searchString[1:] ==# <SID>GenerateHeaderID(l:line)
                     let l:line = substitute(l:line, '/', '\\/', 'g')
-                    execute '/' . l:line
-                    execute "normal! gno\<Esc>"
+                    silent execute '/' . l:line
+                    silent execute "normal! gno\<Esc>"
                     return
                 endif
             endif
@@ -34,12 +34,17 @@ function! s:JumpToReference(searchString) abort
         " The pandoc method is pretty slow, though very accurate. Using my
         " citation is much faster, and probably accurate enough for most
         " purposes.
-        "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/Bibdatabase-new.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/Bibdatabase-helm-new.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
+        "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-new.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-helm-new.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
         if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
             let l:biblio = s:constructOneEntry(a:searchString)
         else  " if not on iPad, python is faster
-            python import references
-            let l:biblio = pyeval("references.constructOneEntry('" . a:searchString . "')")
+            if has('nvim')
+                python3 import references
+                let l:biblio = py3eval("references.constructOneEntry('" . a:searchString . "')")
+            else
+                pythonx import references
+                let l:biblio = pyxeval("references.constructOneEntry('" . a:searchString . "')")
+            endif
         endif
         if l:biblio !=# ''
             new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference\ filetype=pandoc
@@ -182,8 +187,13 @@ function! s:GetBibEntries(base)
     if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
         return s:createBibList(a:base)
     else  " if not on iPad, python is faster
-        python import references
-        return pyeval("references.createBibList('" . a:base . "')")
+        if has('nvim')
+            python3 import references
+            return py3eval("references.createBibList('" . a:base . "')")
+        else
+            pythonx import references
+            return pyxeval("references.createBibList('" . a:base . "')")
+        endif
     endif
 endfunction
 
@@ -230,15 +240,15 @@ endfunction
 function! s:GetBibData()
     " Read data from .bib files
     if b:system == 'ios'
-        let l:file = fnamemodify('~/Bibdatabase-new.bib', ':p')
+        let l:file = fnamemodify('~/bibdatabase-new.bib', ':p')
     else
-        let l:file = system('kpsewhich Bibdatabase-new.bib')[:-2]
+        let l:file = system('kpsewhich bibdatabase-new.bib')[:-2]
     endif
     let l:bibText = join(readfile(l:file), "\n")
     if b:system == 'ios'
-        let l:file = fnamemodify('~/Bibdatabase-helm-new.bib', ':p')
+        let l:file = fnamemodify('~/bibdatabase-helm-new.bib', ':p')
     else
-        let l:file = system('kpsewhich Bibdatabase-helm-new.bib')[:-2]
+        let l:file = system('kpsewhich bibdatabase-helm-new.bib')[:-2]
     endif
     let l:bibText .= join(readfile(l:file), "\n")
     return l:bibText
