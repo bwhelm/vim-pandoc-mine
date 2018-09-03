@@ -13,7 +13,17 @@ let b:loaded_pandoc_mine=1
 
 let b:pandoc_converting = 0  " keeps track of whether currently converting or not
 let b:pandoc_autoPDFEnabled = 0  " Turn autoPDF off by default...
-let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'  " Last method used for conversions
+" Identify default (i.e., last) method for file conversions. If we can
+" identify the file as a presentation, initialize with beamer or revealjs;
+" otherwise initialize with pdflatex.
+let s:fileBegin = join(getline(0, 50), "\n")
+if s:fileBegin =~ '\ntransition:'
+    let b:pandoc_lastConversionMethod = 'markdown-to-revealjs-pandoc-direct.py'
+elseif s:fileBegin =~ '\n- aspectratio' || s:fileBegin =~ '\ntheme'
+    let b:pandoc_lastConversionMethod = 'markdown-to-beamer-pandoc-direct.py'
+else
+    let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'
+endif
 
 " ======================================================================== }}}
 " Key mappings {{{1
