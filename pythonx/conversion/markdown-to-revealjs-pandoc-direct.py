@@ -27,13 +27,16 @@ revealJSSource = path.expanduser(
         '~/Applications/pandoc-others/hakimel-reveal.js')
 try:
     makedirs(revealJSAliasDir)
-except OSError:  # This is for Python 2.7. For 3.5, need FileExistsError
+except FileExistsError:  # This is for Python 3.x. For 2.7, need OSError
     pass
 if not path.exists(path.join(revealJSAliasDir, revealJSAliasFile)):
     chdir(revealJSAliasDir)
     symlink(revealJSSource, revealJSAliasFile)
 
 theFile = argv[1].strip('"')
+pandocTempDir = path.expanduser(argv[2])
+pdfApp = path.expanduser(argv[3])
 
-pandocConvert.convertMd(theFile, toFormat, toExtension, extraOptions,
-                        bookOptions, articleOptions, addedFilter, imageFormat)
+pandocConvert.convertMd(pdfApp, pandocTempDir, theFile, toFormat, toExtension,
+                        extraOptions, bookOptions, articleOptions,
+                        addedFilter, imageFormat)

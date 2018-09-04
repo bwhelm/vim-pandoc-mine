@@ -13,7 +13,9 @@ function! pandoc#conversion#DisplayMessages(PID, text, ...) abort
     endif
     echohl WarningMsg
     for l:item in l:text
-        laddexpr l:item
+        if l:item !=# ''
+            laddexpr l:item
+        endif
         if l:item[0] ==# '!'
             echom 'ERROR: ' . l:item
             call pandoc#conversion#KillProcess(a:PID, 'silent')
@@ -61,7 +63,7 @@ function! s:removePIDFromLists(PID) abort
     endif
 endfunction
 
-function! pandoc#conversion#EndProcess(PID, text, ...)
+function! pandoc#conversion#EndProcess(PID, ...)
     try
         let [l:buffer, l:winnum, l:errorFlag] = g:pandocRunPID[a:PID]
     catch /E716/  " Key not in Dict -- will happen if user kills process
@@ -118,8 +120,8 @@ function! pandoc#conversion#KillProcess(...) abort
         let [l:buffer, l:winnum, l:error] = g:pandocRunPID[l:PID]
         if has('nvim')
             call jobstop(str2nr(l:PID))
-        else
-            call job_stop(str2nr(l:PID))
+        else  " for vim
+            call job_stop(l:PID)
         endif
     catch /E900\|E716/  " This may happen if job has just stopped on its own.
     endtry
@@ -154,6 +156,12 @@ function! s:MyConvertHelper(command, ...) abort
         let g:pandocRunPID = {}
         let g:pandocRunBuf = {}
     endif
+    if !exists('g:pandocTempDir')
+        let g:pandocTempDir = '~/tmp/pandoc'
+    endif
+    if !exists('g:pandocPdfApp')
+        let g:pandocPdfApp = '/Applications/Skim.app'
+    endif
     let l:auxCommand = a:0 == 0 ? '' : a:1
     if empty(a:command)
         let l:command = b:pandoc_lastConversionMethod
@@ -174,7 +182,18 @@ function! s:MyConvertHelper(command, ...) abort
     let l:buffer = bufnr("%")
     " l:pandoc_converting will be > 0 only if a conversion is ongoing.
     if has_key(g:pandocRunBuf, l:buffer)
-        let l:pandoc_converting = len(g:pandocRunBuf[l:buffer])
+        if has('nvim')
+            let l:pandoc_converting = len(g:pandocRunBuf[l:buffer])
+        elseif g:pandocRunBuf[l:buffer][0] =~ 'dead'
+            " If using vim, the job ID will change from 'run' to 'dead' when
+            " the job ends. Catch this, and remove it from lists.
+            let l:pandoc_converting = 0
+            let l:PID = matchstr(g:pandocRunBuf[l:buffer][0], '\d\+')
+            unlet g:pandocRunBuf[l:buffer][0]
+            unlet g:pandocRunPID['process ' . l:PID . ' run']
+        else
+            let l:pandoc_converting = 1
+        endif
     else
         let l:pandoc_converting = 0
     endif
@@ -187,14 +206,16 @@ function! s:MyConvertHelper(command, ...) abort
         if has('nvim')
             let l:jobPID = jobstart('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
-                    \ ' "' . l:fileName . '" ' . l:auxCommand,
+                    \ ' "' . l:fileName . '" ' . g:pandocTempDir . ' ' .
+                    \ g:pandocPdfApp . ' ' . l:auxCommand,
                     \ {'on_stdout': 'pandoc#conversion#DisplayMessages',
                     \ 'on_stderr': 'pandoc#conversion#DisplayError',
                     \ 'on_exit': 'pandoc#conversion#EndProcess'})
         else
             let l:jobPID = job_start('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
-                    \ ' "' . l:fileName . '" ' . l:auxCommand,
+                    \ ' "' . l:fileName . '" ' . g:pandocTempDir . ' ' .
+                    \ g:pandocPdfApp . ' ' . l:auxCommand,
                     \ {'out_cb': 'pandoc#conversion#DisplayMessages',
                     \ 'err_cb': 'pandoc#conversion#DisplayError',
                     \ 'close_cb': 'pandoc#conversion#EndProcess'})

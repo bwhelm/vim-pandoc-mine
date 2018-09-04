@@ -26,8 +26,10 @@ imageFormat = '.pdf'
 currentFileName = argv[1].strip('"')
 currentFilePath, currentFileShortName = path.split(currentFileName)
 chdir(currentFilePath)
-if len(argv) > 2:
-    gitObject = argv[2]  # To identify the old commit to diff with....
+pandocTempDir = path.expanduser(argv[2])
+pdfApp = path.expanduser(argv[3])
+if len(argv) > 4:
+    gitObject = argv[4]  # To identify the old commit to diff with....
 else:
     gitObject = ''  # If empty, uses git cache
 gitPrefix = check_output(['git', 'rev-parse',
@@ -40,14 +42,16 @@ oldFileText = check_output(['git', 'show', gitObject + ':' +
 # Create .tex file of file in git cache
 pandocConvert.writeMessage('Retrieving from git cache...')
 pandocConvert.writeFile(oldFileName, oldFileText)
-pandocConvert.convertMd(oldFileName, toFormat, toExtension, extraOptions,
-                        bookOptions, articleOptions, addedFilter, imageFormat)
+pandocConvert.convertMd(pdfApp, pandocTempDir, oldFileName, toFormat,
+                        toExtension, extraOptions, bookOptions,
+                        articleOptions, addedFilter, imageFormat)
 remove(oldFileName)  # No longer needed after conversion....
 
 # Create .tex file of current working file
 pandocConvert.writeMessage('Creating .tex of working file...')
-pandocConvert.convertMd(currentFileName, toFormat, toExtension, extraOptions,
-                        bookOptions, articleOptions, addedFilter, imageFormat)
+pandocConvert.convertMd(pdfApp, pandocTempDir, currentFileName, toFormat,
+                        toExtension, extraOptions, bookOptions,
+                        articleOptions, addedFilter, imageFormat)
 
 # Create texdiff file
 pandocConvert.writeMessage('Creating latexdiff...')
@@ -63,7 +67,12 @@ pandocConvert.writeFile(newTexName, diffContents)
 
 # Convert to PDF
 pandocConvert.writeMessage('Converting to .pdf...')
-latexError = pandocConvert.runLatex(tempDir, currentFileBaseName, '-pdf')
+# Note: The `False` below is `bookFlag`, which is used in runLatex to determine
+# whether makeidx will be run, and so to set an enviroment flag accordingly.
+# Setting it False here will preserve security, when I don't care whether the
+# index is being produced.
+latexError = pandocConvert.runLatex(tempDir, currentFileBaseName,
+                                    '-pdf', False)
 if latexError:
     pandocConvert.writeError('Error running LaTeX.')
     exit(1)
