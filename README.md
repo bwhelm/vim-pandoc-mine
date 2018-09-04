@@ -20,8 +20,8 @@ different computer.
 
 4. I assume two pandoc filters are available: <bwhelm/pandoc-reference-filter>
    and <bwhelm/Pandoc-Comment-Filter>. These are assumed to be at
-   `~/Applications/pandoc/pandoc-reference-filter/internalreferences.py` and at
-   `~/Applications/pandoc/Comment-Filter/pandocCommentFilter.py`, respectively.
+   `~/Applications/pandoc/pandoc-reference-filter/internalreferences.lua` and at
+   `~/Applications/pandoc/Comment-Filter/pandocCommentFilter.lua`, respectively.
 
     - Keybindings and textobjects are provided for working with
       Pandoc-Comment-Filter's various comments.
