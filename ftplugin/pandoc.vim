@@ -406,7 +406,7 @@ try
             " current file, this could be problematic. I won't worry about
             " this possibility.
             echohl WarningMsg
-            echom 'Destination file (' . l:title . ') already exists. Overwrite? (y/N)'
+            echom 'Destination file (' . l:newName . ') already exists. Overwrite? (y/N)'
             if getchar() != 121  " ('y')
                 echom 'Aborting...'
                 echohl None
@@ -441,10 +441,10 @@ try
                 catch
                     if rename(l:currentName, l:newName)
                         echohl Error
-                        echom 'Error renaming file ' . l:currentName . ' to ' . l:title
+                        echom 'Error renaming file ' . l:currentName . ' to ' . l:newName
                         echohl None
                     else
-                        echom 'File renamed to: ' . l:title
+                        echom 'File renamed to: ' . l:newName
                         execute 'bwipeout ' . l:currentName
                         " Next line is needed when l:newName only modifies the
                         " case of l:currentName: bwipeout will kill the
