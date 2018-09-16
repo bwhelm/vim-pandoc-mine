@@ -29,13 +29,22 @@ endif
 " Key mappings {{{1
 " ============================================================================
 
-" Jumping to Headings {{{2
-" -------------------
-function! s:JumpToHeader(direction)
-    let l:jumpLine = search('^#\{1,6}\s.*', a:direction . 'nW')
-    if l:jumpLine > 0
-        execute l:jumpLine
-    else
+" Jump to Headers {{{2
+" ---------------
+function! s:JumpToHeader(direction, count)
+    let l:count = a:count
+    let l:cursorPos = getcurpos()
+    if l:count > 1 && a:direction ==# 'b'
+        let l:count += 1
+    endif
+    let l:foundCount = 0
+    for l:index in range(l:count)
+        let l:jumpLine = search('^#\{1,6}\s', a:direction . 'W')
+        if l:jumpLine > 0
+            let l:foundCount += 1
+        endif
+    endfor
+    if !l:foundCount
         echohl Error
         if a:direction ==# 'b'
             echo 'No previous header'
@@ -43,10 +52,16 @@ function! s:JumpToHeader(direction)
             echo 'No next header'
         endif
         echohl None
+        call setpos('.', l:cursorPos)
+    elseif (a:direction ==# '' && l:foundCount < l:count) ||
+                \ (a:direction ==# 'b' && l:foundCount < l:count - 1)
+        echohl Error
+        echo "Can't jump that many headers!"
+        echohl None
     endif
 endfunction
-noremap <buffer><silent> ]] :call <SID>JumpToHeader('')<CR>
-noremap <buffer><silent> [[ :call <SID>JumpToHeader('b')<CR>
+noremap <buffer><silent> ]] :call <SID>JumpToHeader('', v:count1)<CR>
+noremap <buffer><silent> [[ :call <SID>JumpToHeader('b', v:count1)<CR>
 
 " Fold Section {{{2
 " ------------
