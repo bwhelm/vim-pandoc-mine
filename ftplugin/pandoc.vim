@@ -404,6 +404,7 @@ try
             endif
         endif
         let l:title = substitute(l:title, '[,:] ', '-', 'g')
+        let l:title = substitute(l:title, '/', '-', 'g')
         let l:title = substitute(l:title, ' ', '_', 'g')
         let l:title = <SID>RemoveDiacritics(l:title)
         let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
