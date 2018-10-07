@@ -47,12 +47,15 @@ function! s:JumpToReference(searchString) abort
             endif
         endif
         if l:biblio !=# ''
-            new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference\ filetype=pandoc
+            new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference
             resize 5
             put! =l:biblio
+            " Set filetype *after* adading content so as not to trigger
+            " template prompt.
+            setlocal filetype=pandoc
             $delete_
             " Move to URL (if there is one; fail silently if not)
-            silent! normal! f<
+            call search('<\zs.', 'zW')
             " Use next line only with pandoc method
             nmap <buffer> <CR> <Plug>NetrwBrowseX
             nnoremap <silent><buffer> q :quit<CR>
@@ -71,7 +74,7 @@ function! pandoc#references#GoToReference() abort
     let l:ignorecaseSave = &ignorecase
     let l:smartcaseSave = &smartcase
     set noignorecase nosmartcase
-    normal! mx
+    mark x
     let l:line = getline('.')
     let [l:bufnum, l:lnum, l:col, l:off] = getpos('.')
     let l:col -= 1
