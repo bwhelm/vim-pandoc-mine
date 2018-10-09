@@ -21,8 +21,10 @@ def readFile(fileName):
 
 def getBibData():
     """Read data from .bib files"""
-    bibText = readFile(check_output(['kpsewhich', 'Bibdatabase-new.bib'])[:-1].decode('utf-8'))
-    bibText += readFile(check_output(['kpsewhich', 'Bibdatabase-helm-new.bib'])[:-1].decode('utf-8'))
+    bibText = readFile(check_output(['kpsewhich', 'Bibdatabase-new.bib'])
+                       [:-1].decode('utf-8'))
+    bibText += readFile(check_output(['kpsewhich', 'Bibdatabase-helm-new.bib'])
+                        [:-1].decode('utf-8'))
     bibDataList = findall(r'@[^@]*', bibText)
     return bibDataList
 
