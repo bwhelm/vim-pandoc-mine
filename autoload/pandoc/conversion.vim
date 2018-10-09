@@ -63,7 +63,7 @@ function! s:removePIDFromLists(PID) abort
     endif
 endfunction
 
-function! pandoc#conversion#EndProcess(PID, ...)
+function! pandoc#conversion#EndProcess(PID, ...) abort
     try
         let [l:buffer, l:winnum, l:errorFlag] = g:pandocRunPID[a:PID]
     catch /E716/  " Key not in Dict -- will happen if user kills process
@@ -81,14 +81,14 @@ function! pandoc#conversion#EndProcess(PID, ...)
     let l:winnum = <SID>removePIDFromLists(a:PID)
     " Retrieve wordcount from location list, and display as message.
     let l:locList = getloclist(l:winnum)
-    let l:wordcount = ""
+    let l:wordcount = ''
     for l:dict in l:locList
-        if l:dict['text'] =~ "^Words:"
+        if l:dict['text'] =~# '^Words:'
             let l:wordcount = dict['text']
             break
         endif
     endfor
-    if l:wordcount != ""
+    if l:wordcount !=# ''
         echohl Comment
         echom l:wordcount
         echohl None
@@ -105,7 +105,7 @@ function! pandoc#conversion#KillProcess(...) abort
     else
         let l:silent = 0
     endif
-    if !exists("l:PID")
+    if !exists('l:PID')
         let l:PIDList = keys(g:pandocRunPID)
         if len(l:PIDList) == 0
             echohl Comment
@@ -179,12 +179,12 @@ function! s:MyConvertHelper(command, ...) abort
     else
         update
     endif
-    let l:buffer = bufnr("%")
+    let l:buffer = bufnr('%')
     " l:pandoc_converting will be > 0 only if a conversion is ongoing.
     if has_key(g:pandocRunBuf, l:buffer)
         if has('nvim')
             let l:pandoc_converting = len(g:pandocRunBuf[l:buffer])
-        elseif g:pandocRunBuf[l:buffer][0] =~ 'dead'
+        elseif g:pandocRunBuf[l:buffer][0] =~# 'dead'
             " If using vim, the job ID will change from 'run' to 'dead' when
             " the job ends. Catch this, and remove it from lists.
             let l:pandoc_converting = 0
@@ -220,7 +220,7 @@ function! s:MyConvertHelper(command, ...) abort
                     \ 'err_cb': 'pandoc#conversion#DisplayError',
                     \ 'close_cb': 'pandoc#conversion#EndProcess'})
         endif
-        let g:pandocRunPID[l:jobPID] = [l:buffer, bufwinid("%"), 0]
+        let g:pandocRunPID[l:jobPID] = [l:buffer, bufwinid('%'), 0]
         if has_key(g:pandocRunBuf, l:buffer)
             let g:pandocRunBuf[l:buffer] += [l:jobPID]
         else

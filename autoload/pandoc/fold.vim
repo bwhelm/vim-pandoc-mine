@@ -2,7 +2,7 @@ scriptencoding utf-8
 " vim: set fdm=marker foldlevel=0:
 " ============================================================================
 
-function! pandoc#fold#FoldText()
+function! pandoc#fold#FoldText() abort
     let l:text = getline(v:foldstart)
     let l:numLines = ' [' . string(v:foldend - v:foldstart + 1) . ' ℓ]'
     if l:text ==# '---'
@@ -28,7 +28,7 @@ function! pandoc#fold#FoldText()
     return l:text . l:numLines
 endfunction
 
-function! pandoc#fold#FindSectionBoundaries()
+function! pandoc#fold#FindSectionBoundaries() abort
     if getline('.') =~# '^#\{1,6}\s'
         let l:startLine = line('.')
     else
@@ -50,7 +50,7 @@ function! pandoc#fold#FindSectionBoundaries()
     return [l:startLine, l:endLine]
 endfunction
 
-function! pandoc#fold#foldSection(exclusive)
+function! pandoc#fold#foldSection(exclusive) abort
     if foldlevel('.') > 0 && a:exclusive == 1
         echohl WarningMsg
         echo 'Already in a fold.'
@@ -68,7 +68,7 @@ function! pandoc#fold#foldSection(exclusive)
     return l:endLine
 endfunction
 
-function! pandoc#fold#foldAllSections()
+function! pandoc#fold#foldAllSections() abort
     " Delete all folds
     normal! zE
     let l:origCursor = getpos('.')
@@ -84,7 +84,7 @@ function! pandoc#fold#foldAllSections()
     call setpos('.', l:origCursor)
 endfunction
 
-function! pandoc#fold#foldAllSectionsNested()
+function! pandoc#fold#foldAllSectionsNested() abort
     " Delete all folds
     normal! zE
     let l:origCursor = getpos('.')

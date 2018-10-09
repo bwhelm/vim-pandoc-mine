@@ -120,7 +120,7 @@ endfunction
 
 let s:abbrLength = 10  " Length of citation key abbreviation
 
-function! s:GenerateHeaderID(header)
+function! s:GenerateHeaderID(header) abort
     " Generates pandoc-style identifiers for headers. Assumes headers are
     " relatively well behaved (without much formatting, for example), and so
     " is somewhat fragile.
@@ -136,7 +136,7 @@ function! s:GenerateHeaderID(header)
     return l:header
 endfunction
 
-function! s:FindHeaderID(base)
+function! s:FindHeaderID(base) abort
     let l:text = getline(0, '$')
     let l:completionList = []
     let l:matchHeaderPattern = '\(#\{1,6}\s\+.\{-}\)\s\+{#\([[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß\-_+:]\+\).\{-}}'
@@ -186,7 +186,7 @@ function! s:FindHeaderID(base)
     return l:completionList
 endfunction
 
-function! s:GetBibEntries(base)
+function! s:GetBibEntries(base) abort
     if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
         return s:createBibList(a:base)
     else  " if not on iPad, python is faster
@@ -200,7 +200,7 @@ function! s:GetBibEntries(base)
     endif
 endfunction
 
-function! pandoc#references#MyCompletion(findstart, base)
+function! pandoc#references#MyCompletion(findstart, base) abort
     if a:findstart
         " locate the start of the partial ID but only if within 30 chars of
         " cursor
@@ -240,15 +240,15 @@ endfunction
 " augroup END
 
 
-function! s:GetBibData()
+function! s:GetBibData() abort
     " Read data from .bib files
-    if b:system == 'ios'
+    if b:system ==# 'ios'
         let l:file = fnamemodify('~/bibdatabase-new.bib', ':p')
     else
         let l:file = system('kpsewhich bibdatabase-new.bib')[:-2]
     endif
     let l:bibText = join(readfile(l:file), "\n")
-    if b:system == 'ios'
+    if b:system ==# 'ios'
         let l:file = fnamemodify('~/bibdatabase-helm-new.bib', ':p')
     else
         let l:file = system('kpsewhich bibdatabase-helm-new.bib')[:-2]
@@ -258,7 +258,7 @@ function! s:GetBibData()
 endfunction
 
 
-function! s:retrieveBibField(bibItem, fieldname)
+function! s:retrieveBibField(bibItem, fieldname) abort
     try
         let l:field = matchstr(a:bibItem, '\c\n\s*' . a:fieldname . '\s*=\s*{\zs.\{-}\ze}[,}]\{0,2}\n')
     catch
@@ -268,8 +268,8 @@ function! s:retrieveBibField(bibItem, fieldname)
 endfunction
 
 
-function! s:getAuthorLast(author)
-    if a:author =~ ','
+function! s:getAuthorLast(author) abort
+    if a:author =~# ','
         let l:authorLast = matchstr(a:author, '^[^,]*')
     else
         let l:authorLast = matchstr(a:author, '\s\S\+$')
@@ -278,10 +278,10 @@ function! s:getAuthorLast(author)
 endfunction
 
 
-function! s:constructBookEntry(bibItem, desired)
+function! s:constructBookEntry(bibItem, desired) abort
     " Create markdown bibliography entry for book
     let l:author = s:retrieveBibField(a:bibItem, 'author')
-    if l:author == ''
+    if l:author ==# ''
         let l:editor = s:retrieveBibField(a:bibItem, 'editor')
         let l:entry = l:editor
         let l:shortEntry = s:getAuthorLast(l:editor)
@@ -293,7 +293,7 @@ function! s:constructBookEntry(bibItem, desired)
     let l:entry .= ' (' . l:year . ').'
     let l:shortEntry .= '(' . l:year . ').'
     let booktitle = s:retrieveBibField(a:bibItem, 'booktitle')
-    if l:booktitle != ''
+    if l:booktitle !=# ''
         let l:entry .= ' *' . l:booktitle . '*.'
         let l:shortEntry .= ' *' . l:booktitle . '*.'
     else
@@ -301,7 +301,7 @@ function! s:constructBookEntry(bibItem, desired)
         let l:shortEntry .= ' *' . s:retrieveBibField(a:bibItem, 'title') . '*.'
     endif
     let l:publisher = s:retrieveBibField(a:bibItem, 'publisher')
-    if l:publisher != ''
+    if l:publisher !=# ''
         let address = s:retrieveBibField(a:bibItem, 'address')
         if address
             let l:entry .= ' ' . address . ': ' . l:publisher . '.'
@@ -318,7 +318,7 @@ function! s:constructBookEntry(bibItem, desired)
             let l:entry .= ' <' . l:url . '>'
         endif
     endif
-    if a:desired == 'entry'
+    if a:desired ==# 'entry'
         return l:entry
     else
         return l:shortEntry
@@ -326,15 +326,15 @@ function! s:constructBookEntry(bibItem, desired)
 endfunction
 
 
-function! s:constructArticleEntry(bibItem, desired)
+function! s:constructArticleEntry(bibItem, desired) abort
     " Create markdown bibliography entry for article
     let l:author = s:retrieveBibField(a:bibItem, 'author')
-    if a:desired == 'entry'
+    if a:desired ==# 'entry'
         let l:entry = l:author . ' (' . s:retrieveBibField(a:bibItem, 'year') . '). "'
                 \ . s:retrieveBibField(a:bibItem, 'title') . '". *'
                 \ . s:retrieveBibField(a:bibItem, 'journal') . '*.'
         let l:volume = s:retrieveBibField(a:bibItem, 'volume')
-        if l:volume != ''
+        if l:volume !=# ''
             let l:entry .= ' ' . l:volume . ':'
             let l:entry .= s:retrieveBibField(a:bibItem, 'pages') . '.'
         endif
@@ -348,7 +348,7 @@ function! s:constructArticleEntry(bibItem, desired)
             endif
         endif
         return l:entry
-    elseif a:desired == 'short'
+    elseif a:desired ==# 'short'
         let shortEntry = s:getAuthorLast(l:author) . '('
                 \ . s:retrieveBibField(a:bibItem, 'year') . '). "'
                 \ . s:retrieveBibField(a:bibItem, 'title') . '". *'
@@ -358,11 +358,11 @@ function! s:constructArticleEntry(bibItem, desired)
 endfunction
 
 
-function! s:constructInCollEntry(bibItem, crossref, desired)
+function! s:constructInCollEntry(bibItem, crossref, desired) abort
     let l:crossref = a:crossref
     """Create markdown bibliography entry for incollection"""
     let l:year = s:retrieveBibField(a:bibItem, 'year')
-    if l:year == ''
+    if l:year ==# ''
         try
             let l:year = matchstr(l:crossref, '(\zs[^)]*\ze)')
             " year = search(r'\(([^)]*)\)', crossref).group(1)
@@ -370,17 +370,17 @@ function! s:constructInCollEntry(bibItem, crossref, desired)
         endtry
     endif
     let l:author = s:retrieveBibField(a:bibItem, 'author')
-    if l:author == ''
+    if l:author ==# ''
         try
             let l:author = matchstr(l:crossref, '[^(]*')
             " author = search(r'[^(]*', l:crossref).group(0)
         catch
         endtry
     endif
-    if l:crossref == ''
+    if l:crossref ==# ''
         let l:crossref = '*' . s:retrieveBibField(a:bibItem, 'booktitle') . '*'
     endif
-    if a:desired == 'entry'
+    if a:desired ==# 'entry'
         let l:entry = l:author . ' (' . year . '). "'
                 \ . s:retrieveBibField(a:bibItem, 'title') . '". In ' . l:crossref
                 \ . ' ' . s:retrieveBibField(a:bibItem, 'pages') . '.'
@@ -404,7 +404,7 @@ function! s:constructInCollEntry(bibItem, crossref, desired)
 endfunction
 
 
-function! s:removeLatex(text)
+function! s:removeLatex(text) abort
     """Quick substitution of markdown for common LaTeX"""
     let l:text = substitute(a:text, '\\emph{\([^}]*\)}', '*\1*', 'g')  " Swap emphasis
     let l:text = substitute(l:text, '\\mkbibquote{\([^}]*\)}', '"\1"', 'g')  " Remove mkbibquote
@@ -425,7 +425,7 @@ function! s:removeLatex(text)
 endfunction
 
 
-function! s:constructBibEntry(bibItem, bibDataText, desired)
+function! s:constructBibEntry(bibItem, bibDataText, desired) abort
     " Create markdown bibliography entry for .bib entry. a:desired can be
     " either 'key', 'entry', or 'short', depending on the desired return
     " value.
@@ -433,16 +433,16 @@ function! s:constructBibEntry(bibItem, bibDataText, desired)
     " First extract relevant bibtex fields...
     let l:entryType = matchstr(a:bibItem, '^.\{-}\ze{')
     let l:key = matchstr(a:bibItem, '^[^{]*{\zs[^,]\+')
-    if a:desired == 'key'
+    if a:desired ==# 'key'
         return l:key
     endif
     " Now construct rough markdown representations of citation
-    if a:desired == 'entry'
-        if l:entryType == 'book'
+    if a:desired ==# 'entry'
+        if l:entryType ==# 'book'
             let l:entry = s:constructBookEntry(a:bibItem, 'entry')
-        elseif l:entryType == 'article'
+        elseif l:entryType ==# 'article'
             let l:entry = s:constructArticleEntry(a:bibItem, 'entry')
-        elseif l:entryType == 'incollection'
+        elseif l:entryType ==# 'incollection'
             " ==========
             try
                 let l:crossref = matchstr(a:bibItem, '\c\n\s*crossref\s*=\s*{\zs.\{-}\ze}[,}]*\n')
@@ -466,18 +466,18 @@ function! s:constructBibEntry(bibItem, bibDataText, desired)
             let l:entry = l:author . ' (' . l:year . '). "' . l:title . '".'
             " let l:short = l:author[:l:author.find(',')] . '(' . l:year . '). ' . '"' . l:title . '".'
             let l:book = s:retrieveBibField(a:bibItem, 'booktitle')
-            if l:book != ''
+            if l:book !=# ''
                 let l:entry .= ' In *' . book . '*.'
                 " let l:short .= ' In *' . book . '*.'
             endif
         endif
         return s:removeLatex(l:entry)
-    elseif a:desired == 'short'
-        if l:entryType == 'book'
+    elseif a:desired ==# 'short'
+        if l:entryType ==# 'book'
             let l:short = s:constructBookEntry(a:bibItem, 'short')
-        elseif l:entryType == 'article'
+        elseif l:entryType ==# 'article'
             let l:short = s:constructArticleEntry(a:bibItem, 'short')
-        elseif l:entryType == 'incollection'
+        elseif l:entryType ==# 'incollection'
             try
                 let l:crossref = matchstr(a:bibItem, '\c\n\s*crossref\s*=\s*{\zs.\{-}\ze}[,}]*\n')
                 " let l:crossref = search(r'(\s*crossref\s*=\s*{)(.*)}[,}]', bibItem,
@@ -499,7 +499,7 @@ function! s:constructBibEntry(bibItem, bibDataText, desired)
             let l:authorLast = s:getAuthorLast(l:author)
             let l:short = l:authorLast . '(' . l:year . '). ' . '"' . l:title . '".'
             let l:book = s:retrieveBibField(a:bibItem, 'booktitle')
-            if l:book != ''
+            if l:book !=# ''
                 let l:short .= ' In *' . book . '*.'
             endif
         endif
@@ -508,7 +508,7 @@ function! s:constructBibEntry(bibItem, bibDataText, desired)
 endfunction
 
 
-function! s:constructEntryDict(bibItem, bibDataText)
+function! s:constructEntryDict(bibItem, bibDataText) abort
     " Construct dictionary entry from full/short entry
     let l:bibDataList = split(a:bibDataText, '@')[1:]
     let l:key = s:constructBibEntry(a:bibItem, a:bibDataText, 'key')
@@ -524,7 +524,7 @@ function! s:constructEntryDict(bibItem, bibDataText)
 endfunction
 
 
-function! s:constructOneEntry(bibKey)
+function! s:constructOneEntry(bibKey) abort
     let l:bibDataText = s:GetBibData()
     let l:bibDataList = split(l:bibDataText, '@')[1:]
     let l:bibItem = ''
@@ -534,7 +534,7 @@ function! s:constructOneEntry(bibKey)
             break
         endif
     endfor
-    if l:bibItem != ''
+    if l:bibItem !=# ''
         let l:entry = s:constructBibEntry(l:bibItem, l:bibDataText, 'entry')
         return l:entry
     else
@@ -543,21 +543,21 @@ function! s:constructOneEntry(bibKey)
 endfunction
 
 
-function! s:sortByKey(i1, i2)
+function! s:sortByKey(i1, i2) abort
     let l:i1 = matchstr(a:i1, '^[^{]*{\zs[^,]*')
     let l:i2 = matchstr(a:i2, '^[^{]*{\zs[^,]*')
-    return l:i1 == l:i2 ? 0 : l:i1 > l:i2 ? 1 : -1
+    return l:i1 ==# l:i2 ? 0 : l:i1 > l:i2 ? 1 : -1
 endfunction
 
 
-function! s:createBibList(base)
+function! s:createBibList(base) abort
     """Create list of entries that match on every word in base"""
     let l:bibDataText = s:GetBibData()
     let l:bibDataList = split(l:bibDataText, '@')[1:]
     let l:baseList = split(tolower(a:base), ' ')  " List of terms to match
     let l:matchedList = []  " List of matched bibliography items
     for l:bibItem in l:bibDataList
-        if l:bibItem !~ '^comment{'
+        if l:bibItem !~# '^comment{'
             let l:keep = 1
             for l:baseItem in l:baseList
                 if tolower(l:bibItem) !~ l:baseItem
@@ -571,7 +571,7 @@ function! s:createBibList(base)
         endif
     endfor
     " Sort matchedList by citation key (`AuthorDATETitle`)
-    call sort(l:matchedList, "s:sortByKey")
+    call sort(l:matchedList, 's:sortByKey')
     let l:constructedList = []
     for l:item in l:matchedList
         call add(l:constructedList, s:constructEntryDict(l:item, l:bibDataText))

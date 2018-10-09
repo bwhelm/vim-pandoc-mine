@@ -17,9 +17,9 @@ let b:pandoc_autoPDFEnabled = 0  " Turn autoPDF off by default...
 " identify the file as a presentation, initialize with beamer or revealjs;
 " otherwise initialize with pdflatex.
 let s:fileBegin = join(getline(0, 50), "\n")
-if s:fileBegin =~ '\ntransition:'
+if s:fileBegin =~# '\ntransition:'
     let b:pandoc_lastConversionMethod = 'markdown-to-revealjs-pandoc-direct.py'
-elseif s:fileBegin =~ '\n- aspectratio' || s:fileBegin =~ '\ntheme'
+elseif s:fileBegin =~# '\n- aspectratio' || s:fileBegin =~# '\ntheme'
     let b:pandoc_lastConversionMethod = 'markdown-to-beamer-pandoc-direct.py'
 else
     let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'
@@ -222,23 +222,23 @@ nnoremap <buffer><silent> csch mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`c
 " Jump to .tex file in tmp dir
 function! s:JumpToTex(filetype) abort
-    let l:fileroot = expand("%:t:r")
+    let l:fileroot = expand('%:t:r')
     if l:fileroot ==# ''
         let l:fileroot = 'temp'
     endif
-    let l:filename = fnamemodify("~/tmp/pandoc/" . l:fileroot . a:filetype, ":p")
+    let l:filename = fnamemodify('~/tmp/pandoc/' . l:fileroot . a:filetype, ':p')
     if filereadable(l:filename)
-        let l:linenum = "0"
-        if a:filetype ==# "\.tex"
-            let l:linenum = system("/usr/bin/env python3 " .
+        let l:linenum = '0'
+        if a:filetype ==# '\.tex'
+            let l:linenum = system('/usr/bin/env python3 ' .
                         \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                        \ ' "' . expand('%:p') . '" ' . line(".") . " " . a:filetype)
+                        \ ' "' . expand('%:p') . '" ' . line('.') . ' ' . a:filetype)
         endif
-        execute "tabedit " . l:filename
+        execute 'tabedit ' . l:filename
         execute l:linenum
     else
         echohl Error
-        echo "Corresponding " . a:filetype . " file does not exist."
+        echo 'Corresponding ' . a:filetype . ' file does not exist.'
         echohl None
     endif
 endfunction
@@ -397,8 +397,8 @@ try
             let l:title = l:title . '-' . l:suffix
         else
             " Try to guess a suffix: if presentation, name it that!
-            if l:fileBegin =~ '\n- aspectratio' || l:fileBegin =~ '\ntheme' ||
-                        \ l:fileBegin =~ '\nbeamerarticle'
+            if l:fileBegin =~# '\n- aspectratio' || l:fileBegin =~# '\ntheme' ||
+                        \ l:fileBegin =~# '\nbeamerarticle'
                 let l:title .= '-Presentation'
                 echo 'Identified as presentation.'
             endif
