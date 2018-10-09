@@ -1,6 +1,6 @@
 scriptencoding utf-8
 " vim: set fdm=marker foldlevel=0:
-" 
+"
 " Vim syntax file
 "
 " Heavy mods by Bennett Helm
@@ -47,13 +47,13 @@ endif
 " cchars used in conceal rules {{{2
 " utf-8 defaults (preferred)
 if &encoding ==# 'utf-8'
-    let s:cchars = { 
-        \'newline': '↵', 
-        \'image': '▨', 
-        \'super': '⇡', 
-        \'sub': '⇣', 
-        \'strike': 'x̶', 
-        \'atx': '§',  
+    let s:cchars = {
+        \'newline': '↵',
+        \'image': '▨',
+        \'super': '⇡',
+        \'sub': '⇣',
+        \'strike': 'x̶',
+        \'atx': '§',
         \'codelang': 'λ',
         \'codeend': '—',
         \'abbrev': '→',
@@ -64,13 +64,13 @@ if &encoding ==# 'utf-8'
         \'html_c_e': '›'}
 else
     " ascii defaults
-    let s:cchars = { 
-        \'newline': ' ', 
-        \'image': 'i', 
-        \'super': '^', 
-        \'sub': '_', 
-        \'strike': '~', 
-        \'atx': '#',  
+    let s:cchars = {
+        \'newline': ' ',
+        \'image': 'i',
+        \'super': '^',
+        \'sub': '_',
+        \'strike': '~',
+        \'atx': '#',
         \'codelang': 'l',
         \'codeend': '-',
         \'abbrev': 'a',
@@ -91,7 +91,7 @@ if !exists('g:pandoc#syntax#conceal#urls')
     let g:pandoc#syntax#conceal#urls = 0
 endif
 " should backslashes in escapes be concealed? {{{2
-if !exists('g:pandoc#syntax#conceal#backslash') 
+if !exists('g:pandoc#syntax#conceal#backslash')
     let g:pandoc#syntax#conceal#backslash = 0
 endif
 "}}}2
@@ -167,7 +167,7 @@ if b:system !=# 'ios'
                 \' contains=@' . toupper(s:langname)
         exe 'syn region pandocDelimitedCodeBlockinBlockQuote_' . s:langname . ' start=/>\s\(`\{3,}`*\|\~\{3,}\~*\)\s*\%({[^.]*\.\)\=' . s:langname . '\>/' .
                 \ ' end=/\(`\{3,}`*\|\~\{3,}\~*\)/ contained containedin=pandocDelimitedCodeBlock' .
-                \' contains=@' . toupper(s:langname) . 
+                \' contains=@' . toupper(s:langname) .
                 \',pandocDelimitedCodeBlockStart,pandocDelimitedCodeBlockEnd,pandodDelimitedCodeblockLang,pandocBlockQuoteinDelimitedCodeBlock'
         catch /E484/
           echo "No syntax file found for '" . s:langsyntaxfile . "'"
@@ -242,11 +242,11 @@ if b:system !=# 'ios'
     " contains=@LATEX
     syn region pandocLaTeXMathBlock start=/\$\$/ end=/\$\$/ keepend contains=@LATEX
     syn region pandocLaTeXMathBlock start=/\\\@<!\\\[/ end=/\\\@<!\\\]/ keepend contains=@LATEX
-    syn match pandocLaTeXCommand /\\[[:alpha:]]\+\(\({.\{-}}\)\=\(\[.\{-}\]\)\=\)*/ contains=@LATEX 
+    syn match pandocLaTeXCommand /\\[[:alpha:]]\+\(\({.\{-}}\)\=\(\[.\{-}\]\)\=\)*/ contains=@LATEX
     syn region pandocLaTeXRegion start=/\\begin{\z(.\{-}\)}/ end=/\\end{\z1}/ keepend contains=@LATEX
     " we rehighlight sectioning commands, because otherwise tex.vim captures all text until EOF or a new sectioning command
     syn region pandocLaTexSection start=/\\\(part\|chapter\|\(sub\)\{,2}section\|\(sub\)\=paragraph\)\*\=\(\[.*\]\)\={/ end=/\}/ keepend
-    syn match pandocLaTexSectionCmd /\\\(part\|chapter\|\(sub\)\{,2}section\|\(sub\)\=paragraph\)/ contained containedin=pandocLaTexSection 
+    syn match pandocLaTexSectionCmd /\\\(part\|chapter\|\(sub\)\{,2}section\|\(sub\)\=paragraph\)/ contained containedin=pandocLaTexSection
     syn match pandocLaTeXDelimiter /[[\]{}]/ contained containedin=pandocLaTexSection
     " }}}
 endif
@@ -254,7 +254,7 @@ endif
 " Titleblock: {{{2
 "
 if b:system !=# 'ios'
-    syn region pandocTitleBlock start=/\%^%/ end=/\n\n/ contains=pandocReferenceLabel,pandocReferenceURL,pandocNewLine 
+    syn region pandocTitleBlock start=/\%^%/ end=/\n\n/ contains=pandocReferenceLabel,pandocReferenceURL,pandocNewLine
     call s:WithConceal('titleblock', 'syn match pandocTitleBlockMark /%\ / contained containedin=pandocTitleBlock,pandocTitleBlockTitle', 'conceal')
     syn match pandocTitleBlockTitle /\%^%.*\n/ contained containedin=pandocTitleBlock
 endif
@@ -274,11 +274,11 @@ if b:system !=# 'ios'
 endif
 "}}}
 " Clusters: {{{2
-if b:system !=# 'ios'
+" if b:system !=# 'ios'
     syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
-else
-    syn cluster pandocInline contains=@Spell,pandocEmphasis
-endif
+" else
+"     syn cluster pandocInline contains=@Spell,pandocEmphasis
+" endif
 "}}}
 " Links: {{{2
 if b:system !=# 'ios'
@@ -293,7 +293,7 @@ if b:system !=# 'ios'
     " let's not consider "a [label] a" as a label, remove formatting - Note: breaks implicit links
     syn match pandocNoLabel /\]\@1<!\(\s\{,3}\|^\)\[[^\[\]]\{-}\]\(\s\+\|$\)[\[(]\@!/ contains=pandocPCite
     syn match pandocLinkTip /\s*".\{-}"/ contained containedin=pandocReferenceURL contains=pandocAmpersandEscape display
-    call s:WithConceal('image', 'syn match pandocImageIcon /!\[\@=/ display', 'conceal cchar='. s:cchars['image']) 
+    call s:WithConceal('image', 'syn match pandocImageIcon /!\[\@=/ display', 'conceal cchar='. s:cchars['image'])
     " }}}
     " Definitions: {{{3
     syn region pandocReferenceDefinition start=/\[.\{-}\]:/ end=/\(\n\s*".*"$\|$\)/ keepend
@@ -363,7 +363,7 @@ if b:system !=# 'ios'
     call s:WithConceal('inlinecode', 'syn region pandocNoFormattedInStrong matchgroup=pandocOperator start=/\\\@<!``/ end=/\\\@<!``/ nextgroup=pandocNoFormattedAttrs contained', 'concealends')
     syn match pandocNoFormattedAttrs /{.\{-}}/ contained
     "}}}
-    " Subscripts: {{{3 
+    " Subscripts: {{{3
     syn region pandocSubscript start=/\~\(\([[:graph:]]\(\\ \)\=\)\{-}\~\)\@=/ end=/\~/ keepend
     call s:WithConceal('subscript', 'syn match pandocSubscriptMark /\~/ contained containedin=pandocSubscript', 'conceal cchar='.s:cchars['sub'])
     "}}}
@@ -434,7 +434,7 @@ if b:system !=# 'ios'
     syn region pandocDelimitedCodeBlock start=/^\(>\s\)\?\z(\([ ]\{4,}\|\t\)\=\~\{3,}\~*\)/ end=/^\z1\~*/ skipnl contains=pandocDelimitedCodeBlockStart,pandocDelimitedCodeBlockEnd keepend
     syn region pandocDelimitedCodeBlock start=/^\(>\s\)\?\z(\([ ]\{4,}\|\t\)\=`\{3,}`*\)/ end=/^\z1`*/ skipnl contains=pandocDelimitedCodeBlockStart,pandocDelimitedCodeBlockEnd keepend
     call s:WithConceal('codeblock_start', 'syn match pandocDelimitedCodeBlockStart /\(\_^\n\_^\(>\s\)\?\([ ]\{4,}\|\t\)\=\)\@<=\(\~\{3,}\~*\|`\{3,}`*\)/ contained containedin=pandocDelimitedCodeBlock nextgroup=pandocDelimitedCodeBlockLanguage', 'conceal cchar='.s:cchars['codelang'])
-    syn match pandocDelimitedCodeBlockLanguage /\(\s\?\)\@<=.\+\(\_$\)\@=/ contained 
+    syn match pandocDelimitedCodeBlockLanguage /\(\s\?\)\@<=.\+\(\_$\)\@=/ contained
     call s:WithConceal('codeblock_delim', 'syn match pandocDelimitedCodeBlockEnd /\(`\{3,}`*\|\~\{3,}\~*\)\(\_$\n\(>\s\)\?\_$\)\@=/ contained containedin=pandocDelimitedCodeBlock', 'conceal cchar='.s:cchars['codeend'])
     syn match pandocBlockQuoteinDelimitedCodeBlock '^>' contained containedin=pandocDelimitedCodeBlock
     syn match pandocCodePre /<pre>.\{-}<\/pre>/ skipnl
@@ -489,7 +489,7 @@ if b:system !=# 'ios'
     syn match pandocListItem /^\s*(\?\(\d\+\|\l\|\#\|@\)[.)].*$/ nextgroup=pandocListItem,pandocLaTeXMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation contains=@pandocInline skipempty display
     " support for roman numerals up to 'c'
     if g:pandoc#syntax#roman_lists != 0
-        syn match pandocListItem /^\s*(\?x\=l\=\(i\{,3}[vx]\=\)\{,3}c\{,3}[.)].*$/ nextgroup=pandocListItem,pandocMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation,pandocAutomaticLink skipempty display 
+        syn match pandocListItem /^\s*(\?x\=l\=\(i\{,3}[vx]\=\)\{,3}c\{,3}[.)].*$/ nextgroup=pandocListItem,pandocMathBlock,pandocLaTeXInlineMath,pandocDelimitedCodeBlock,pandocListItemContinuation,pandocAutomaticLink skipempty display
     endif
     syn match pandocListItemBullet /^(\?.\{-}[.)]/ contained containedin=pandocListItem
     syn match pandocListItemBulletId /\(\d\+\|\l\|\#\|@.\{-}\|x\=l\=\(i\{,3}[vx]\=\)\{,3}c\{,3}\)/ contained containedin=pandocListItemBullet
@@ -512,7 +512,7 @@ syn region myPandocCommentBlock start="^<!comment>" end="^</!comment>" contains=
 syn region myPandocCommentBlock start="^\n:\{3,}\s*comment\n" end="^:\{3,}\n\n" contains=@pandocInline keepend
 syn region myPandocBoxBlock start="^\n:\{3,}\s*box\n" end="^:\{3,}\n\n" contains=@pandocInline keepend
 syn region myPandocCenterBlock start="^\n:\{3,}\s*center\n" end="^:\{3,}\n\n" contains=@pandocInline keepend
-if b:system !=# 'ios'
+" if b:system !=# 'ios'
     syn region myPandocSpeakerBlock start="^<!speaker>" end="^</!speaker>" contains=@pandocInline keepend
     syn region myPandocSpeakerBlock start="^:\{3,}\s*speaker" end="^:\{3,}" contains=@pandocInline keepend
     " syn match myPandocHighlight "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.highlight}" contains=@pandocInline oneline
@@ -533,7 +533,7 @@ if b:system !=# 'ios'
     syn match myPandocFixme "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\]{\.fixme}" contains=@pandocInline oneline
     " syn match myPandocSmallCaps "\\\@<!\[\(\(\]\)\@<!.\)\{-}\]{\.smcaps}" contains=@pandocInline oneline
     syn match myPandocSmallCaps "\\\@<!\[\([^[]*\)\]{\.smcaps}" contains=@pandocInline oneline
-endif
+" endif
 syn match myPandocHighlight "<highlight>.\{-}</highlight>" contains=@pandocInline oneline
 syn match myPandocComment "<comment>.\{-}</comment>" contains=@pandocInline oneline
 syn match myPandocMargin "<margin>.\{-}</margin>" contains=@pandocInline oneline
