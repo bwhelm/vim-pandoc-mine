@@ -25,18 +25,18 @@ endtry
 if b:system !=# 'ios'
     if !exists('g:pandoc#syntax#conceal#use')
         if v:version < 703
-        let g:pandoc#syntax#conceal#use = 0
+            let g:pandoc#syntax#conceal#use = 0
         else
-        let g:pandoc#syntax#conceal#use = 1
+            let g:pandoc#syntax#conceal#use = 1
         endif
     else
         " exists, but we cannot use it, disable anyway
         if v:version < 703
-        let g:pandoc#syntax#conceal#use = 0
+            let g:pandoc#syntax#conceal#use = 0
         endif
     endif
 else
-    let g:pandoc#syntax#conceal#use = 0
+    let g:pandoc#syntax#conceal#use = 1
 endif
 "}}}2
 " what groups not to use conceal in. works as a blacklist {{{2
