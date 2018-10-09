@@ -55,7 +55,7 @@ function! s:JumpToReference(searchString) abort
             setlocal filetype=pandoc
             $delete_
             " Move to URL (if there is one; fail silently if not)
-            call search('<\zs.', 'zW')
+            call search('<\zs.', 'W')
             " Use next line only with pandoc method
             nmap <buffer> <CR> <Plug>NetrwBrowseX
             nnoremap <silent><buffer> q :quit<CR>
