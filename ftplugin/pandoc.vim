@@ -494,28 +494,23 @@ setlocal fillchars+=fold:·
 " Tidy Up Pandoc Documents {{{1
 " ============================================================================
 function! s:TidyPandoc() abort
+    let l:saveSearch = @/
     " Tidy up pandoc documents
     " 1. Convert tabs to spaces at beginnings of lines
     setlocal tabstop=4
     retab
     " 2. Remove extra blank lines between list items
     silent! global/\(^\s*\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s[^\n]*$\n\)\@<=\n\ze\s\+\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s\+/d
-    " (b) removing extra spaces after list identifiers
+    " 3. removing extra spaces after list identifiers
     silent! %substitute /^\(\s*\)\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s\s\+/\1\2 /
-    " TODO: 3. remove excess escaping
+    " TODO: 4. remove excess escaping
+    let @/ = l:saveSearch
 endfunction
 command! TidyPandoc call <SID>TidyPandoc()
 
 " ======================================================================== }}}
 " Other {{{1
 " ============================================================================
-" Don't want numbers displayed for pandoc documents
-"setlocal nonumber
-"setlocal norelativenumber
-" Turn on spell checking
-setlocal spell spelllang=en_us
-" Turn off checking for capitalization errors
-"setlocal spellcapcheck=
 setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs
 " Allow wrapping past BOL and EOL when using `h` and `l`
 setlocal whichwrap+=h,l

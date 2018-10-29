@@ -7,6 +7,7 @@ scriptencoding utf-8
 " <https://github.com/vim-pandoc/vim-pandoc/blob/master/autoload/pandoc/toc.vim>
 
 function! pandoc#toc#ShowTOC() abort
+    let l:saveSearch = @/
     " Show the TOC in location list, and allow user to jump to locations by
     " hitting `<CR>` (closing location list) or `<C-CR>` (leaving location
     " list open). Much of this is taken from vim-pandoc's TOC code.
@@ -64,4 +65,5 @@ function! pandoc#toc#ShowTOC() abort
     noremap <buffer> <Esc> :lclose<CR>
     noremap <buffer> <CR> <CR>:lclose<CR>
     noremap <buffer> <C-CR> <CR>
+    let @/ = l:saveSearch
 endfunction
