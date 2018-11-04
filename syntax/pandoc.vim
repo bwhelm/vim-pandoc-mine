@@ -562,7 +562,7 @@ syn match myPandocIndexText /<i\zs[ \n]\+.\{-}\ze>/ contained containedin=myPand
 syn match myPandocIndexText /\[[^]]\+\]\ze{\.\(i\|l\|r\|rp\)}/ contained containedin=myPandocIndexMark conceal
 " }}}3
 " FixMe: {{{3
-syn keyword myFixme XXX[XXX]
+syn keyword myFixme XXX[XXX] TODO FIXME
 " }}}
 "}}}1
 " New_lines: {{{3
