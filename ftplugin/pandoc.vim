@@ -306,9 +306,9 @@ if exists('*textobj#user#plugin')
     endfunction
     call textobj#user#plugin('pandocfootnotes', {
         \    'footnote': {
-        \        'select-a': 'an',
+        \        'select-a': 'af',
         \        'select-a-function': 'FindAroundFootnote',
-        \        'select-i': 'in',
+        \        'select-i': 'if',
         \        'select-i-function': 'FindInsideFootnote',
         \    },
         \ })
