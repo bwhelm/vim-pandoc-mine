@@ -143,8 +143,8 @@ nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 " -----------------------
 nnoremap <buffer><silent> <LocalLeader>fc /\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
 nnoremap <buffer><silent> <LocalLeader>fC ?\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)?<CR>
-nnoremap <buffer><silent> <LocalLeader>fn /\^\[<CR>m<l%m>`<
-nnoremap <buffer><silent> <LocalLeader>fN ?\^\[<CR>m<l%m>`<
+nnoremap <buffer><silent> <LocalLeader>ff /\^\[<CR>m<l%m>`<
+nnoremap <buffer><silent> <LocalLeader>fF ?\^\[<CR>m<l%m>`<
 
 " Citations {{{2
 " ---------
