@@ -410,19 +410,16 @@ try
         let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
         let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
         let l:title = substitute(l:title, '__', '_', 'g')
-        let l:newName = fnameescape(l:title . l:extension)
-        " let l:currentName = fnameescape(expand('%:t'))
-        let l:currentName = expand('%:t')
-        " let l:currentPath = getcwd() . '/' . expand('%:h') . '/'
-        let l:currentPath = fnameescape(expand('%:h') . '/')
-        if l:newName !=? l:currentName && findfile(l:newName, l:currentPath) !=# ''
+        let l:newName = fnameescape(expand('%:p:h') . '/' . l:title . l:extension)
+        let l:currentName = expand('%:p')
+        if l:newName !=? l:currentName && findfile(l:newName) !=# ''
             " Note: if l:newName merely modifies the case of l:currentName, this
             " will not throw up a warning. In most cases this is what I want,
             " but if there is another file that is a case variant of the
             " current file, this could be problematic. I won't worry about
             " this possibility.
             echohl WarningMsg
-            echom 'Destination file (' . l:newName . ') already exists. Overwrite? (y/N)'
+            echom 'Destination file (' . fnamemodify(l:newName, ':t') . ') already exists. Overwrite? (y/N)'
             if getchar() != 121  " ('y')
                 echom 'Aborting...'
                 echohl None
@@ -431,9 +428,7 @@ try
             echom 'Overwriting...'
             echohl None
         endif
-        let l:oldPath = fnameescape(getcwd())
         if l:currentName !=# ''  "File already has a name
-            execute 'cd ' . l:currentPath
             if findfile(l:currentName, '.') ==# ''  " No existing file
                 execute 'write ' . l:newName
             elseif l:currentName ==# l:newName  " Existing file with same name
@@ -453,27 +448,26 @@ try
                         " case of l:currentName: bwipeout will kill the
                         " current buffer, and so it needs to be reloaded. (In
                         " other cases, `edit` will do nothing.)
-                        execute 'edit ' . l:currentPath . l:newName
+                        execute 'edit ' . l:newName
                 catch
                     if rename(l:currentName, l:newName)
                         echohl Error
-                        echom 'Error renaming file ' . l:currentName . ' to ' . l:newName
+                        echom 'Error renaming file ' . fnamemodify(l:currentName, ':t') . ' to ' . fnamemodify(l:newName, ':t')
                         echohl None
                     else
-                        echom 'File renamed to: ' . l:newName
+                        echom 'File renamed to: ' . fnamemodify(l:newName, ':t')
                         execute 'bwipeout ' . l:currentName
                         " Next line is needed when l:newName only modifies the
                         " case of l:currentName: bwipeout will kill the
                         " current buffer, and so it needs to be reloaded. (In
                         " other cases, `edit` will do nothing.)
-                        execute 'edit ' . l:currentPath . l:newName
+                        execute 'edit ' . l:newName
                     endif
                 endtry
             endif
         else  " File does not already have a name
             execute 'write! ' . l:newName
         endif
-        execute 'cd ' . l:oldPath
     endfunction
 catch /E127/  " Can't redefine function, it's already in use.
 "     " This will happen when the new filename only modifies the case of the old
