@@ -259,20 +259,20 @@ if b:system !=# 'ios'
     syn match pandocTitleBlockTitle /\%^%.*\n/ contained containedin=pandocTitleBlock
 endif
 "}}}
-" Blockquotes: {{{2
-"
-syn match pandocBlockQuote /^\s\{,3}>.*\n\(.*\n\@1<!\n\)*/ contains=@pandocInline
-syn match pandocBlockQuoteMark /\_^\s\{,3}>/ contained containedin=pandocEmphasis,pandocStrong,pandocPCite,pandocSuperscript,pandocSubscript,pandocStrikeout,pandocUListItem,pandocNoFormatted
-
-" }}}
 " Code Blocks: {{{2
 if b:system !=# 'ios'
     if g:pandoc#syntax#protect#codeblocks == 1
-        syn match pandocCodeblock /\([ ]\{4}\|\t\).*$/
+        syn match pandocCodeBlock /\([ ]\{4}\|\t\).*$/
     endif
     syn region pandocCodeBlockInsideIndent   start=/\(\(\d\|\a\|*\).*\n\)\@<!\(^\(\s\{8,}\|\t\+\)\).*\n/ end=/.\(\n^\s*\n\)\@=/ contained
 endif
 "}}}
+" Blockquotes: {{{2
+"
+syn match pandocBlockQuote /^\s*>.*\n\(.*\n\@1<!\n\)*/ contains=@pandocInline
+syn match pandocBlockQuoteMark /\_^\s*>/ contained containedin=pandocEmphasis,pandocStrong,pandocPCite,pandocSuperscript,pandocSubscript,pandocStrikeout,pandocUListItem,pandocNoFormatted
+
+" }}}
 " Clusters: {{{2
 " if b:system !=# 'ios'
     syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
