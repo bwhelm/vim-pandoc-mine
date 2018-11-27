@@ -243,13 +243,13 @@ endfunction
 function! s:GetBibData() abort
     " Read data from .bib files
     if b:system ==# 'ios'
-        let l:file = fnamemodify('~/bibdatabase-new.bib', ':p')
+        let l:file = fnamemodify('~/Documents/research/+texmf/bibtex/bib/bibdatabase-new.bib', ':p')
     else
         let l:file = system('kpsewhich bibdatabase-new.bib')[:-2]
     endif
     let l:bibText = join(readfile(l:file), "\n")
     if b:system ==# 'ios'
-        let l:file = fnamemodify('~/bibdatabase-helm-new.bib', ':p')
+        let l:file = fnamemodify('~/Documents/research/+texmf/bibtex/bib/bibdatabase-helm-new.bib', ':p')
     else
         let l:file = system('kpsewhich bibdatabase-helm-new.bib')[:-2]
     endif
