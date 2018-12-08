@@ -28,11 +28,12 @@ function! pandoc#fold#FoldText() abort
     return l:text . l:numLines
 endfunction
 
-function! pandoc#fold#FindSectionBoundaries() abort
-    if getline('.') =~# '^#\{1,6}\s'
+function! pandoc#fold#FindSectionBoundaries(...) abort
+    let l:count = a:1 != 0 ? a:1 : 6
+    if getline('.') =~# '^#\{1,' . l:count . '}\s'
         let l:startLine = line('.')
     else
-        let l:startLine = search('^#\{1,6}\s', 'bnW')
+        let l:startLine = search('^#\{1,' . l:count . '}\s', 'bnW')
         if l:startLine == 0
             if getline(1) ==# '---'
                 call cursor(2, 0)
@@ -41,7 +42,7 @@ function! pandoc#fold#FindSectionBoundaries() abort
             let l:startLine = l:startLine + 1  " This is either start of file or after YAML header
         endif
     endif
-    let l:endLine = search('^#\{1,6}\s', 'nW')
+    let l:endLine = search('^#\{1,' . l:count . '}\s', 'nW')
     if l:endLine == 0
         let l:endLine = line('$')
     else

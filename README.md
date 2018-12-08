@@ -25,6 +25,8 @@ different computer.
 
     - Keybindings and textobjects are provided for working with
       Pandoc-Comment-Filter's various comments.
+    - Note that the section text-object takes a count, which is the depth of
+      the desired section.
 
 5. I assume some CSL files are available:
    `~/.pandoc/chicago-fullnote-bibliography.csl` and

@@ -314,11 +314,11 @@ if exists('*textobj#user#plugin')
         \ })
     " Create text object for (sub)sections
     function! FindAroundSection()
-        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
+        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries(v:count)
         return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
     endfunction
     function! FindInsideSection()
-        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
+        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries(v:count)
         let l:eof = line('$')
         while l:startLine < l:eof
             let l:startLine = l:startLine + 1
