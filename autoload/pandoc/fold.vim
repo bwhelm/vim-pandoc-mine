@@ -28,8 +28,14 @@ function! pandoc#fold#FoldText() abort
     return l:text . l:numLines
 endfunction
 
-function! pandoc#fold#FindSectionBoundaries(...) abort
-    let l:count = a:1 != 0 ? a:1 : 6
+function! pandoc#fold#FindSectionBoundaries() abort
+    " Set l:count to be v:count if set, otherwise v:prevcount if set,
+    " otherwise 6. When this function is called by the `a#` or `i#` mappings,
+    " it takes an optional count indicating the level of section to operate
+    " on. Thus, `1va#` = `v1a#` will select around the current top-level
+    " section. `3v1a#` will select around the current first-level section,
+    " with the "1" taking precedence over the "3".
+    let l:count = v:count > 0 ? v:count : v:prevcount > 0 ? v:prevcount : 6
     if getline('.') =~# '^#\{1,' . l:count . '}\s'
         let l:startLine = line('.')
     else
@@ -58,7 +64,7 @@ function! pandoc#fold#foldSection(exclusive) abort
         echohl None
         let l:endLine = 0
     else
-        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries(6)
+        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
         if l:startLine > line('.')  " If we're in YAML header
             execute '1,' . string(l:startLine - 1) . 'fold'
             execute l:startLine . ',' . l:endLine . 'fold'
