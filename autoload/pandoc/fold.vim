@@ -58,7 +58,7 @@ function! pandoc#fold#foldSection(exclusive) abort
         echohl None
         let l:endLine = 0
     else
-        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
+        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries(6)
         if l:startLine > line('.')  " If we're in YAML header
             execute '1,' . string(l:startLine - 1) . 'fold'
             execute l:startLine . ',' . l:endLine . 'fold'
