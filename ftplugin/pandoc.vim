@@ -32,36 +32,23 @@ endif
 " Jump to Headers {{{2
 " ---------------
 function! s:JumpToHeader(direction, count)
-    let l:count = a:count
+    " The count indicates the level of heading to jump to
+    let l:count = a:count == 0 ? 6 : a:count
     let l:cursorPos = getcurpos()
-    if l:count > 1 && a:direction ==# 'b'
-        let l:count += 1
-    endif
-    let l:foundCount = 0
-    for l:index in range(l:count)
-        let l:jumpLine = search('^#\{1,6}\s', a:direction . 'W')
-        if l:jumpLine > 0
-            let l:foundCount += 1
-        endif
-    endfor
-    if !l:foundCount
+    let l:found = search('^#\{1,' . l:count . '}\s', a:direction . 'W')
+    if l:found == 0
         echohl Error
         if a:direction ==# 'b'
-            echo 'No previous header'
+            echo 'No previous header of level' l:count 'or below.'
         else
-            echo 'No next header'
+            echo 'No next header of level' l:count 'or below.'
         endif
-        echohl None
-        call setpos('.', l:cursorPos)
-    elseif (a:direction ==# '' && l:foundCount < l:count) ||
-                \ (a:direction ==# 'b' && l:foundCount < l:count - 1)
-        echohl Error
-        echo "Can't jump that many headers!"
         echohl None
     endif
 endfunction
-noremap <buffer><silent> ]] :call <SID>JumpToHeader('', v:count1)<CR>
-noremap <buffer><silent> [[ :call <SID>JumpToHeader('b', v:count1)<CR>
+" Note: `<C-U>` below does away with the count. (See :h v:count.)
+noremap <silent><buffer> ]] :<C-U>call <SID>JumpToHeader('', v:count)<CR>
+noremap <silent><buffer> [[ :<C-U>call <SID>JumpToHeader('b', v:count)<CR>
 
 " Fold Section {{{2
 " ------------
