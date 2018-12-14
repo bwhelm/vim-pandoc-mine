@@ -631,7 +631,7 @@ hi link myPandocBoxBlock Identifier
 hi link myPandocCenterBlock Constant
 hi link myPandocSpeakerBlock Special
 hi link myPandocFixme Constant
-hi myPandocHighlight guibg=Yellow ctermbg=DarkGreen ctermfg=Black cterm=bold
+hi myPandocHighlight guibg=Yellow ctermbg=DarkGreen ctermfg=Black
 hi myPandocSmallCaps gui=underline term=underline
 hi link myPandocCommentOpen Operator
 hi link myPandocCommentClose Operator
