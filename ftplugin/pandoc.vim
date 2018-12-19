@@ -331,6 +331,22 @@ if exists('*textobj#user#plugin')
         \ })
 endif
 
+function! s:pageRange()
+    " Page Range should pick out patterns like 'pp. 1-2' and '342--22'.
+    " It searches from the current postiion to the bottom of the screen,
+    " and then to the top of the screen.
+    let l:pattern = '\m\(\<p\{1,2}\.\\\? \)\?\d\+\-\{1,2}\d\+'
+    if !search(l:pattern, 'ce', line('w$'))  " Can't find mach forward: look backward
+        if !search(l:pattern, 'cbe', line('w0'))
+            return
+        endif
+    endif
+    normal! v
+    call search(l:pattern, 'cb', line('.'))
+endfunction
+onoremap <silent> pr :<C-u>call <SID>pageRange()<CR>
+xnoremap <silent> pr :<C-u>call <SID>pageRange()<CR>
+
 " ======================================================================== }}}
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
@@ -390,7 +406,7 @@ try
                 echo 'Identified as presentation.'
             endif
         endif
-        let l:title = substitute(l:title, '[,:] ', '-', 'g')
+        let l:title = substitute(l:title, '[.!?,:;] ', '-', 'g')
         let l:title = substitute(l:title, '/', '-', 'g')
         let l:title = substitute(l:title, ' ', '_', 'g')
         let l:title = <SID>RemoveDiacritics(l:title)
