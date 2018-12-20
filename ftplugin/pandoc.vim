@@ -245,107 +245,55 @@ if exists('*textobj#user#plugin')
         " For tag-style block Comments:
         " \         'pattern': ['<!comment>\n\n',
         " \                   '\n\n<\/!comment>'],
-    call textobj#user#plugin('pandoccomments', {
-        \    'inlinecomment': {
-        \        'pattern': ['\[',
-                    \ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
-        \        'select-a': 'ac',
-        \        'select-i': 'ic',
-        \    },
-        \    'blockcomment': {
-        \         'pattern': ['^::: comment\n',
-        \                   '\n:::$'],
-        \        'select-a': 'aC',
-        \        'select-i': 'iC',
-        \    },
-        \ })
-    " Text object for foontones
-    function! FindAroundFootnote()
-        let l:curPos = getcurpos()
-        let l:found = search('\^[', 'bcW', l:curPos[1])
-        if l:found == 0
-            let l:found = search('\^[', 'cW', l:curPos[1])
-        endif
-        if l:found > 0
-            let l:beginPos = getcurpos()
-            normal! l%
-            let l:endPos = getcurpos()
-            call setpos('.', l:curPos)
-            if l:endPos != l:beginPos
-                return ['v', l:beginPos, l:endPos]
-            endif
-        endif
-        call setpos('.', l:curPos)
-        echohl WarningMsg
-        echo 'No footnote found.'
-        echohl None
-        return
-    endfunction
-    function! FindInsideFootnote()
-        try
-            let [l:type, l:begin, l:end] = FindAroundFootnote()
-            let l:begin[2] += 2
-            let l:end[2] -= 1
-            return [l:type, l:begin, l:end]
-        catch /E714/
-            return
-        endtry
-    endfunction
-    call textobj#user#plugin('pandocfootnotes', {
-        \    'footnote': {
-        \        'select-a': 'af',
-        \        'select-a-function': 'FindAroundFootnote',
-        \        'select-i': 'if',
-        \        'select-i-function': 'FindInsideFootnote',
-        \    },
-        \ })
-    " Create text object for (sub)sections
-    function! FindAroundSection()
-        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
-        return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
-    endfunction
-    function! FindInsideSection()
-        let [l:startLine, l:endLine] = pandoc#fold#FindSectionBoundaries()
-        let l:eof = line('$')
-        while l:startLine < l:eof
-            let l:startLine = l:startLine + 1
-            if getline(l:startLine) =~# '\S'
-                break
-            endif
-        endwhile
-        while l:endLine > l:startLine
-            if getline(l:endLine) =~# '\S'
-                break
-            endif
-            let l:endLine = l:endLine - 1
-        endwhile
-        return ['V', [0, l:startLine, 1, 0], [0, l:endLine, 1, 0]]
-    endfunction
-    call textobj#user#plugin('pandocmine', {
+
+    let s:innerCitationPattern = '-\?@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~/]*'
+    let s:aroundCitationPattern = s:innerCitationPattern . '\( \[[^]]\+\]\)\?' . '\|' .
+                \ '\[[^[]\{-}' . s:innerCitationPattern . '[^]]\{-}\]'
+    let s:pageRangePattern = '\m\(\<p\{1,2}\.\\\? \)\?\d\+\-\{1,2}\d\+'
+
+    call textobj#user#plugin('pandoc', {
         \ 'section': {
         \        'select-a': 'a#',
-        \         'select-a-function': 'FindAroundSection',
+        \        'select-a-function': 'pandoc#textobjects#FindAroundSection',
         \        'select-i': 'i#',
-        \         'select-i-function': 'FindInsideSection',
+        \        'select-i-function': 'pandoc#textobjects#FindInsideSection',
+        \    },
+        \ 'innerCitation': {
+        \        'pattern': s:innerCitationPattern,
+        \        'select': 'ic',
+        \        'scan': 'nearest',
+        \    },
+        \ 'aroundCitation': {
+        \        'pattern': s:aroundCitationPattern,
+        \        'select': 'ac',
+        \        'scan': 'nearest',
+        \    },
+        \ 'pageRange': {
+        \        'pattern': s:pageRangePattern,
+        \        'select': 'pr',
+        \        'scan': 'nearest',
+        \    },
+        \    'inlineNote': {
+        \        'pattern': ['\[',
+                    \ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
+        \        'select-a': 'an',
+        \        'select-i': 'in',
+        \    },
+        \    'blockNote': {
+        \         'pattern': ['^::: comment\n',
+        \                   '\n:::$'],
+        \        'select-a': 'aN',
+        \        'select-i': 'iN',
+        \    },
+        \    'footnote': {
+        \        'select-a': 'af',
+        \        'select-a-function': 'pandoc#textobjects#FindAroundFootnote',
+        \        'select-i': 'if',
+        \        'select-i-function': 'pandoc#textobjects#FindInsideFootnote',
+        \        'scan': 'nearest',
         \    },
         \ })
 endif
-
-function! s:pageRange()
-    " Page Range should pick out patterns like 'pp. 1-2' and '342--22'.
-    " It searches from the current postiion to the bottom of the screen,
-    " and then to the top of the screen.
-    let l:pattern = '\m\(\<p\{1,2}\.\\\? \)\?\d\+\-\{1,2}\d\+'
-    if !search(l:pattern, 'ce', line('w$'))  " Can't find mach forward: look backward
-        if !search(l:pattern, 'cbe', line('w0'))
-            return
-        endif
-    endif
-    normal! v
-    call search(l:pattern, 'cb', line('.'))
-endfunction
-onoremap <silent> pr :<C-u>call <SID>pageRange()<CR>
-xnoremap <silent> pr :<C-u>call <SID>pageRange()<CR>
 
 " ======================================================================== }}}
 " Completion Function for References/Bibliography {{{1
