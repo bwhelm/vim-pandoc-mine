@@ -44,7 +44,7 @@ function! pandoc#toc#ShowTOC() abort
             let l:currentLine = l:line
         endif
         let l:level = len(matchstr(l:heading.text, '#*', '')) - 1
-        let l:heading.text = '•' l:heading.text[l:level + 2:]
+        let l:heading.text = '• ' . l:heading.text[l:level + 2:]
         let l:heading.text = matchstr(l:heading.text, '.\{-}\ze\({.\{-}}\)\?$')
         call setline(l:line, repeat(' ', 4 * l:level) . l:heading.text)
     endfor

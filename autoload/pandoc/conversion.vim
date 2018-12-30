@@ -190,7 +190,7 @@ function! s:MyConvertHelper(command, ...) abort
             let l:pandoc_converting = 0
             let l:PID = matchstr(g:pandocRunBuf[l:buffer][0], '\d\+')
             unlet g:pandocRunBuf[l:buffer][0]
-            unlet g:pandocRunPID['process' l:PID . ' run']
+            unlet g:pandocRunPID['process ' . l:PID . ' run']
         else
             let l:pandoc_converting = 1
         endif
@@ -206,16 +206,16 @@ function! s:MyConvertHelper(command, ...) abort
         if has('nvim')
             let l:jobPID = jobstart('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
-                    \ ' "' . l:fileName . '"' g:pandocTempDir . ' ' .
-                    \ g:pandocPdfApp l:auxCommand,
+                    \ ' "' . l:fileName . '" ' . g:pandocTempDir . ' ' .
+                    \ g:pandocPdfApp . ' ' . l:auxCommand,
                     \ {'on_stdout': 'pandoc#conversion#DisplayMessages',
                     \ 'on_stderr': 'pandoc#conversion#DisplayError',
                     \ 'on_exit': 'pandoc#conversion#EndProcess'})
         else
             let l:jobPID = job_start('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
-                    \ ' "' . l:fileName . '"' g:pandocTempDir . ' ' .
-                    \ g:pandocPdfApp l:auxCommand,
+                    \ ' "' . l:fileName . '" ' . g:pandocTempDir . ' ' .
+                    \ g:pandocPdfApp . ' ' . l:auxCommand,
                     \ {'out_cb': 'pandoc#conversion#DisplayMessages',
                     \ 'err_cb': 'pandoc#conversion#DisplayError',
                     \ 'close_cb': 'pandoc#conversion#EndProcess'})

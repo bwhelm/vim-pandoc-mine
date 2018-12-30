@@ -219,7 +219,7 @@ function! s:JumpToTex(filetype) abort
         if a:filetype ==# '\.tex'
             let l:linenum = system('/usr/bin/env python3 ' .
                         \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                        \ ' "' . expand('%:p') . '"' line('.') a:filetype)
+                        \ ' "' . expand('%:p') . '" ' . line('.') . ' ' . a:filetype)
         endif
         execute 'tabedit' l:filename
         execute l:linenum
@@ -290,7 +290,6 @@ if exists('*textobj#user#plugin')
         \        'select-a-function': 'pandoc#textobjects#FindAroundFootnote',
         \        'select-i': 'if',
         \        'select-i-function': 'pandoc#textobjects#FindInsideFootnote',
-        \        'scan': 'nearest',
         \    },
         \ })
 endif
