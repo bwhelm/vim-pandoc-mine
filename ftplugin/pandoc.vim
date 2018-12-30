@@ -1,4 +1,4 @@
-" vim: set fdm=marker foldlevel=1:
+" vim: set fdm=marker:
 scriptencoding utf-8
 " My settings that should apply only to files with filetype=pandoc.
 
