@@ -17,7 +17,7 @@ function! pandoc#conversion#DisplayMessages(PID, text, ...) abort
             laddexpr l:item
         endif
         if l:item[0] ==# '!'
-            echom 'ERROR: ' . l:item
+            echom 'ERROR:' l:item
             call pandoc#conversion#KillProcess(a:PID, 'silent')
         elseif l:item[:15] =~? 'error'
             echom l:item
@@ -75,7 +75,7 @@ function! pandoc#conversion#EndProcess(PID, ...) abort
         echohl None
     else
         echohl Comment
-        echom 'Conversion Complete'
+        redraw | echo 'Conversion Complete'
         echohl None
     endif
     let l:winnum = <SID>removePIDFromLists(a:PID)
@@ -90,7 +90,7 @@ function! pandoc#conversion#EndProcess(PID, ...) abort
     endfor
     if l:wordcount !=# ''
         echohl Comment
-        echom l:wordcount
+        redraw | echo l:wordcount
         echohl None
     endif
 endfunction
@@ -109,7 +109,7 @@ function! pandoc#conversion#KillProcess(...) abort
         let l:PIDList = keys(g:pandocRunPID)
         if len(l:PIDList) == 0
             echohl Comment
-            echom 'No job to kill!'
+            redraw | echo 'No job to kill!'
             echohl None
             return
         endif
@@ -128,7 +128,7 @@ function! pandoc#conversion#KillProcess(...) abort
     " Print message ... only if there are no arguments.
     if !l:silent
         echohl Comment
-        echom 'Job killed.'
+        redraw | echo 'Job killed.'
         echohl None
     endif
     call <SID>removePIDFromLists(l:PID)
@@ -190,7 +190,7 @@ function! s:MyConvertHelper(command, ...) abort
             let l:pandoc_converting = 0
             let l:PID = matchstr(g:pandocRunBuf[l:buffer][0], '\d\+')
             unlet g:pandocRunBuf[l:buffer][0]
-            unlet g:pandocRunPID['process ' . l:PID . ' run']
+            unlet g:pandocRunPID['process' l:PID . ' run']
         else
             let l:pandoc_converting = 1
         endif
@@ -206,16 +206,16 @@ function! s:MyConvertHelper(command, ...) abort
         if has('nvim')
             let l:jobPID = jobstart('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
-                    \ ' "' . l:fileName . '" ' . g:pandocTempDir . ' ' .
-                    \ g:pandocPdfApp . ' ' . l:auxCommand,
+                    \ ' "' . l:fileName . '"' g:pandocTempDir . ' ' .
+                    \ g:pandocPdfApp l:auxCommand,
                     \ {'on_stdout': 'pandoc#conversion#DisplayMessages',
                     \ 'on_stderr': 'pandoc#conversion#DisplayError',
                     \ 'on_exit': 'pandoc#conversion#EndProcess'})
         else
             let l:jobPID = job_start('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
-                    \ ' "' . l:fileName . '" ' . g:pandocTempDir . ' ' .
-                    \ g:pandocPdfApp . ' ' . l:auxCommand,
+                    \ ' "' . l:fileName . '"' g:pandocTempDir . ' ' .
+                    \ g:pandocPdfApp l:auxCommand,
                     \ {'out_cb': 'pandoc#conversion#DisplayMessages',
                     \ 'err_cb': 'pandoc#conversion#DisplayError',
                     \ 'close_cb': 'pandoc#conversion#EndProcess'})
@@ -249,7 +249,7 @@ function! pandoc#conversion#ToggleAutoPDF() abort
             autocmd!
         augroup END
         echohl Comment
-        echom 'Auto PDF Off...'
+        redraw | echo 'Auto PDF Off...'
         echohl None
     else
         let b:pandoc_autoPDFEnabled = 1
@@ -258,7 +258,7 @@ function! pandoc#conversion#ToggleAutoPDF() abort
             autocmd BufWritePost <buffer> :call <SID>MyConvertHelper('')
         augroup END
         echohl Comment
-        echom 'Auto PDF On...'
+        redraw | echo 'Auto PDF On...'
         echohl None
     endif
 endfunction

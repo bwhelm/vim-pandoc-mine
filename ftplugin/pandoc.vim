@@ -172,18 +172,18 @@ endif
 if has('nvim')
     command! JumpToPDF silent call jobstart("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"on_stdout":
+                \ ' "' . expand('%:p') . '"' line(".") "pdf", {"on_stdout":
                 \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
 else  " normal vim
     command! JumpToPDF silent call job_start("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"out_cb":
+                \ ' "' . expand('%:p') . '"' line(".") "pdf", {"out_cb":
                 \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
-" nnoremap <buffer><silent> <LocalLeader>j :call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
+" nnoremap <buffer><silent> <LocalLeader>j :call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '"' line('.'))<CR>
 " FIXME: Should the next line be mapped to :JumpToPDF?
-inoremap <buffer><silent> <LocalLeader>j <C-o>:call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '" ' . line('.'))<CR>
+inoremap <buffer><silent> <LocalLeader>j <C-o>:call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '"' line('.'))<CR>
 " Open Dictionary.app with word under cursor
 nnoremap <buffer><silent> K :!open dict:///<cword><CR><CR>
 " Faster mapping to bibliography/cross-reference completion
@@ -219,13 +219,13 @@ function! s:JumpToTex(filetype) abort
         if a:filetype ==# '\.tex'
             let l:linenum = system('/usr/bin/env python3 ' .
                         \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                        \ ' "' . expand('%:p') . '" ' . line('.') . ' ' . a:filetype)
+                        \ ' "' . expand('%:p') . '"' line('.') a:filetype)
         endif
-        execute 'tabedit ' . l:filename
+        execute 'tabedit' l:filename
         execute l:linenum
     else
         echohl Error
-        echo 'Corresponding ' . a:filetype . ' file does not exist.'
+        echo 'Corresponding' a:filetype 'file does not exist.'
         echohl None
     endif
 endfunction
@@ -340,7 +340,7 @@ try
         endif
         if l:title ==# ''
             echohl WarningMsg
-            echom 'Could not find title.'
+            redraw | echo 'Could not find title.'
             echohl None
             return
         endif
@@ -370,22 +370,22 @@ try
             " current file, this could be problematic. I won't worry about
             " this possibility.
             echohl WarningMsg
-            echom 'Destination file (' . fnamemodify(l:newName, ':t') . ') already exists. Overwrite? (y/N)'
+            redraw | echo 'Destination file (' . fnamemodify(l:newName, ':t') . ') already exists. Overwrite? (y/N)'
             if getchar() != 121  " ('y')
-                echom 'Aborting...'
+                redraw | echo 'Aborting...'
                 echohl None
                 return
             endif
-            echom 'Overwriting...'
+            redraw | echo 'Overwriting...'
             echohl None
         endif
         if l:currentName !=# ''  "File already has a name
             if findfile(l:currentName, '.') ==# ''  " No existing file
-                execute 'write ' . l:newName
+                execute 'write' l:newName
             elseif l:currentName ==# l:newName  " Existing file with same name
                 update
                 echohl Comment
-                echom 'Updated existing file w/o renaming.'
+                redraw | echo 'Updated existing file w/o renaming.'
                 echohl None
             else  " Existing file with different name
                 try
@@ -393,31 +393,31 @@ try
                     " delete manually. This happens (a) if fugitive is not loaded
                     " or the file is not in a git repository or (b) if the file is
                     " already saved but not yet added to git repository.
-                    execute 'Gmove! ' . l:newName
-                    execute 'bwipeout ' . l:currentName
+                    execute 'Gmove!' l:newName
+                    execute 'bwipeout' l:currentName
                         " Next line is needed when l:newName only modifies the
                         " case of l:currentName: bwipeout will kill the
                         " current buffer, and so it needs to be reloaded. (In
                         " other cases, `edit` will do nothing.)
-                        execute 'edit ' . l:newName
+                        execute 'edit' l:newName
                 catch
                     if rename(l:currentName, l:newName)
                         echohl Error
-                        echom 'Error renaming file ' . fnamemodify(l:currentName, ':t') . ' to ' . fnamemodify(l:newName, ':t')
+                        echom 'Error renaming file' fnamemodify(l:currentName, ':t') 'to' fnamemodify(l:newName, ':t')
                         echohl None
                     else
-                        echom 'File renamed to: ' . fnamemodify(l:newName, ':t')
-                        execute 'bwipeout ' . l:currentName
+                        redraw | echo 'File renamed to:' fnamemodify(l:newName, ':t')
+                        execute 'bwipeout' l:currentName
                         " Next line is needed when l:newName only modifies the
                         " case of l:currentName: bwipeout will kill the
                         " current buffer, and so it needs to be reloaded. (In
                         " other cases, `edit` will do nothing.)
-                        execute 'edit ' . l:newName
+                        execute 'edit' l:newName
                     endif
                 endtry
             endif
         else  " File does not already have a name
-            execute 'write! ' . l:newName
+            execute 'write!' l:newName
         endif
     endfunction
 catch /E127/  " Can't redefine function, it's already in use.

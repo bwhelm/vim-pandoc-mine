@@ -8,7 +8,7 @@ function! s:JumpToReference(searchString) abort
     if a:searchString =~# '^@'  " If pandoc-style heading identifier
         let l:commandString = '/#' . a:searchString[1:]
     else  " pandocCommentFilter-style label
-        let l:commandString = '/<l ' . a:searchString
+        let l:commandString = '/<l' a:searchString
     endif
     " Search for it. (This puts cursor at beginning of line.)
     try
@@ -62,7 +62,7 @@ function! s:JumpToReference(searchString) abort
             nnoremap <silent><buffer> <Esc> :quit<CR>
         else
             echohl WarningMsg
-            echom 'Cannot find ID.'
+            redraw | echo 'Cannot find ID.'
             echohl None
         endif
     endtry
@@ -104,7 +104,7 @@ function! pandoc#references#GoToReference() abort
             silent call <SID>JumpToReference(l:searchString)
         else
             echohl WarningMsg
-            echom 'No cross-reference found.'
+            redraw | echo 'No cross-reference found.'
             echohl None
         endif
     endif
@@ -168,7 +168,7 @@ function! s:FindHeaderID(base) abort
             if l:line =~ '#' . a:base
                 let l:match = matchlist(l:line, '^\s*!\[\(.*\)\]([^)]*){#\([[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß\-_+:]\+\).\{-}}')
                 let l:completionList += [{'word': l:match[2],
-                            \ 'abbr': 'Figure: ' . l:match[1],
+                            \ 'abbr': 'Figure:' l:match[1],
                             \ 'icase': 1}]
             endif
         elseif match(l:line, '^(\?@[^.]\{1,20}[).]\s') == 0
@@ -304,7 +304,7 @@ function! s:constructBookEntry(bibItem, desired) abort
     if l:publisher !=# ''
         let address = s:retrieveBibField(a:bibItem, 'address')
         if address
-            let l:entry .= ' ' . address . ': ' . l:publisher . '.'
+            let l:entry .= ' ' . address . ':' l:publisher . '.'
         else
             let l:entry .= ' ' . l:publisher . '.'
         endif
@@ -382,7 +382,7 @@ function! s:constructInCollEntry(bibItem, crossref, desired) abort
     endif
     if a:desired ==# 'entry'
         let l:entry = l:author . ' (' . year . '). "'
-                \ . s:retrieveBibField(a:bibItem, 'title') . '". In ' . l:crossref
+                \ . s:retrieveBibField(a:bibItem, 'title') . '". In' l:crossref
                 \ . ' ' . s:retrieveBibField(a:bibItem, 'pages') . '.'
         let l:doi = s:retrieveBibField(a:bibItem, 'Doi')
         if l:doi
@@ -397,7 +397,7 @@ function! s:constructInCollEntry(bibItem, crossref, desired) abort
     else
         let l:authorLast = s:getAuthorLast(l:author)
         let l:shortEntry = l:authorLast . '(' . l:year . '). "'
-                \ . s:retrieveBibField(a:bibItem, 'title') . '". In ' . l:crossref
+                \ . s:retrieveBibField(a:bibItem, 'title') . '". In' l:crossref
                 \ . '.'
         return l:shortEntry
     endif
@@ -464,7 +464,7 @@ function! s:constructBibEntry(bibItem, bibDataText, desired) abort
             let l:year = s:retrieveBibField(a:bibItem, 'year')
             let l:title = s:retrieveBibField(a:bibItem, 'title')
             let l:entry = l:author . ' (' . l:year . '). "' . l:title . '".'
-            " let l:short = l:author[:l:author.find(',')] . '(' . l:year . '). ' . '"' . l:title . '".'
+            " let l:short = l:author[:l:author.find(',')] . '(' . l:year . '). "' . l:title . '".'
             let l:book = s:retrieveBibField(a:bibItem, 'booktitle')
             if l:book !=# ''
                 let l:entry .= ' In *' . book . '*.'
@@ -497,7 +497,7 @@ function! s:constructBibEntry(bibItem, bibDataText, desired) abort
             let l:year = s:retrieveBibField(a:bibItem, 'year')
             let l:title = s:retrieveBibField(a:bibItem, 'title')
             let l:authorLast = s:getAuthorLast(l:author)
-            let l:short = l:authorLast . '(' . l:year . '). ' . '"' . l:title . '".'
+            let l:short = l:authorLast . '(' . l:year . '). "' . l:title . '".'
             let l:book = s:retrieveBibField(a:bibItem, 'booktitle')
             if l:book !=# ''
                 let l:short .= ' In *' . book . '*.'
