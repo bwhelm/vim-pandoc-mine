@@ -126,10 +126,10 @@ inoremap <buffer><silent> <LocalLeader>ca <C-o>:call pandoc#conversion#ToggleAut
 
 nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 
-" Find Comments and Notes {{{2
+" Find Notes and Footnotes {{{2
 " -----------------------
-nnoremap <buffer><silent> <LocalLeader>fc /\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
-nnoremap <buffer><silent> <LocalLeader>fC ?\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)?<CR>
+nnoremap <buffer><silent> <LocalLeader>fn /\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
+nnoremap <buffer><silent> <LocalLeader>fN ?\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)?<CR>
 nnoremap <buffer><silent> <LocalLeader>ff /\^\[<CR>m<l%m>`<
 nnoremap <buffer><silent> <LocalLeader>fF ?\^\[<CR>m<l%m>`<
 
@@ -182,12 +182,9 @@ else  " normal vim
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
 " nnoremap <buffer><silent> <LocalLeader>j :call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '"' line('.'))<CR>
-" FIXME: Should the next line be mapped to :JumpToPDF?
-inoremap <buffer><silent> <LocalLeader>j <C-o>:call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '"' line('.'))<CR>
+inoremap <buffer><silent> <LocalLeader>j <C-o>:JumpToPDF<CR>
 " Open Dictionary.app with word under cursor
 nnoremap <buffer><silent> K :!open dict:///<cword><CR><CR>
-" Faster mapping to bibliography/cross-reference completion
-"inoremap <buffer> <C-c> <C-x><C-u>
 " Italicize/boldface current word
 nnoremap <buffer><silent> <D-e> "zciw*<Esc>"zpa*<Esc>
 inoremap <buffer><silent> <D-e> <Esc>"zciw*<Esc>"zpa*
@@ -425,7 +422,6 @@ catch /E127/  " Can't redefine function, it's already in use.
 "     " file to be sourced and so this function redefined.
 endtry
 command! -nargs=* AutoNameFile call <SID>AutoNameFile(<q-args>)
-cnoreabbr <buffer> anf AutoNameFile
 
 " ======================================================================== }}}
 " Folding {{{1
