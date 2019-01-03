@@ -170,14 +170,14 @@ endif
 
 " Jump to corresponding line in Skim.app
 if has('nvim')
-    command! JumpToPDF silent call jobstart("/usr/bin/env python3 " .
+    command! JumpToPDF call jobstart("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '"' line(".") "pdf", {"on_stdout":
+                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"on_stdout":
                 \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
 else  " normal vim
-    command! JumpToPDF silent call job_start("/usr/bin/env python3 " .
+    command! JumpToPDF call job_start("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '"' line(".") "pdf", {"out_cb":
+                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"out_cb":
                 \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
