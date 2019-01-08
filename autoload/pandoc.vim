@@ -49,8 +49,7 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
         endif
     endif
     let l:title = substitute(l:title, '[.!?,:;] ', '-', 'g')
-    let l:title = substitute(l:title, '/', '-', 'g')
-    let l:title = substitute(l:title, ' ', '_', 'g')
+    let l:title = tr(l:title, '/ ', '-_')
     let l:title = <SID>RemoveDiacritics(l:title)
     let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
     let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
@@ -64,13 +63,13 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
         " current file, this could be problematic. I won't worry about
         " this possibility.
         echohl WarningMsg
-        redraw | echo 'Destination file (' . fnamemodify(l:newName, ':t') . ') already exists. Overwrite? (y/N)'
+        echo 'Destination file (' . fnamemodify(l:newName, ':t') . ') already exists. Overwrite? (y/N)'
         if getchar() != 121  " ('y')
-            redraw | echo 'Aborting...'
+            echo 'Aborting...'
             echohl None
             return
         endif
-        redraw | echo 'Overwriting...'
+        echo 'Overwriting...'
         echohl None
     endif
     if l:currentName !=# ''  "File already has a name
@@ -79,38 +78,25 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
         elseif l:currentName ==# l:newName  " Existing file with same name
             update
             echohl Comment
-            redraw | echo 'Updated existing file w/o renaming.'
+            echo 'Updated existing file w/o renaming.'
             echohl None
         else  " Existing file with different name
-            try
-                " Try using fugitive's Gmove. In case of error, write and
-                " delete manually. This happens (a) if fugitive is not loaded
-                " or the file is not in a git repository or (b) if the file is
-                " already saved but not yet added to git repository.
-                execute 'Gmove!' l:newName
-                execute 'bwipeout' l:currentName
-                    " Next line is needed when l:newName only modifies the
-                    " case of l:currentName: bwipeout will kill the
-                    " current buffer, and so it needs to be reloaded. (In
-                    " other cases, `edit` will do nothing.)
-                    execute 'edit' l:newName
-            catch
-                if rename(l:currentName, l:newName)
-                    echohl Error
-                    echom 'Error renaming file' fnamemodify(l:currentName, ':t') 'to' fnamemodify(l:newName, ':t')
-                    echohl None
-                else
-                    redraw | echo 'File renamed to:' fnamemodify(l:newName, ':t')
-                    execute 'bwipeout' fnameescape(l:currentName)
-                    " Next line is needed when l:newName only modifies the
-                    " case of l:currentName: bwipeout will kill the
-                    " current buffer, and so it needs to be reloaded. (In
-                    " other cases, `edit` will do nothing.)
-                    execute 'edit' l:newName
-                endif
-            endtry
+            if rename(l:currentName, l:newName)
+                echohl Error
+                echom 'Error renaming file' fnamemodify(l:currentName, ':t') 'to' fnamemodify(l:newName, ':t')
+                echohl None
+            else
+                echo 'File renamed to:' fnamemodify(l:newName, ':t')
+                " Next line is needed when l:newName only modifies the
+                " case of l:currentName: bwipeout will kill the
+                " current buffer, and so it needs to be reloaded. (In
+                " other cases, `edit` will do nothing.)
+                execute 'edit' l:newName
+                execute 'bwipeout' fnameescape(l:currentName)
+            endif
         endif
-    else  " File does not already have a name
+    else
+        " File does not already have a name. (Need `!` because we might be overwriting an existing file.)
         execute 'write!' l:newName
     endif
 endfunction
