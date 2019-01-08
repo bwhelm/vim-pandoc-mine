@@ -39,9 +39,9 @@ function! s:JumpToHeader(direction, count)
     if l:found == 0
         echohl Error
         if a:direction ==# 'b'
-            echo 'No previous header of level' l:count 'or below.'
+            redraw | echo 'No previous header of level' l:count 'or below.'
         else
-            echo 'No next header of level' l:count 'or below.'
+            redraw | echo 'No next header of level' l:count 'or below.'
         endif
         echohl None
     endif
@@ -222,7 +222,7 @@ function! s:JumpToTex(filetype) abort
         execute l:linenum
     else
         echohl Error
-        echo 'Corresponding' a:filetype 'file does not exist.'
+        redraw | echo 'Corresponding' a:filetype 'file does not exist.'
         echohl None
     endif
 endfunction

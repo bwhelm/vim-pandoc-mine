@@ -45,7 +45,7 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
         if l:fileBegin =~# '\n- aspectratio' || l:fileBegin =~# '\ntheme' ||
                     \ l:fileBegin =~# '\nbeamerarticle'
             let l:title .= '-Presentation'
-            echo 'Identified as presentation.'
+            redraw | echo 'Identified as presentation.'
         endif
     endif
     let l:title = substitute(l:title, '[.!?,:;] ', '-', 'g')

@@ -60,7 +60,7 @@ endfunction
 function! pandoc#fold#foldSection(exclusive) abort
     if foldlevel('.') > 0 && a:exclusive == 1
         echohl WarningMsg
-        echo 'Already in a fold.'
+        redraw | echo 'Already in a fold.'
         echohl None
         let l:endLine = 0
     else

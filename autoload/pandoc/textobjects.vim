@@ -20,7 +20,7 @@ function! pandoc#textobjects#FindAroundFootnote()
     endif
     call setpos('.', l:curPos)
     echohl WarningMsg
-    echo 'No footnote found.'
+    redraw | echo 'No footnote found.'
     echohl None
     return
 endfunction
