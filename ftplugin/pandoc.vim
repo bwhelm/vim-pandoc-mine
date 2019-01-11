@@ -116,7 +116,7 @@ nnoremap <buffer><silent> <LocalLeader>ck :call pandoc#conversion#KillProcess()<
 " Path to plugin's python conversion folder (e.g.,
 " `~/.vim/plugged/vim-pandoc-mine/pythonx/conversion/`)
 let s:pythonScriptDir = expand('<sfile>:p:h:h') . '/pythonx/conversion/'
-command! RemoveAuxFiles :execute '!'
+command! -buffer RemoveAuxFiles :execute '!'
             \ . s:pythonScriptDir . 'remove-aux-files.py'
             \ . ' ' . fnameescape(expand('%:p'))
 nnoremap <buffer><silent> <LocalLeader>cK :RemoveAuxFiles<CR>
@@ -170,12 +170,12 @@ endif
 
 " Jump to corresponding line in Skim.app
 if has('nvim')
-    command! JumpToPDF call jobstart("/usr/bin/env python3 " .
+    command! -buffer JumpToPDF call jobstart("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
                 \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"on_stdout":
                 \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
 else  " normal vim
-    command! JumpToPDF call job_start("/usr/bin/env python3 " .
+    command! -buffer JumpToPDF call job_start("/usr/bin/env python3 " .
                 \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
                 \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"out_cb":
                 \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
@@ -299,12 +299,12 @@ setlocal omnifunc=pandoc#references#MyCompletion
 " ======================================================================== }}}
 " TOC Support {{{1
 " ============================================================================
-command! TOC call pandoc#toc#ShowTOC()
+command! -buffer TOC call pandoc#toc#ShowTOC()
 
 " ======================================================================== }}}
 " AutoNameFile {{{1
 " ============================================================================
-command! -nargs=* AutoNameFile call pandoc#AutoNameFile(<q-args>)
+command! -buffer -nargs=* AutoNameFile call pandoc#AutoNameFile(<q-args>)
 
 " ======================================================================== }}}
 " Folding {{{1
@@ -329,7 +329,7 @@ function! s:TidyPandoc() abort
     " TODO: 4. remove excess escaping
     let @/ = l:saveSearch
 endfunction
-command! TidyPandoc call <SID>TidyPandoc()
+command! -buffer TidyPandoc call <SID>TidyPandoc()
 
 " ======================================================================== }}}
 " Other {{{1

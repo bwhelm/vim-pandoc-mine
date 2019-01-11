@@ -1,8 +1,10 @@
+scriptencoding utf-8
+" vim: set fdm=marker:
 " ============================================================================
 " Helper Functions for Pandoc {{{1
 " ============================================================================
 
-function! pandoc#conversion#DisplayMessages(PID, text, ...) abort
+function! pandoc#conversion#DisplayMessages(PID, text, ...) abort  "{{{2
     " To write to location list. Note that `...` is there because neovim
     " will include `stdout` and `stderr` as part of its arguments; I can
     " simply ignore those.
@@ -27,8 +29,8 @@ function! pandoc#conversion#DisplayMessages(PID, text, ...) abort
     endfor
     echohl None
 endfunction
-
-function! pandoc#conversion#DisplayError(PID, text, ...) abort
+"2}}}
+function! pandoc#conversion#DisplayError(PID, text, ...) abort  "{{{2
     " To write to messages
     " let l:winWidth = winwidth(0)
     echohl Comment
@@ -46,8 +48,8 @@ function! pandoc#conversion#DisplayError(PID, text, ...) abort
     endfor
     echohl None
 endfunction
-
-function! s:removePIDFromLists(PID) abort
+"2}}}
+function! s:removePIDFromLists(PID) abort  "{{{2
     if has_key(g:pandocRunPID, a:PID)
         let [l:buffer, l:winnum, l:error] = g:pandocRunPID[a:PID]
         call remove(g:pandocRunPID, a:PID)
@@ -62,8 +64,8 @@ function! s:removePIDFromLists(PID) abort
         return l:winnum
     endif
 endfunction
-
-function! pandoc#conversion#EndProcess(PID, ...) abort
+"2}}}
+function! pandoc#conversion#EndProcess(PID, ...) abort  "{{{2
     try
         let [l:buffer, l:winnum, l:errorFlag] = g:pandocRunPID[a:PID]
     catch /E716/  " Key not in Dict -- will happen if user kills process
@@ -94,8 +96,8 @@ function! pandoc#conversion#EndProcess(PID, ...) abort
         echohl None
     endif
 endfunction
-
-function! pandoc#conversion#KillProcess(...) abort
+"2}}}
+function! pandoc#conversion#KillProcess(...) abort  "{{{2
     " Presence of any argument indicates silence.
     if a:0 > 1
         let l:PID = a:1
@@ -133,7 +135,7 @@ function! pandoc#conversion#KillProcess(...) abort
     endif
     call <SID>removePIDFromLists(l:PID)
 endfunction
-
+"2}}}
 
 " =========================================================================== }}}
 " Functions for Conversions {{{1
@@ -143,17 +145,17 @@ endfunction
 " `~/.vim/plugged/vim-pandoc-mine/pythonx/conversion/`)
 let s:pythonScriptDir = expand('<sfile>:p:h:h:h') . '/pythonx/conversion/'
 
-" Following function calls the conversion script given by a:command only if
-" another conversion is not currently running.
-function! s:MyConvertHelper(command, ...) abort
+function! s:MyConvertHelper(command, ...) abort  "{{{2
+    " Following function calls the conversion script given by a:command only if
+    " another conversion is not currently running.
     if !exists('g:pandocRunPID')
         " `g:pandocRunPID` is a dictionary used to keep track of all PIDs and
         " errorFlags for each buffer number. Its keys are the PIDs;
         " its values are lists of [buffer number, errorFlag].
+        let g:pandocRunPID = {}
         " `g:pandocRunBuf` is a dictionary used to keep track of all buffers
         " and what PIDs there might be for current processes. Its keys are the
         " buffer numbers; its values are [PID1, PID2, ...].
-        let g:pandocRunPID = {}
         let g:pandocRunBuf = {}
     endif
     if !exists('g:pandocTempDir')
@@ -239,10 +241,10 @@ function! s:MyConvertHelper(command, ...) abort
         endif
     endif
 endfunction
-
-" Following sets up autogroup to call .pdf conversion script when leaving
-" insert mode.
-function! pandoc#conversion#ToggleAutoPDF() abort
+"2}}}
+function! pandoc#conversion#ToggleAutoPDF() abort  "{{{2
+    " Following sets up autogroup to call .pdf conversion script when leaving
+    " insert mode.
     if b:pandoc_autoPDFEnabled
         let b:pandoc_autoPDFEnabled = 0
         augroup AutoPDFConvert
@@ -262,13 +264,13 @@ function! pandoc#conversion#ToggleAutoPDF() abort
         echohl None
     endif
 endfunction
-
-" Following function will temporarily turn off auto conversion, run the
-" requested conversion, and then restore auto conversion to its former state.
-" It will also check to see if the current buffer has a filename, and if not
-" it will create a temporary .md file with the text of the current buffer and
-" run the conversion on that file.
-function! pandoc#conversion#MyConvertMappingHelper(command, ...) abort
+"2}}}
+function! pandoc#conversion#MyConvertMappingHelper(command, ...) abort  "{{{2
+    " Following function will temporarily turn off auto conversion, run the
+    " requested conversion, and then restore auto conversion to its former state.
+    " It will also check to see if the current buffer has a filename, and if not
+    " it will create a temporary .md file with the text of the current buffer and
+    " run the conversion on that file.
     let l:auxCommand = a:0 == 0 ? '' : a:1
     if !exists('b:pandoc_autoPDFEnabled')
         let b:pandoc_autoPDFEnabled = 0
@@ -281,3 +283,5 @@ function! pandoc#conversion#MyConvertMappingHelper(command, ...) abort
         call <SID>MyConvertHelper(a:command, l:auxCommand)
     endif
 endfunction
+"2}}}
+"1}}}
