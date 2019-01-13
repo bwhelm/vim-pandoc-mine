@@ -196,14 +196,14 @@ vnoremap <buffer><silent> <C-b> c**<C-r>"**<Esc>gvlloll
 " Next mapping will delete the surrounding comment, leaving the inside text.
 " Note that it doesn't do any checking to see if the cursor is actually in a
 " comment.
-nnoremap <buffer><silent> dsc mclT[dt]hPldf}`ch
+nnoremap <buffer><silent> dsn mclT[dt]hPldf}`ch
 " Next mappings allow for changing the comment type of next comment. Note that
 " it doesn't do anything about checking to see where that comment is.
-nnoremap <buffer><silent> cscc mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwcomment<Esc>`c
-nnoremap <buffer><silent> cscm mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwmargin<Esc>`c
-nnoremap <buffer><silent> cscf mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwfixme<Esc>`c
-nnoremap <buffer><silent> csch mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwhighlight<Esc>`c
-nnoremap <buffer><silent> cscs mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`c
+nnoremap <buffer><silent> csnc mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwcomment<Esc>`c
+nnoremap <buffer><silent> csnm mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwmargin<Esc>`c
+nnoremap <buffer><silent> csnf mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwfixme<Esc>`c
+nnoremap <buffer><silent> csnh mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwhighlight<Esc>`c
+nnoremap <buffer><silent> csns mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`c
 " Jump to .tex file in tmp dir
 function! s:JumpToTex(filetype) abort
     let l:fileroot = expand('%:t:r')
