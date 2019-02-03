@@ -249,46 +249,54 @@ if exists('*textobj#user#plugin')
     let s:pageRangePattern = '\m\(\<p\{1,2}\.\\\? \)\?\d\+\-\{1,2}\d\+'
 
     call textobj#user#plugin('pandoc', {
-        \ 'section': {
-        \        'select-a': 'a#',
-        \        'select-a-function': 'pandoc#textobjects#FindAroundSection',
-        \        'select-i': 'i#',
-        \        'select-i-function': 'pandoc#textobjects#FindInsideSection',
-        \    },
-        \ 'innerCitation': {
-        \        'pattern': s:innerCitationPattern,
-        \        'select': 'ic',
-        \        'scan': 'nearest',
-        \    },
-        \ 'aroundCitation': {
-        \        'pattern': s:aroundCitationPattern,
-        \        'select': 'ac',
-        \        'scan': 'nearest',
-        \    },
-        \ 'pageRange': {
-        \        'pattern': s:pageRangePattern,
-        \        'select': 'pr',
-        \        'scan': 'nearest',
-        \    },
-        \    'inlineNote': {
-        \        'pattern': ['\[',
-                    \ '\]{\.\(comment\|margin\|fixme\|highlight\|smcaps\)}'],
-        \        'select-a': 'an',
-        \        'select-i': 'in',
-        \    },
-        \    'blockNote': {
-        \         'pattern': ['^::: comment\n',
-        \                   '\n:::$'],
-        \        'select-a': 'aN',
-        \        'select-i': 'iN',
-        \    },
-        \    'footnote': {
-        \        'select-a': 'af',
-        \        'select-a-function': 'pandoc#textobjects#FindAroundFootnote',
-        \        'select-i': 'if',
-        \        'select-i-function': 'pandoc#textobjects#FindInsideFootnote',
-        \    },
-        \ })
+        \   'section': {
+        \       'select-a': 'a#',
+        \       'select-a-function': 'pandoc#textobjects#FindAroundSection',
+        \       'select-i': 'i#',
+        \       'select-i-function': 'pandoc#textobjects#FindInsideSection',
+        \   },
+        \   'innerCitation': {
+        \       'pattern': s:innerCitationPattern,
+        \       'select': 'ic',
+        \       'scan': 'nearest',
+        \   },
+        \   'aroundCitation': {
+        \       'pattern': s:aroundCitationPattern,
+        \       'select': 'ac',
+        \       'scan': 'nearest',
+        \   },
+        \   'pageRange': {
+        \       'pattern': s:pageRangePattern,
+        \       'select': 'pr',
+        \       'scan': 'nearest',
+        \   },
+        \   'insideInlineNote': {
+        \       'pattern': '\[\zs[^]]*\ze\]{\.[A-z]\{2,}}',
+        \       'select': 'in',
+        \       'scan': 'nearest',
+        \   },
+        \   'aroundInlineNote': {
+        \       'pattern': '\[[^]]*\]{\.[A-z]\{2,}}',
+        \       'select': 'an',
+        \       'scan': 'nearest',
+        \   },
+        \   'insideBlockNote': {
+        \        'pattern': '^::: comment\n\zs\_.*\ze\n:::$',
+        \       'select': 'iN',
+        \       'scan': 'nearest',
+        \   },
+        \   'aroundBlockNote': {
+        \        'pattern': '^::: comment\n\_.*\n:::$',
+        \       'select': 'aN',
+        \       'scan': 'nearest',
+        \   },
+        \   'footnote': {
+        \       'select-a': 'af',
+        \       'select-a-function': 'pandoc#textobjects#FindAroundFootnote',
+        \       'select-i': 'if',
+        \       'select-i-function': 'pandoc#textobjects#FindInsideFootnote',
+        \   },
+        \})
 endif
 
 " ======================================================================== }}}

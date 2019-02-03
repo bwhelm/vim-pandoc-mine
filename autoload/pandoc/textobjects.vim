@@ -5,9 +5,15 @@ scriptencoding utf-8
 " Text object for foontones
 function! pandoc#textobjects#FindAroundFootnote()
     let l:curPos = getcurpos()
-    let l:found = search('\^[', 'bcW', l:curPos[1])
-    if l:found == 0
-        let l:found = search('\^[', 'cW', l:curPos[1])
+    let l:found = search('\^[', 'cW', l:curPos[1])  " try ahead on current line
+    if l:found == 0  " ... otherwise try behind on current line ...
+        let l:found = search('\^[', 'bcW', l:curPos[1])
+    endif
+    if l:found == 0  " ... otherwise try ahead on screen ...
+        let l:found = search('\^[', 'cW', line("w$"))
+    endif
+    if l:found == 0  " ... otherwise try behind on screen ...
+        let l:found = search('\^[', 'bcW', line("w0"))
     endif
     if l:found > 0
         let l:beginPos = getcurpos()
