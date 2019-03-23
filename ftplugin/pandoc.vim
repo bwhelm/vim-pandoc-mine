@@ -128,8 +128,8 @@ nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 
 " Find Notes and Footnotes {{{2
 " -----------------------
-nnoremap <buffer><silent> <LocalLeader>fn /\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)/<CR>
-nnoremap <buffer><silent> <LocalLeader>fN ?\\\@<!\(\[[^[]*\]{\.[a-z]\{-}}\\|<\(!\?comment\\|highlight\\|fixme\\|margin\\|smcaps\)>\)?<CR>
+nnoremap <buffer><silent> <LocalLeader>fn /\]{\.[a-z]\{-}}/e<CR>m>F]%m<
+nnoremap <buffer><silent> <LocalLeader>fN ?\]{\.[a-z]\{-}}?e<CR>m>F]%m<
 nnoremap <buffer><silent> <LocalLeader>ff /\^\[<CR>m<l%m>`<
 nnoremap <buffer><silent> <LocalLeader>fF ?\^\[<CR>m<l%m>`<
 
@@ -196,7 +196,7 @@ vnoremap <buffer><silent> <C-b> c**<C-r>"**<Esc>gvlloll
 " Next mapping will delete the surrounding comment, leaving the inside text.
 " Note that it doesn't do any checking to see if the cursor is actually in a
 " comment.
-nnoremap <buffer><silent> dsn mclT[dt]hPldf}`ch
+nnoremap <buffer><silent> dsn mclT[mdh%d`dhPldf}`ch
 " Next mappings allow for changing the comment type of next comment. Note that
 " it doesn't do anything about checking to see where that comment is.
 nnoremap <buffer><silent> csnc mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwcomment<Esc>`c
@@ -271,12 +271,12 @@ if exists('*textobj#user#plugin')
         \       'scan': 'nearest',
         \   },
         \   'insideInlineNote': {
-        \       'pattern': '\[\zs[^]]*\ze\]{\.[A-z]\{2,}}',
+        \       'pattern': '\[\zs.\{-}\ze\]{\.[a-z]\{2,}}',
         \       'select': 'in',
         \       'scan': 'nearest',
         \   },
         \   'aroundInlineNote': {
-        \       'pattern': '\[[^]]*\]{\.[A-z]\{2,}}',
+        \       'pattern': '\[.\{-}\]{\.[a-z]\{2,}}',
         \       'select': 'an',
         \       'scan': 'nearest',
         \   },
