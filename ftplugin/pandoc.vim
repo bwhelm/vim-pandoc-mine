@@ -281,12 +281,12 @@ if exists('*textobj#user#plugin')
         \       'scan': 'nearest',
         \   },
         \   'insideBlockNote': {
-        \        'pattern': '^::: comment\n\zs\_.*\ze\n:::$',
+        \       'pattern': '^:\{3,} [a-z]\{2,}\n\zs\_.*\ze\n:\{3,}$',
         \       'select': 'iN',
         \       'scan': 'nearest',
         \   },
         \   'aroundBlockNote': {
-        \        'pattern': '^::: comment\n\_.*\n:::$',
+        \       'pattern': '^:\{3,} [a-z]\{2,}\n\_.*\n:\{3,}$',
         \       'select': 'aN',
         \       'scan': 'nearest',
         \   },
