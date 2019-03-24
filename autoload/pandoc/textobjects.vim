@@ -2,7 +2,7 @@ scriptencoding utf-8
 " vim: set fdm=marker:
 " ============================================================================
 
-" Text object for foontones  {{{
+" Text object for footnotes  {{{
 function! pandoc#textobjects#FindAroundFootnote()
     let l:curPos = getcurpos()
     let l:found = search('\^[', 'cW', l:curPos[1])  " try ahead on current line
