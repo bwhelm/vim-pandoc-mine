@@ -235,14 +235,6 @@ nnoremap <silent><buffer> <LocalLeader>fl :call <SID>JumpToTex(".log")<CR>
 " ============================================================================
 " If textobj-user plugin is loaded, ...
 if exists('*textobj#user#plugin')
-    " Create text object for deleting/changing/etc. comments of various types
-        " For tag-style inline comments:
-        " \         'pattern': ['<\(comment\|margin\|fixme\|highlight\|smcaps\)>',
-        " \                   '</\(comment\|margin\|fixme\|highlight\|smcaps\)>'],
-        " For tag-style block Comments:
-        " \         'pattern': ['<!comment>\n\n',
-        " \                   '\n\n<\/!comment>'],
-
     let s:innerCitationPattern = '-\?@[[:alnum:]_][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~/]*'
     let s:aroundCitationPattern = s:innerCitationPattern . '\( \[[^]]\+\]\)\?' . '\|' .
                 \ '\[[^[]\{-}' . s:innerCitationPattern . '[^]]\{-}\]'
@@ -270,15 +262,11 @@ if exists('*textobj#user#plugin')
         \       'select': 'pr',
         \       'scan': 'nearest',
         \   },
-        \   'insideInlineNote': {
-        \       'pattern': '\[\zs.\{-}\ze\]{\.[a-z]\{2,}}',
-        \       'select': 'in',
-        \       'scan': 'nearest',
-        \   },
-        \   'aroundInlineNote': {
-        \       'pattern': '\[.\{-}\]{\.[a-z]\{2,}}',
-        \       'select': 'an',
-        \       'scan': 'nearest',
+        \   'inlineNote': {
+        \       'select-a': 'an',
+        \       'select-a-function': 'pandoc#textobjects#FindAroundNote',
+        \       'select-i': 'in',
+        \       'select-i-function': 'pandoc#textobjects#FindInsideNote',
         \   },
         \   'insideBlockNote': {
         \       'pattern': '^:\{3,} [a-z]\{2,}\n\zs\_.*\ze\n:\{3,}$',
