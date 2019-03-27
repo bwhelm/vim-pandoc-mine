@@ -31,24 +31,9 @@ endif
 
 " Jump to Headers {{{2
 " ---------------
-function! s:JumpToHeader(direction, count)
-    " The count indicates the level of heading to jump to
-    let l:count = a:count == 0 ? 6 : a:count
-    let l:cursorPos = getcurpos()
-    let l:found = search('^#\{1,' . l:count . '}\s', a:direction . 'W')
-    if l:found == 0
-        echohl Error
-        if a:direction ==# 'b'
-            redraw | echo 'No previous header of level' l:count 'or below.'
-        else
-            redraw | echo 'No next header of level' l:count 'or below.'
-        endif
-        echohl None
-    endif
-endfunction
 " Note: `<C-U>` below does away with the count. (See :h v:count.)
-noremap <silent><buffer> ]] :<C-U>call <SID>JumpToHeader('', v:count)<CR>
-noremap <silent><buffer> [[ :<C-U>call <SID>JumpToHeader('b', v:count)<CR>
+noremap <silent><buffer> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('', v:count)<CR>
+noremap <silent><buffer> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('b', v:count)<CR>
 
 " Fold Section {{{2
 " ------------
@@ -127,7 +112,7 @@ inoremap <buffer><silent> <LocalLeader>ca <C-o>:call pandoc#conversion#ToggleAut
 nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 
 " Find Notes and Footnotes {{{2
-" -----------------------
+" ------------------------
 nnoremap <buffer><silent> <LocalLeader>fn /\]{\.[a-z]\{-}}/e<CR>m>F]%m<
 nnoremap <buffer><silent> <LocalLeader>fN ?\]{\.[a-z]\{-}}?e<CR>m>F]%m<
 nnoremap <buffer><silent> <LocalLeader>ff /\^\[<CR>m<l%m>`<
@@ -181,7 +166,6 @@ else  " normal vim
                 \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
 endif
 nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
-" nnoremap <buffer><silent> <LocalLeader>j :call system('/usr/bin/env python3 ~/.vim/python-scripts/jump-to-line-in-Skim.py "' . expand('%') . '"' line('.'))<CR>
 inoremap <buffer><silent> <LocalLeader>j <C-o>:JumpToPDF<CR>
 " Open Dictionary.app with word under cursor
 nnoremap <buffer><silent> K :!open dict:///<cword><CR><CR>
@@ -196,38 +180,17 @@ vnoremap <buffer><silent> <C-b> c**<C-r>"**<Esc>gvlloll
 " Next mapping will delete the surrounding comment, leaving the inside text.
 " Note that it doesn't do any checking to see if the cursor is actually in a
 " comment.
-nnoremap <buffer><silent> dsn mclT[mdh%d`dhPldf}`ch
+nnoremap <buffer><silent> dsn mzlT[mdh%d`dhPldf}`zh
 " Next mappings allow for changing the comment type of next comment. Note that
 " it doesn't do anything about checking to see where that comment is.
-nnoremap <buffer><silent> csnc mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwcomment<Esc>`c
-nnoremap <buffer><silent> csnm mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwmargin<Esc>`c
-nnoremap <buffer><silent> csnf mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwfixme<Esc>`c
-nnoremap <buffer><silent> csnh mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwhighlight<Esc>`c
-nnoremap <buffer><silent> csns mc/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`c
+nnoremap <buffer><silent> csnc mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwcomment<Esc>`z
+nnoremap <buffer><silent> csnm mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwmargin<Esc>`z
+nnoremap <buffer><silent> csnf mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwfixme<Esc>`z
+nnoremap <buffer><silent> csnh mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwhighlight<Esc>`z
+nnoremap <buffer><silent> csns mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`z
 " Jump to .tex file in tmp dir
-function! s:JumpToTex(filetype) abort
-    let l:fileroot = expand('%:t:r')
-    if l:fileroot ==# ''
-        let l:fileroot = 'temp'
-    endif
-    let l:filename = fnamemodify('~/tmp/pandoc/' . l:fileroot . a:filetype, ':p')
-    if filereadable(l:filename)
-        let l:linenum = '0'
-        if a:filetype ==# '\.tex'
-            let l:linenum = system('/usr/bin/env python3 ' .
-                        \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                        \ ' "' . expand('%:p') . '" ' . line('.') . ' ' . a:filetype)
-        endif
-        execute 'tabedit' l:filename
-        execute l:linenum
-    else
-        echohl Error
-        redraw | echo 'Corresponding' a:filetype 'file does not exist.'
-        echohl None
-    endif
-endfunction
-nnoremap <silent><buffer> <LocalLeader>ft :call <SID>JumpToTex(".tex")<CR>
-nnoremap <silent><buffer> <LocalLeader>fl :call <SID>JumpToTex(".log")<CR>
+nnoremap <silent><buffer> <LocalLeader>ft :call pandoc#ftplugin#JumpToTex(".tex")<CR>
+nnoremap <silent><buffer> <LocalLeader>fl :call pandoc#ftplugin#JumpToTex(".log")<CR>
 "}}}
 
 " ======================================================================== }}}
@@ -312,20 +275,7 @@ setlocal fillchars+=fold:·
 " ======================================================================== }}}
 " Tidy Up Pandoc Documents {{{1
 " ============================================================================
-function! s:TidyPandoc() abort
-    let l:saveSearch = @/
-    " Tidy up pandoc documents
-    " 1. Convert tabs to spaces at beginnings of lines
-    setlocal tabstop=4
-    retab
-    " 2. Remove extra blank lines between list items
-    silent! global/\(^\s*\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s[^\n]*$\n\)\@<=\n\ze\s\+\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s\+/d
-    " 3. removing extra spaces after list identifiers
-    silent! %substitute /^\(\s*\)\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s\s\+/\1\2 /
-    " TODO: 4. remove excess escaping
-    let @/ = l:saveSearch
-endfunction
-command! -buffer TidyPandoc call <SID>TidyPandoc()
+command! -buffer TidyPandoc call pandoc#ftplugin#TidyPandoc()
 
 " ======================================================================== }}}
 " Other {{{1
