@@ -12,29 +12,46 @@ function! pandoc#toc#ShowTOC() abort
     " hitting `<CR>` (closing location list) or `<C-CR>` (leaving location
     " list open). Much of this is taken from vim-pandoc's TOC code.
     let l:winID = winnr()
-    let l:pos = search('^#\{1,6}\s', 'bnW')
-    let l:currentSection = getline(l:pos)
-    try
-        silent lvimgrep /^#\{1,6}\s/j %
-    catch /E480/
+    let l:bufID = bufnr('')
+    let l:startPos = getpos('.')  " Save cursor position
+    let l:currentSection = getline(search('^#\{1,6}\s', 'bnW'))
+    keepjumps normal! H
+    let l:headingList = []
+    keepjumps 1
+    while 1
+        let [l:line, l:col] = searchpos('^#\{1,6}\s', 'W')
+        if l:line
+            call add(l:headingList, {'bufnr': l:bufID,
+                                   \ 'lnum': l:line,
+                                   \ 'col': 1,
+                                   \ 'text': getline(l:line)
+                                   \ })
+        else
+            break
+        endif
+    endwhile
+    keepjumps call setpos('.', l:startPos)  " Restore cursor position
+    if len(l:headingList) > 0
+        call setloclist(0, l:headingList)
+    else
         echohl WarningMsg
         echo'No section headings found.'
         echohl None
         return
-    endtry
+    endif
     if len(getloclist(l:winID)) == 0
         return
     endif
-    try
-        " Must specify `botright` to put cursor in it when there are other
-        " windows around!
+    " try
+    "     " Must specify `botright` to put cursor in it when there are other
+    "     " windows around!
         botright lopen
-    catch /E776/  " no location list
-        echohl ErrorMsg
-        redraw | echo 'No TOC to show!'
-        echohl None
-        return
-    endtry
+    " catch /E776/  " no location list
+    "     echohl ErrorMsg
+    "     redraw | echo 'No TOC to show!'
+    "     echohl None
+    "     return
+    " endtry
     setlocal statusline=TOC modifiable
     silent %substitute/^\([^|]*|\)\{2,2} //e
     let l:currentLine = 1
@@ -43,10 +60,10 @@ function! pandoc#toc#ShowTOC() abort
         if l:heading['text'] ==# l:currentSection
             let l:currentLine = l:line
         endif
-        let l:level = len(matchstr(l:heading.text, '#*', '')) - 1
+        let l:level = len(matchstr(l:heading.text, '^#\{1,6}', '')) - 1
         let l:heading.text = '• ' . l:heading.text[l:level + 2:]
         let l:heading.text = matchstr(l:heading.text, '.\{-}\ze\({.\{-}}\)\?$')
-        call setline(l:line, repeat(' ', 4 * l:level) . l:heading.text)
+        call setline(l:line, repeat(' ', 2 * l:level) . l:heading.text)
     endfor
     setlocal nomodified nomodifiable
 
