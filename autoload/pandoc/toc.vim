@@ -11,21 +11,27 @@ function! pandoc#toc#ShowTOC() abort
     " Show the TOC in location list, and allow user to jump to locations by
     " hitting `<CR>` (closing location list) or `<C-CR>` (leaving location
     " list open). Much of this is taken from vim-pandoc's TOC code.
-    let l:winID = winnr()
     let l:bufID = bufnr('')
     let l:startPos = getpos('.')  " Save cursor position
-    let l:currentSection = getline(search('^#\{1,6}\s', 'bnW'))
-    keepjumps normal! H
+    let l:currentSectionLine = search('^#\{1,6}\s', 'bcnW')
     let l:headingList = []
+    let l:currentHeading = ''
     keepjumps 1
     while 1
-        let [l:line, l:col] = searchpos('^#\{1,6}\s', 'W')
+        keepjumps let [l:line, l:col] = searchpos('^#\{1,6}\s', 'W')
         if l:line
+            let l:text = getline(l:line)
+            let l:level = len(matchstr(l:text, '^#\{1,6}', '')) - 1
+            let l:headingText = repeat(' ', 2 * l:level) . '• ' . l:text[l:level + 2:]
+            let l:headingText = matchstr(l:headingText, '.\{-}\ze\({.\{-}}\)\?$')
             call add(l:headingList, {'bufnr': l:bufID,
                                    \ 'lnum': l:line,
                                    \ 'col': 1,
-                                   \ 'text': getline(l:line)
+                                   \ 'text': '|' . l:headingText
                                    \ })
+            if l:line == l:currentSectionLine
+                let l:currentHeading = l:headingText
+            endif
         else
             break
         endif
@@ -39,48 +45,29 @@ function! pandoc#toc#ShowTOC() abort
         echohl None
         return
     endif
-    if len(getloclist(l:winID)) == 0
-        return
-    endif
-    " try
-    "     " Must specify `botright` to put cursor in it when there are other
-    "     " windows around!
-        botright lopen
-    " catch /E776/  " no location list
-    "     echohl ErrorMsg
-    "     redraw | echo 'No TOC to show!'
-    "     echohl None
-    "     return
-    " endtry
-    setlocal statusline=TOC modifiable
-    silent %substitute/^\([^|]*|\)\{2,2} //e
-    let l:currentLine = 1
-    for l:line in range(1, len(getloclist(l:winID)))
-        let l:heading = getloclist(l:winID)[l:line - 1]
-        if l:heading['text'] ==# l:currentSection
-            let l:currentLine = l:line
-        endif
-        let l:level = len(matchstr(l:heading.text, '^#\{1,6}', '')) - 1
-        let l:heading.text = '• ' . l:heading.text[l:level + 2:]
-        let l:heading.text = matchstr(l:heading.text, '.\{-}\ze\({.\{-}}\)\?$')
-        call setline(l:line, repeat(' ', 2 * l:level) . l:heading.text)
-    endfor
+
+    let l:qfedit_enable = get(g:, 'qfedit_enable', 1)  " If qfedit plugin is used
+    let g:qfedit_enable = 0                            " Turn it off for now
+    botright lopen
+    setlocal statusline=TOC cursorline modifiable nolinebreak foldmethod=indent
+    keepjumps silent %substitute/^.\{-}|\ze *•//e
     setlocal nomodified nomodifiable
 
-    syn match TOCHeader /^.*\n/
-    syn match TOCBullet /•/ contained containedin=TOCHeader
+    syntax match TOCHeader /• .*/
+    syntax match TOCBullet /•/ contained containedin=TOCHeader
     highlight link TOCHeader Directory
     highlight link TOCBullet Delimiter
 
-    setlocal linebreak foldmethod=indent shiftwidth=4
+    let g:qfedit_enable = l:qfedit_enable              " Now re-enable qfedit plugin
     wincmd K
     silent! 0,$foldopen!
-    call cursor(l:currentLine, 1)
+    keepjumps 1
+    keepjumps call search(l:currentHeading)
     normal! zz
 
-    noremap <buffer> q :lclose<CR>
-    noremap <buffer> <Esc> :lclose<CR>
-    noremap <buffer> <CR> <CR>:lclose<CR>
-    noremap <buffer> <C-CR> <CR>
+    noremap <silent><buffer> q :lclose<CR>zz
+    noremap <silent><buffer> <Esc> :lclose<CR>zz
+    noremap <silent><buffer> <CR> <CR>:lclose<CR>zz
+    noremap <silent><buffer> <C-CR> <CR>zz
     let @/ = l:saveSearch
 endfunction
