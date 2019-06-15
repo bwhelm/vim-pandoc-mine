@@ -20,7 +20,7 @@ Here's what each of these are (read from stdin):
 """
 
 from distutils.spawn import find_executable
-from os import chdir, makedirs, listdir, environ, path, remove, rename
+from os import chdir, makedirs, listdir, environ, path, remove, rename, uname
 from subprocess import run, check_output, call
 from sys import stdout, stderr
 from time import time
@@ -141,6 +141,8 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
         .decode('utf-8').split('\n')[0].split(' ')[1].split('.')
     if int(pandocVersion[0]) < 2 and int(pandocVersion[1]) < 19:
         platform = 'old'
+    elif uname()[1] == 'instance-1':
+        platform = 'google'
     else:
         platform = 'new'
 
@@ -273,10 +275,11 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
             if path.exists('/usr/bin/open') and not suppressPdfFlag:
                 call(['/usr/bin/open', path.join(pandocTempDir, endFile)])
     # If on raspberrypi, upload resulting file to dropbox.
-    if platform == 'old':
+    if platform in ['old', 'google']:
         message = check_output(
             ['/home/bennett/Applications/dropbox-uploader/dropbox_uploader.sh',
-             'upload', endFile, endFile]).decode('utf-8')[:-1]
+             'upload', path.join(pandocTempDir, endFile),
+             endFile]).decode('utf-8')[:-1]
         writeMessage(message)
     if path.exists('/System/Library/Sounds/Morse.aiff') \
             and not suppressPdfFlag:
