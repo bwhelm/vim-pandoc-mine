@@ -281,30 +281,29 @@ syn match pandocBlockQuoteMark /\_^\s*>/ contained containedin=pandocEmphasis,pa
 " endif
 "}}}
 " Links: {{{2
+" Base: {{{3
+syn region pandocReferenceLabel matchgroup=pandocOperator start=/!\{,1}\\\@<!\^\@<!\[/ skip=/\(\\\@<!\]\]\@=\|`.*\\\@<!].*`\)/ end=/\\\@<!\]/ keepend display
+if g:pandoc#syntax#conceal#urls == 1
+    syn region pandocReferenceURL matchgroup=pandocOperator start=/\]\@1<=(/ end=/)/ keepend conceal
+else
+    syn region pandocReferenceURL matchgroup=pandocOperator start=/\]\@1<=(/ end=/)/ keepend
+endif
+" let's not consider "a [label] a" as a label, remove formatting - Note: breaks implicit links
+syn match pandocNoLabel /\]\@1<!\(\s\{,3}\|^\)\[[^\[\]]\{-}\]\(\s\+\|$\)[\[(]\@!/ contains=pandocPCite
+syn match pandocLinkTip /\s*".\{-}"/ contained containedin=pandocReferenceURL contains=pandocAmpersandEscape display
+call s:WithConceal('image', 'syn match pandocImageIcon /!\[\@=/ display', 'conceal cchar='. s:cchars['image'])
+" }}}
 if b:system !=# 'ios'
-    "
-    " Base: {{{3
-    syn region pandocReferenceLabel matchgroup=pandocOperator start=/!\{,1}\\\@<!\^\@<!\[/ skip=/\(\\\@<!\]\]\@=\|`.*\\\@<!].*`\)/ end=/\\\@<!\]/ keepend display
-    if g:pandoc#syntax#conceal#urls == 1
-        syn region pandocReferenceURL matchgroup=pandocOperator start=/\]\@1<=(/ end=/)/ keepend conceal
-    else
-        syn region pandocReferenceURL matchgroup=pandocOperator start=/\]\@1<=(/ end=/)/ keepend
-    endif
-    " let's not consider "a [label] a" as a label, remove formatting - Note: breaks implicit links
-    syn match pandocNoLabel /\]\@1<!\(\s\{,3}\|^\)\[[^\[\]]\{-}\]\(\s\+\|$\)[\[(]\@!/ contains=pandocPCite
-    syn match pandocLinkTip /\s*".\{-}"/ contained containedin=pandocReferenceURL contains=pandocAmpersandEscape display
-    call s:WithConceal('image', 'syn match pandocImageIcon /!\[\@=/ display', 'conceal cchar='. s:cchars['image'])
-    " }}}
     " Definitions: {{{3
     syn region pandocReferenceDefinition start=/\[.\{-}\]:/ end=/\(\n\s*".*"$\|$\)/ keepend
     syn match pandocReferenceDefinitionLabel /\[\zs.\{-}\ze\]:/ contained containedin=pandocReferenceDefinition display
     syn match pandocReferenceDefinitionAddress /:\s*\zs.*/ contained containedin=pandocReferenceDefinition
     syn match pandocReferenceDefinitionTip /\s*".\{-}"/ contained containedin=pandocReferenceDefinition,pandocReferenceDefinitionAddress contains=pandocAmpersandEscape
     "}}}
-    " Automatic_links: {{{3
-    syn match pandocAutomaticLink /<\(https\{0,1}.\{-}\|[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~.]\{-}@[A-Za-z0-9\-]\{-}\.\w\{-}\)>/ contains=NONE
-    " }}}
 endif
+" Automatic_links: {{{3
+syn match pandocAutomaticLink /<\(https\{0,1}.\{-}\|[A-Za-z0-9!#$%&'*+\-/=?^_`{|}~.]\{-}@[A-Za-z0-9\-]\{-}\.\w\{-}\)>/ contains=NONE
+" }}}
 "}}}
 " Citations: {{{2
 " parenthetical citations
@@ -625,9 +624,9 @@ syn region pandocYAMLHeader start=/\%(\%^\|\_^\s*\n\)\@<=\_^---\ze\n.\+/ end=/^\
 " Styling: {{{1
 " My special (taken from PandocCommentFilter)
 hi myFixme guibg=Red guifg=Black ctermbg=Red ctermfg=Black gui=bold term=bold cterm=bold
-hi link myPandocComment Special
-hi link myPandocCommentBlock Special
-hi link myPandocBoxBlock Identifier
+hi link myPandocComment Identifier
+hi link myPandocCommentBlock Identifier
+hi link myPandocBoxBlock Special
 hi link myPandocCenterBlock Constant
 hi link myPandocSpeakerBlock Special
 hi link myPandocFixme Constant
