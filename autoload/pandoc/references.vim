@@ -205,8 +205,8 @@ function! pandoc#references#MyCompletion(findstart, base) abort
         " locate the start of the partial ID but only if within 30 chars of
         " cursor
         let l:line = getline('.')
-        let l:cursorPos = getpos('.')[2]
-        if l:line[:col('.') - 1] =~# '@'
+        let l:cursorPos = col('.')
+        if l:line[:l:cursorPos - 1] =~# '@'
             let l:pos = searchpos('@', 'Wncb')
             if l:pos != [0,0] && l:cursorPos > l:pos[1] && l:pos[1] > l:cursorPos - 25
                 return l:pos[1]
