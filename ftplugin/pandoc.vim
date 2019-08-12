@@ -113,7 +113,7 @@ nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
 
 " Find Notes and Footnotes {{{2
 " ------------------------
-nnoremap <buffer><silent> <LocalLeader>fn /\]{\.[a-z]\{-}}/e<CR>m>F]%m<
+nnoremap <buffer><silent> <LocalLeader>fn /\]{\.\(comment\\|margin\\|fixme\\|highlight\)}/e<CR>m>F]%m<
 nnoremap <buffer><silent> <LocalLeader>fN ?\]{\.[a-z]\{-}}?e<CR>m>F]%m<
 nnoremap <buffer><silent> <LocalLeader>ff /\^\[<CR>m<l%m>`<
 nnoremap <buffer><silent> <LocalLeader>fF ?\^\[<CR>m<l%m>`<
