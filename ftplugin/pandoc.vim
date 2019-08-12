@@ -258,7 +258,7 @@ setlocal omnifunc=pandoc#references#MyCompletion
 " ======================================================================== }}}
 " TOC Support {{{1
 " ============================================================================
-command! -buffer TOC call pandoc#toc#ShowTOC()
+command! -buffer -nargs=* TOC call pandoc#toc#ShowTOC("<args>")
 
 " ======================================================================== }}}
 " AutoNameFile {{{1
