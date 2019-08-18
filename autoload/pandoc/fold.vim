@@ -35,6 +35,7 @@ function! pandoc#fold#FindSectionBoundaries() abort
     " on. Thus, `1va#` = `v1a#` will select around the current top-level
     " section. `3v1a#` will select around the current first-level section,
     " with the "1" taking precedence over the "3".
+    let l:startPos = getpos('.')
     let l:count = v:count > 0 ? v:count : v:prevcount > 0 ? v:prevcount : 6
     if getline('.') =~# '^#\{1,' . l:count . '}\s'
         let l:startLine = line('.')
@@ -48,7 +49,9 @@ function! pandoc#fold#FindSectionBoundaries() abort
             let l:startLine = l:startLine + 1  " This is either start of file or after YAML header
         endif
     endif
+    call cursor(l:startLine, 1)
     let l:endLine = search('^#\{1,' . l:count . '}\s', 'nW')
+    call setpos('.', l:startPos)
     if l:endLine == 0
         let l:endLine = line('$')
     else
@@ -78,7 +81,7 @@ endfunction
 function! pandoc#fold#foldAllSections() abort
     " Delete all folds
     normal! zE
-    let l:origCursor = getpos('.')
+    let l:startPos = getpos('.')
     1
     let l:cursor = 1
     while l:cursor < line('$')
@@ -86,15 +89,15 @@ function! pandoc#fold#foldAllSections() abort
         if l:cursor == 0
             break
         endif
-        call setpos('.', [0, l:cursor, 1, 0])
+        call cursor(l:cursor, 1)
     endwhile
-    call setpos('.', l:origCursor)
+    call setpos('.', l:startPos)
 endfunction
 
 function! pandoc#fold#foldAllSectionsNested() abort
     " Delete all folds
     normal! zE
-    let l:origCursor = getpos('.')
+    let l:startPos = getpos('.')
     call setpos('.', [0, 1, 1, 0])
     let l:cursorStart = 1
     if getline('.') ==# '---'
@@ -116,5 +119,5 @@ function! pandoc#fold#foldAllSectionsNested() abort
             let l:cursor = l:endPos + 1
         endwhile
     endfor
-    call setpos('.', l:origCursor)
+    call setpos('.', l:startPos)
 endfunction

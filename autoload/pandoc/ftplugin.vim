@@ -4,9 +4,22 @@ scriptencoding utf-8
 
 function! pandoc#ftplugin#JumpToHeader(direction, count) abort  "{{{
     " The count indicates the level of heading to jump to
+    let l:startPos = getpos('.')
+    if getline(1) ==# "---"
+        call cursor(2,0)
+        let l:yamlEnd = search("^---$", "nW")
+        if a:direction == "" && l:yamlEnd > l:startPos[1]
+            call cursor(l:yamlEnd + 1, 0)
+        else
+            call cursor(l:startPos[1], 1)
+        endif
+    endif
     let l:count = a:count == 0 ? 6 : a:count
-    let l:found = search('^#\{1,' . l:count . '}\s', a:direction . 'W')
-    if l:found == 0
+    let l:found = search('^#\{1,' . l:count . '}\s', a:direction . 'nW')
+    if a:direction ==# "b" && l:yamlEnd > l:found
+        let l:found = l:yamlEnd + 1
+    endif
+    if (a:direction ==# "b" && l:found == l:yamlEnd + 1) || l:found == 0
         echohl Error
         if a:direction ==# 'b'
             redraw | echo 'No previous header of level' l:count 'or below.'
@@ -14,6 +27,10 @@ function! pandoc#ftplugin#JumpToHeader(direction, count) abort  "{{{
             redraw | echo 'No next header of level' l:count 'or below.'
         endif
         echohl None
+        call setpos('.', l:startPos)  " restore initial position
+    else
+        call setpos('.', l:startPos)  " restore initial position to add to jumplist
+        execute 'normal!' l:found . 'G'
     endif
 endfunction
 "}}}
