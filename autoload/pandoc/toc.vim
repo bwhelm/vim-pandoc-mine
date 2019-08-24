@@ -16,7 +16,20 @@ function! pandoc#toc#ShowTOC(...) abort
     let l:currentSectionLine = search('^#\{1,6}\s', 'bcnW')
     let l:headingList = []
     let l:currentHeading = ''
-    keepjumps 1
+
+    " Skip YAML header
+    if getline(1) ==# '---'
+        keepjumps 2
+        if search('^---$')
+            +
+        else
+            1
+        endif
+    else
+        keepjumps 1
+    endif
+
+    " Find all headings
     while 1
         keepjumps let [l:line, l:col] = searchpos('^#\{1,6}\s', 'W')
         if l:line
@@ -37,6 +50,7 @@ function! pandoc#toc#ShowTOC(...) abort
         endif
     endwhile
     keepjumps call setpos('.', l:startPos)  " Restore cursor position
+
     if len(l:headingList) > 0
         call setloclist(0, l:headingList)
     else
