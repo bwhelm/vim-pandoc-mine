@@ -22,87 +22,83 @@ endtry
 " Configuration: {{{1
 "
 " use conceal? {{{2
-if b:system !=# 'ios'
-    if !exists('g:pandoc#syntax#conceal#use')
-        if v:version < 703
-            let g:pandoc#syntax#conceal#use = 0
-        else
-            let g:pandoc#syntax#conceal#use = 1
-        endif
+if !exists('g:pandoc#syntax#conceal#use')
+    if v:version < 703
+        let g:pandoc#syntax#conceal#use = 0
     else
-        " exists, but we cannot use it, disable anyway
-        if v:version < 703
-            let g:pandoc#syntax#conceal#use = 0
-        endif
+        let g:pandoc#syntax#conceal#use = 1
     endif
 else
-    let g:pandoc#syntax#conceal#use = 1
+    " exists, but we cannot use it, disable anyway
+    if v:version < 703
+        let g:pandoc#syntax#conceal#use = 0
+    endif
 endif
 "}}}2
 " what groups not to use conceal in. works as a blacklist {{{2
 if !exists('g:pandoc#syntax#conceal#blacklist')
-    let g:pandoc#syntax#conceal#blacklist = []
+let g:pandoc#syntax#conceal#blacklist = []
 endif
 "}}}2
 " cchars used in conceal rules {{{2
 " utf-8 defaults (preferred)
 if &encoding ==# 'utf-8'
-    let s:cchars = {
-        \'newline': '↵',
-        \'image': '▨',
-        \'super': '⇡',
-        \'sub': '⇣',
-        \'strike': 'x̶',
-        \'atx': '§',
-        \'codelang': 'λ',
-        \'codeend': '—',
-        \'abbrev': '→',
-        \'footnote': '†',
-        \'definition': ' ',
-        \'li': '•',
-        \'html_c_s': '‹',
-        \'html_c_e': '›'}
+let s:cchars = {
+    \'newline': '↵',
+    \'image': '▨',
+    \'super': '⇡',
+    \'sub': '⇣',
+    \'strike': 'x̶',
+    \'atx': '§',
+    \'codelang': 'λ',
+    \'codeend': '—',
+    \'abbrev': '→',
+    \'footnote': '†',
+    \'definition': ' ',
+    \'li': '•',
+    \'html_c_s': '‹',
+    \'html_c_e': '›'}
 else
-    " ascii defaults
-    let s:cchars = {
-        \'newline': ' ',
-        \'image': 'i',
-        \'super': '^',
-        \'sub': '_',
-        \'strike': '~',
-        \'atx': '#',
-        \'codelang': 'l',
-        \'codeend': '-',
-        \'abbrev': 'a',
-        \'footnote': 'f',
-        \'definition': ' ',
-        \'li': '*',
-        \'html_c_s': '+',
-        \'html_c_e': '+'}
+" ascii defaults
+let s:cchars = {
+    \'newline': ' ',
+    \'image': 'i',
+    \'super': '^',
+    \'sub': '_',
+    \'strike': '~',
+    \'atx': '#',
+    \'codelang': 'l',
+    \'codeend': '-',
+    \'abbrev': 'a',
+    \'footnote': 'f',
+    \'definition': ' ',
+    \'li': '*',
+    \'html_c_s': '+',
+    \'html_c_e': '+'}
 endif
 "}}}2
 " if the user has a dictionary with replacements for the default cchars, use those {{{2
 if exists('g:pandoc#syntax#conceal#cchar_overrides')
-    let s:cchars = extend(s:cchars, g:pandoc#syntax#conceal#cchar_overrides)
+let s:cchars = extend(s:cchars, g:pandoc#syntax#conceal#cchar_overrides)
 endif
 "}}}2
 "should the urls in links be concealed? {{{2
 if !exists('g:pandoc#syntax#conceal#urls')
-    let g:pandoc#syntax#conceal#urls = 0
+let g:pandoc#syntax#conceal#urls = 0
 endif
 " should backslashes in escapes be concealed? {{{2
 if !exists('g:pandoc#syntax#conceal#backslash')
-    let g:pandoc#syntax#conceal#backslash = 0
+let g:pandoc#syntax#conceal#backslash = 0
 endif
 "}}}2
 " leave specified codeblocks as Normal (i.e. 'unhighlighted') {{{2
 if !exists('g:pandoc#syntax#codeblocks#ignore')
-    let g:pandoc#syntax#codeblocks#ignore = []
+let g:pandoc#syntax#codeblocks#ignore = []
 endif
 "}}}2
 " use embedded highlighting for delimited codeblocks where a language is specifed. {{{2
 if !exists('g:pandoc#syntax#codeblocks#embeds#use')
-    let g:pandoc#syntax#codeblocks#embeds#use = 1
+let g:pandoc#syntax#codeblocks#embeds#use = 1
 endif
 "}}}2
 " for what languages and using what vim syntax files highlight those embeds. {{{2
@@ -253,11 +249,11 @@ endif
 " }}}2
 " Titleblock: {{{2
 "
-if b:system !=# 'ios'
+" if b:system !=# 'ios'
     syn region pandocTitleBlock start=/\%^%/ end=/\n\n/ contains=pandocReferenceLabel,pandocReferenceURL,pandocNewLine
     call s:WithConceal('titleblock', 'syn match pandocTitleBlockMark /%\ / contained containedin=pandocTitleBlock,pandocTitleBlockTitle', 'conceal')
     syn match pandocTitleBlockTitle /\%^%.*\n/ contained containedin=pandocTitleBlock
-endif
+" endif
 "}}}
 " Code Blocks: {{{2
 if b:system !=# 'ios'
@@ -274,11 +270,7 @@ syn match pandocBlockQuoteMark /\_^\s*>/ contained containedin=pandocEmphasis,pa
 
 " }}}
 " Clusters: {{{2
-" if b:system !=# 'ios'
-    syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
-" else
-"     syn cluster pandocInline contains=@Spell,pandocEmphasis
-" endif
+syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
 "}}}
 " Links: {{{2
 " Base: {{{3
