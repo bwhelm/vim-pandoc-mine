@@ -35,7 +35,7 @@ function! s:JumpToReference(searchString) abort
         " citation is much faster, and probably accurate enough for most
         " purposes.
         "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-new.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-helm-new.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
-        if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
+        if !has('python3')  " use slower vimscript if python not available
             let l:biblio = s:constructOneEntry(a:searchString)
         else  " if not on iPad, python is faster
             if has('nvim')
@@ -187,7 +187,7 @@ function! s:FindHeaderID(base) abort
 endfunction
 
 function! s:GetBibEntries(base) abort
-    if b:system ==# 'ios'  " if on iPad, need to use vim rather than python
+    if !has('python3')  " use slower vimscript if python not available
         return s:createBibList(a:base)
     else  " if not on iPad, python is faster
         if has('nvim')
@@ -242,13 +242,13 @@ endfunction
 
 function! s:GetBibData() abort
     " Read data from .bib files
-    if b:system ==# 'ios'
+    if has('ios')
         let l:file = fnamemodify('~/Documents/research/+texmf/bibtex/bib/bibdatabase-new.bib', ':p')
     else
         let l:file = system('kpsewhich bibdatabase-new.bib')[:-2]
     endif
     let l:bibText = join(readfile(l:file), "\n")
-    if b:system ==# 'ios'
+    if has('ios')
         let l:file = fnamemodify('~/Documents/research/+texmf/bibtex/bib/bibdatabase-helm-new.bib', ':p')
     else
         let l:file = system('kpsewhich bibdatabase-helm-new.bib')[:-2]

@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
+from os.path import expanduser
 from re import findall, match, search, sub, IGNORECASE
 from sys import stdout
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError
 # from vim import eval
 
 
@@ -11,20 +12,24 @@ def debug(message):
 
 
 def readFile(fileName):
-    """
-    Read text from file on disk.
-    """
+    """ Read text from file on disk. """
     with open(fileName, 'r') as f:
         text = f.read()
     return text
 
 
 def getBibData():
-    """Read data from .bib files"""
-    bibText = readFile(check_output(['kpsewhich', 'Bibdatabase-new.bib'])
-                       [:-1].decode('utf-8'))
-    bibText += readFile(check_output(['kpsewhich', 'Bibdatabase-helm-new.bib'])
-                        [:-1].decode('utf-8'))
+    """ Read data from .bib files """
+    try:
+        bibFile = check_output(['kpsewhich', 'Bibdatabase-new.bib'])[:-1].decode('utf-8')
+    except CalledProcessError as e:
+        bibFile = expanduser('~/Documents/research/+texmf/bibtex/bib/bibdatabase-new.bib')
+    bibText = readFile(bibFile)
+    try:
+        bibFile = check_output(['kpsewhich', 'Bibdatabase-helm-new.bib'])[:-1].decode('utf-8')
+    except CalledProcessError as e:
+        bibFile = expanduser('~/Documents/research/+texmf/bibtex/bib/bibdatabase-helm-new.bib')
+    bibText += readFile(bibFile)
     bibDataList = findall(r'@[^@]*', bibText)
     return bibDataList
 
