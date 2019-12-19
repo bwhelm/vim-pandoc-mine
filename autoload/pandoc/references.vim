@@ -74,23 +74,21 @@ function! pandoc#references#GoToReference() abort
     let l:ignorecaseSave = &ignorecase
     let l:smartcaseSave = &smartcase
     set noignorecase nosmartcase
-    mark x
+    let l:savePos = getpos('.')
     let l:line = getline('.')
-    let [l:bufnum, l:lnum, l:col, l:off] = getpos('.')
-    let l:col -= 1
+    let l:col = col('.') - 1
     if l:col > 0 && l:line[l:col-1] !=# ' '
         " If not already at beginning of line or beginning of word, jump back
         " to start of Word
         normal! B
-        let [l:bufnum, l:lnum, l:col, l:off] = getpos('.')
-        let l:col -= 1
+        let l:col = col('.') - 1
     endif
     " The following searches for pandoc-style heading identifiers or for
     " pandocCommentFilter-style cross-references -- whichever comes first.
     let l:searchString = matchstr(l:line, '@[A-z][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~/]*\|<rp\? \zs[^>]*>', l:col)
     if !empty(l:searchString)
         " If found, return to original position (to put it in jumplist)
-        normal! `x
+        call setpos('.', l:savePos)
         call <SID>JumpToReference(l:searchString)
     else
         " Not found ... so try searching for last match in line, even if
@@ -100,7 +98,8 @@ function! pandoc#references#GoToReference() abort
         " fix this.
         let l:searchString = matchstr(l:line, '^.*\(\zs@[A-z][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~/]*\|^.*<rp\? \zs[^>]*>.\{-}\)')
         if !empty(l:searchString)
-            normal! `x
+            " normal! `x
+            call setpos('.', l:savePos)
             silent call <SID>JumpToReference(l:searchString)
         else
             echohl WarningMsg
