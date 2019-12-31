@@ -254,6 +254,9 @@ endif
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
 setlocal omnifunc=pandoc#references#MyCompletion
+" Remap ` ` so that it doesn't complete abbreviations from pop-up windows but
+" does otherwise.
+inoremap <expr><buffer> <Space> pumvisible() ? " " : " "
 
 " ======================================================================== }}}
 " TOC Support {{{1
