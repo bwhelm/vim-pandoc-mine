@@ -264,7 +264,7 @@ syn match pandocBlockQuoteMark /\_^\s*>/ contained containedin=pandocEmphasis,pa
 if !has("ios")
     syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
 else
-    syn cluster pandocInline contains=@Spell,pandocEmphasis
+    syn cluster pandocInline contains=@Spell,pandocEmphasis,pandocPCite,pandocICite,pandocCiteKey
 endif
 "}}}
 " Links: {{{2
