@@ -98,7 +98,6 @@ function! pandoc#references#GoToReference() abort
         " fix this.
         let l:searchString = matchstr(l:line, '^.*\(\zs@[A-z][[:alnum:]äëïöüáéíóúàèìòùłßÄËÏÖÜÁÉÍÓÚÀÈÌÒÙŁß_:.#$%&\-+?<>~/]*\|^.*<rp\? \zs[^>]*>.\{-}\)')
         if !empty(l:searchString)
-            " normal! `x
             call setpos('.', l:savePos)
             silent call <SID>JumpToReference(l:searchString)
         else
