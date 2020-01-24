@@ -254,6 +254,10 @@ endif
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
 setlocal omnifunc=pandoc#references#MyCompletion
+augroup pandoc
+    autocmd!
+    autocmd BufEnter *.md setlocal omnifunc=pandoc#references#MyCompletion
+augroup END
 " Remap ` ` so that it doesn't complete abbreviations from pop-up windows but
 " does otherwise.
 inoremap <expr><buffer> <Space> pumvisible() ? " " : " "
