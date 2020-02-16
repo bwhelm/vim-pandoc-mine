@@ -166,10 +166,10 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
         toFormat = 'latex'
 
     pandocOptions = ['--standalone',
-                     '--from=markdown-fancy_lists',
+                     '--from=markdown-fancy_lists+smart',
                      '--mathml',
                      '--wrap=none',
-                     '--to=' + toFormat + '+smart']
+                     '--to=' + toFormat]
     pandocOptions += ['--lua-filter',
                       find_executable('fixYAML.lua')]
     pandocOptions += ['--lua-filter',
