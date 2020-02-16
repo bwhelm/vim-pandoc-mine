@@ -245,8 +245,9 @@ if !has("ios")
     " Unset current_syntax so the 2nd include will work
     unlet b:current_syntax
     syn include @LATEX syntax/tex.vim
-    syn region pandocLaTeXInlineMath start=/\v\\@<!\$\S@=/ end=/\v\\@<!\$\d@!/ keepend contains=@LATEX
-    syn region pandocLaTeXInlineMath start=/\\\@<!\\(/ end=/\\\@<!\\)/ keepend contains=@LATEX
+    syn match pandocLatexInlineMath /\\\@<!\$[^$]\{-1,}[^\\ ]\$/ keepend contains=@LATEX
+    " syn region pandocLaTeXInlineMath start=/\v\\@<!\$\S@=/ end=/\v\\@<!\$\d@!/ keepend contains=@LATEX
+    " syn region pandocLaTeXInlineMath start=/\\\@<!\\(/ end=/\\\@<!\\)/ keepend contains=@LATEX
     syn match pandocEscapedDollar /\\\$/ conceal cchar=$
     syn match pandocProtectedFromInlineLaTeX /\\\@<!\${.*}\(\(\s\|[[:punct:]]\)\([^$]*\|.*\(\\\$.*\)\{2}\)\n\n\|$\)\@=/ display
     " contains=@LATEX
