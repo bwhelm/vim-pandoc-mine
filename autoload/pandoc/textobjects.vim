@@ -106,4 +106,3 @@ function! pandoc#textobjects#FindAroundNote()
     return [l:type, [0, l:startPos[1], l:startPos[2] - 1, 0],
                 \   [0, l:endPos[1], l:endPos[2], 0]]
 endfunction
-"}}} [testing]{.comment}

@@ -50,13 +50,13 @@ nnoremap <buffer><silent> <LocalLeader>cc :call pandoc#conversion#MyConvertMappi
 inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvertMappingHelper("")<CR>
 " PDF conversion
 nnoremap <buffer><silent> <LocalLeader>cp :call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
 inoremap <buffer><silent> <LocalLeader>cp <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-LaTeX.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
 nnoremap <buffer><silent> <LocalLeader>cP :call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
 inoremap <buffer><silent> <LocalLeader>cP <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-PDF-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
 " Diff conversion against git cache -- converts diff of current file to .pdf
 nnoremap <buffer><silent> <LocalLeader>cd :call
         \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
@@ -71,30 +71,31 @@ nnoremap <buffer><silent> <LocalLeader>cD <C-o>:call
         \ 'HEAD')<CR>
 " HTML conversion
 nnoremap <buffer><silent> <LocalLeader>ch :call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-html-pandoc-direct.py')<CR>
 inoremap <buffer><silent> <LocalLeader>ch <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-html-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-html-pandoc-direct.py')<CR>
 " RevealJS conversion
 nnoremap <buffer><silent> <LocalLeader>cr :call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-revealjs-pandoc-direct.py')<CR>
 inoremap <buffer><silent> <LocalLeader>cr <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-revealjs-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-revealjs-pandoc-direct.py')<CR>
 " LaTeX Beamer conversion
 nnoremap <buffer><silent> <LocalLeader>cb :call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-beamer-pandoc-direct.py')<CR>
 inoremap <buffer><silent> <LocalLeader>cb <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-beamer-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-beamer-pandoc-direct.py')<CR>
 " Word .docx conversion
 nnoremap <buffer><silent> <LocalLeader>cw :call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-docx-pandoc-direct.py')<CR>
 inoremap <buffer><silent> <LocalLeader>cw <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-docx-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-docx-pandoc-direct.py')<CR>
 " Markdown conversion
 nnoremap <buffer><silent> <LocalLeader>cm :call
-        \ pandoc#conversion#MyConvertMappingHelper("convert-to-markdown.py")<CR>
-nnoremap <buffer><silent> <LocalLeader>cM :call pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('convert-to-markdown.py')<CR>
+nnoremap <buffer><silent> <LocalLeader>cM :call
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-markdown-pandoc-direct.py')<CR>
 inoremap <buffer><silent> <LocalLeader>cM <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper("markdown-to-markdown-pandoc-direct.py")<CR>
+        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-markdown-pandoc-direct.py')<CR>
 " Kill current conversion
 nnoremap <buffer><silent> <LocalLeader>ck :call pandoc#conversion#KillProcess()<CR>
 
@@ -123,8 +124,8 @@ nnoremap <buffer><silent> <LocalLeader>fF ?\^\[<CR>m<l%m>`<
 " Find page references needing complete citations
 noremap <buffer><silent> <LocalLeader>fr /(\(\d\+f\{0,2}\(, \d\+f\{0,2}\\|--\d\+\)\?\))<CR>
 " Copy citation into `r` register
-inoremap <buffer> <LocalLeader>y <Esc>mz?@[A-z]<CR>"ryf `za
-nnoremap <buffer> <LocalLeader>y mz?@[A-z]<CR>"ryf `z
+inoremap <buffer> <LocalLeader>r <Esc>?@[A-z]<CR>"ryf <C-o>a
+nnoremap <buffer> <LocalLeader>r ?@[A-z]<CR>"ryf <C-o>
 
 " To break undo sequence automatically {{{2
 " ------------------------------------
