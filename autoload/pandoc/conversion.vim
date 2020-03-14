@@ -4,6 +4,32 @@ scriptencoding utf-8
 " Helper Functions for Pandoc {{{1
 " ============================================================================
 
+function! pandoc#conversion#MarkdownGitDiff() abort  "{{{2
+    let gitLog = split(system('git log -n10 --no-color --format=reference -- ' .
+                \ fnameescape(expand('%', ':p'))), '\n')
+    if len(gitLog) == 0
+        echo 'This file is not found in any commits. Aborting.'
+        return
+    endif
+    let gitLogList = ['Select git commit (1 to ' . string(len(gitLog) + 1) .
+                \ ' or enter anything else for HEAD)', '1. HEAD']
+    for i in range(len(gitLog))
+        call add(gitLogList, string(i + 2) . '. ' . gitLog[i])
+    endfor
+    let answer = inputlist(gitLogList)
+    if answer == 1
+        let answer = 'HEAD'
+    elseif answer > 1 && answer <= len(gitLog) + 1
+        let answer = split(gitLog[answer - 2])[0]
+    else
+        echohl Comment
+        redraw | echo "Invalid response; aborting ..."
+        echohl None
+        return
+    endif
+    call pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py', answer)
+endfunction
+"2}}}
 function! pandoc#conversion#DisplayMessages(PID, text, ...) abort  "{{{2
     " To write to location list. Note that `...` is there because neovim
     " will include `stdout` and `stderr` as part of its arguments; I can

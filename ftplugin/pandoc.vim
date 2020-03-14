@@ -63,12 +63,8 @@ nnoremap <buffer><silent> <LocalLeader>cd :call
 inoremap <buffer><silent> <LocalLeader>cd <C-o>:call
         \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
 " Diff conversion against HEAD -- converts diff of current file to .pdf
-nnoremap <buffer><silent> <LocalLeader>cD :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py',
-        \ 'HEAD')<CR>
-nnoremap <buffer><silent> <LocalLeader>cD <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py',
-        \ 'HEAD')<CR>
+nnoremap <buffer> <LocalLeader>cD :call pandoc#conversion#MarkdownGitDiff()<CR>
+inoremap <buffer> <LocalLeader>cD :call pandoc#conversion#MarkdownGitDiff()<CR>
 " HTML conversion
 nnoremap <buffer><silent> <LocalLeader>ch :call
         \ pandoc#conversion#MyConvertMappingHelper('markdown-to-html-pandoc-direct.py')<CR>
