@@ -39,20 +39,24 @@ function! pandoc#conversion#DisplayMessages(PID, text, ...) abort  "{{{2
     else
         let l:text = [a:text]
     endif
+    let [l:buffer, l:winnum, l:errorFlag, l:texOutput] = s:pandocRunPID[a:PID]
     echohl WarningMsg
     for l:item in l:text
         if l:item !=# ''
-            laddexpr l:item
+            call add(l:texOutput, {'text': l:item})
         endif
         if l:item[0] ==# '!'
             echom 'ERROR:' l:item
+            let s:pandocRunPID[a:PID] = [l:buffer, l:winnum, 1, l:texOutput]
             call pandoc#conversion#KillProcess(a:PID, 'silent')
+            echohl None
+            return
         elseif l:item[:15] =~? 'error'
             echom l:item
-            let [l:buffer, l:winnum, l:errorFlag] = g:pandocRunPID[a:PID]
-            let g:pandocRunPID[a:PID] = [l:buffer, l:winnum, 1]
+            let l:errorFlag = 1
         endif
     endfor
+    let s:pandocRunPID[a:PID] = [l:buffer, l:winnum, l:errorFlag, l:texOutput]
     echohl None
 endfunction
 "2}}}
@@ -76,14 +80,14 @@ function! pandoc#conversion#DisplayError(PID, text, ...) abort  "{{{2
 endfunction
 "2}}}
 function! s:removePIDFromLists(PID) abort  "{{{2
-    if has_key(g:pandocRunPID, a:PID)
-        let [l:buffer, l:winnum, l:error] = g:pandocRunPID[a:PID]
-        call remove(g:pandocRunPID, a:PID)
-        let l:PIDList = g:pandocRunBuf[l:buffer]
+    if has_key(s:pandocRunPID, a:PID)
+        let [l:buffer, l:winnum, l:error, l:texOutput] = s:pandocRunPID[a:PID]
+        call remove(s:pandocRunPID, a:PID)
+        let l:PIDList = s:pandocRunBuf[l:buffer]
         for l:item in range(len(l:PIDList))
             if l:PIDList[l:item] == a:PID
                 call remove(l:PIDList, l:item)
-                let g:pandocRunBuf[l:buffer] = l:PIDList
+                let s:pandocRunBuf[l:buffer] = l:PIDList
                 break
             endif
         endfor
@@ -93,7 +97,7 @@ endfunction
 "2}}}
 function! pandoc#conversion#EndProcess(PID, ...) abort  "{{{2
     try
-        let [l:buffer, l:winnum, l:errorFlag] = g:pandocRunPID[a:PID]
+        let [l:buffer, l:winnum, l:errorFlag, l:texOutput] = s:pandocRunPID[a:PID]
     catch /E716/  " Key not in Dict -- will happen if user kills process
         return
     endtry
@@ -108,15 +112,9 @@ function! pandoc#conversion#EndProcess(PID, ...) abort  "{{{2
     endif
     let l:winnum = <SID>removePIDFromLists(a:PID)
     " Retrieve wordcount from location list, and display as message.
-    let l:locList = getloclist(l:winnum)
-    let l:wordcount = ''
-    for l:dict in l:locList
-        if l:dict['text'] =~# '^Words:'
-            let l:wordcount = dict['text']
-            break
-        endif
-    endfor
-    if l:wordcount !=# ''
+    call setloclist(l:winnum, l:texOutput, 'r')
+    let l:wordcount = l:texOutput[0]['text']
+    if l:wordcount =~# '^Words:'
         echohl Comment
         redraw | echo l:wordcount
         echohl None
@@ -134,7 +132,7 @@ function! pandoc#conversion#KillProcess(...) abort  "{{{2
         let l:silent = 0
     endif
     if !exists('l:PID')
-        let l:PIDList = keys(g:pandocRunPID)
+        let l:PIDList = keys(s:pandocRunPID)
         if len(l:PIDList) == 0
             echohl Comment
             redraw | echo 'No job to kill!'
@@ -145,7 +143,7 @@ function! pandoc#conversion#KillProcess(...) abort  "{{{2
         let l:PID = l:PIDList[0]
     endif
     try
-        let [l:buffer, l:winnum, l:error] = g:pandocRunPID[l:PID]
+        let [l:buffer, l:winnum, l:error, l:texOutput] = s:pandocRunPID[l:PID]
         if has('nvim')
             call jobstop(str2nr(l:PID))
         else  " for vim
@@ -174,21 +172,21 @@ let s:pythonScriptDir = expand('<sfile>:p:h:h:h') . '/pythonx/conversion/'
 function! s:MyConvertHelper(command, ...) abort  "{{{2
     " Following function calls the conversion script given by a:command only if
     " another conversion is not currently running.
-    if !exists('g:pandocRunPID')
-        " `g:pandocRunPID` is a dictionary used to keep track of all PIDs and
+    if !exists('s:pandocRunPID')
+        " `s:pandocRunPID` is a dictionary used to keep track of all PIDs and
         " errorFlags for each buffer number. Its keys are the PIDs;
-        " its values are lists of [buffer number, errorFlag].
-        let g:pandocRunPID = {}
-        " `g:pandocRunBuf` is a dictionary used to keep track of all buffers
+        " its values are lists of [buffer number, errorFlag, texOutput].
+        let s:pandocRunPID = {}
+        " `s:pandocRunBuf` is a dictionary used to keep track of all buffers
         " and what PIDs there might be for current processes. Its keys are the
         " buffer numbers; its values are [PID1, PID2, ...].
-        let g:pandocRunBuf = {}
+        let s:pandocRunBuf = {}
     endif
-    if !exists('g:pandocTempDir')
-        let g:pandocTempDir = '~/tmp/pandoc'
+    if !exists('s:pandocTempDir')
+        let s:pandocTempDir = '~/tmp/pandoc'
     endif
-    if !exists('g:pandocPdfApp')
-        let g:pandocPdfApp = '/Applications/Skim.app'
+    if !exists('s:pandocPdfApp')
+        let s:pandocPdfApp = '/Applications/Skim.app'
     endif
     let l:auxCommand = a:0 == 0 ? '' : a:1
     if empty(a:command)
@@ -209,16 +207,16 @@ function! s:MyConvertHelper(command, ...) abort  "{{{2
     endif
     let l:buffer = bufnr('%')
     " l:pandoc_converting will be > 0 only if a conversion is ongoing.
-    if has_key(g:pandocRunBuf, l:buffer)
+    if has_key(s:pandocRunBuf, l:buffer)
         if has('nvim')
-            let l:pandoc_converting = len(g:pandocRunBuf[l:buffer])
-        elseif g:pandocRunBuf[l:buffer][0] =~# 'dead'
+            let l:pandoc_converting = len(s:pandocRunBuf[l:buffer])
+        elseif s:pandocRunBuf[l:buffer][0] =~# 'dead'
             " If using vim, the job ID will change from 'run' to 'dead' when
             " the job ends. Catch this, and remove it from lists.
             let l:pandoc_converting = 0
-            let l:PID = matchstr(g:pandocRunBuf[l:buffer][0], '\d\+')
-            unlet g:pandocRunBuf[l:buffer][0]
-            unlet g:pandocRunPID['process ' . l:PID . ' run']
+            let l:PID = matchstr(s:pandocRunBuf[l:buffer][0], '\d\+')
+            unlet s:pandocRunBuf[l:buffer][0]
+            unlet s:pandocRunPID['process ' . l:PID . ' run']
         else
             let l:pandoc_converting = 1
         endif
@@ -234,25 +232,25 @@ function! s:MyConvertHelper(command, ...) abort  "{{{2
         if has('nvim')
             let l:jobPID = jobstart('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
-                    \ ' "' . l:fileName . '" ' . g:pandocTempDir . ' ' .
-                    \ g:pandocPdfApp . ' ' . l:auxCommand,
+                    \ ' "' . l:fileName . '" ' . s:pandocTempDir . ' ' .
+                    \ s:pandocPdfApp . ' ' . l:auxCommand,
                     \ {'on_stdout': 'pandoc#conversion#DisplayMessages',
                     \ 'on_stderr': 'pandoc#conversion#DisplayError',
                     \ 'on_exit': 'pandoc#conversion#EndProcess'})
         else
             let l:jobPID = job_start('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
-                    \ ' "' . l:fileName . '" ' . g:pandocTempDir . ' ' .
-                    \ g:pandocPdfApp . ' ' . l:auxCommand,
+                    \ ' "' . l:fileName . '" ' . s:pandocTempDir . ' ' .
+                    \ s:pandocPdfApp . ' ' . l:auxCommand,
                     \ {'out_cb': 'pandoc#conversion#DisplayMessages',
                     \ 'err_cb': 'pandoc#conversion#DisplayError',
                     \ 'close_cb': 'pandoc#conversion#EndProcess'})
         endif
-        let g:pandocRunPID[l:jobPID] = [l:buffer, bufwinid('%'), 0]
-        if has_key(g:pandocRunBuf, l:buffer)
-            let g:pandocRunBuf[l:buffer] += [l:jobPID]
+        let s:pandocRunPID[l:jobPID] = [l:buffer, bufwinid('%'), 0, []]
+        if has_key(s:pandocRunBuf, l:buffer)
+            let s:pandocRunBuf[l:buffer] += [l:jobPID]
         else
-            let g:pandocRunBuf[l:buffer] = [l:jobPID]
+            let s:pandocRunBuf[l:buffer] = [l:jobPID]
         endif
         " Write servername to file if nvim; delete it if not. This will be
         " used in pdf-md-backward-search.py to identify relevant vim server to
