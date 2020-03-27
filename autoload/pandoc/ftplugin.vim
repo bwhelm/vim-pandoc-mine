@@ -5,12 +5,21 @@ scriptencoding utf-8
 function! pandoc#ftplugin#JumpToHeader(direction, count) abort  "{{{
     " The count indicates the level of heading to jump to
     let l:startPos = getcurpos()
+    if a:direction == 'b'
+        -
+    else
+        +
+    endif
     let l:count = a:count == 0 ? 6 : a:count
     let l:found = search('^#\{1,' . l:count . '}\s', a:direction . 'nW')
     if l:found
+        if a:direction == 'b'
+            +
+        else
+            -
+        endif
         " Jump to heading and add to jump list
-        call setpos("''", l:startPos)  " Add starting point to jumplist
-        execute 'normal!' l:found . 'G'
+        execute 'normal!' l:found . 'G_'
     else
         redraw | echohl Error
         if a:direction ==# 'b'
