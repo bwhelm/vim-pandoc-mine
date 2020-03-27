@@ -34,30 +34,41 @@ function! pandoc#conversion#DisplayMessages(PID, text, ...) abort  "{{{2
     " To write to location list. Note that `...` is there because neovim
     " will include `stdout` and `stderr` as part of its arguments; I can
     " simply ignore those.
+    let l:errorFlag = 0  " For errors indicating need immediate stop!
     if has('nvim')
         let l:text = a:text
     else
         let l:text = [a:text]
     endif
-    let [l:buffer, l:winnum, l:errorFlag, l:texOutput] = s:pandocRunPID[a:PID]
-    echohl WarningMsg
+    try
+        let [l:buffer, l:winnum, l:warningFlag, l:texOutput] = s:pandocRunPID[a:PID]
+    catch /E716/  " Key not in Dict -- will happen if error in LaTeX run
+        return
+    endtry
     for l:item in l:text
         if l:item !=# ''
             call add(l:texOutput, {'text': l:item})
         endif
-        if l:item[0] ==# '!'
-            echom 'ERROR:' l:item
-            let s:pandocRunPID[a:PID] = [l:buffer, l:winnum, 1, l:texOutput]
-            call pandoc#conversion#KillProcess(a:PID, 'silent')
-            echohl None
-            return
-        elseif l:item[:15] =~? 'error'
+        if l:item[0] ==# '!'  " ERROR found
+            echohl WarningMsg
             echom l:item
+            echohl None
+            let s:pandocRunPID[a:PID] = [l:buffer, l:winnum, 1, l:texOutput]
             let l:errorFlag = 1
+        elseif l:item[:15] =~? 'error'
+            echohl WarningMsg
+            echom l:item
+            echohl None
+            let l:warningFlag = 1
         endif
     endfor
-    let s:pandocRunPID[a:PID] = [l:buffer, l:winnum, l:errorFlag, l:texOutput]
-    echohl None
+    if l:errorFlag
+        call pandoc#conversion#KillProcess(a:PID, 'silent')
+        lopen
+        wincmd p
+    else
+        let s:pandocRunPID[a:PID] = [l:buffer, l:winnum, l:warningFlag, l:texOutput]
+    endif
 endfunction
 "2}}}
 function! pandoc#conversion#DisplayError(PID, text, ...) abort  "{{{2
@@ -97,11 +108,11 @@ endfunction
 "2}}}
 function! pandoc#conversion#EndProcess(PID, ...) abort  "{{{2
     try
-        let [l:buffer, l:winnum, l:errorFlag, l:texOutput] = s:pandocRunPID[a:PID]
+        let [l:buffer, l:winnum, l:warningFlag, l:texOutput] = s:pandocRunPID[a:PID]
     catch /E716/  " Key not in Dict -- will happen if user kills process
         return
     endtry
-    if l:errorFlag
+    if l:warningFlag
         echohl WarningMsg
         echom 'Conversion Complete with Errors'
         echohl None
@@ -126,10 +137,12 @@ function! pandoc#conversion#KillProcess(...) abort  "{{{2
     if a:0 > 1
         let l:PID = a:1
         let l:silent = 1
-    elseif a:0 == 1
-        let l:silent = 1
     else
-        let l:silent = 0
+        let l:silent = a:0 == 1 ? 1 : 0
+    " elseif a:0 == 1
+    "     let l:silent = 1
+    " else
+    "     let l:silent = 0
     endif
     if !exists('l:PID')
         let l:PIDList = keys(s:pandocRunPID)
@@ -149,6 +162,7 @@ function! pandoc#conversion#KillProcess(...) abort  "{{{2
         else  " for vim
             call job_stop(l:PID)
         endif
+        call setloclist(l:winnum, l:texOutput, 'r')
     catch /E900\|E716/  " This may happen if job has just stopped on its own.
     endtry
     " Print message ... only if there are no arguments.
@@ -175,7 +189,7 @@ function! s:MyConvertHelper(command, ...) abort  "{{{2
     if !exists('s:pandocRunPID')
         " `s:pandocRunPID` is a dictionary used to keep track of all PIDs and
         " errorFlags for each buffer number. Its keys are the PIDs;
-        " its values are lists of [buffer number, errorFlag, texOutput].
+        " its values are lists of [buffer number, warningFlag, texOutput].
         let s:pandocRunPID = {}
         " `s:pandocRunBuf` is a dictionary used to keep track of all buffers
         " and what PIDs there might be for current processes. Its keys are the
@@ -196,7 +210,7 @@ function! s:MyConvertHelper(command, ...) abort  "{{{2
         let l:command = a:command
     endif
     messages clear
-    let l:errorFlag = 0
+    let l:warningFlag = 0
     let l:fileName = expand('%:p')
     if empty(l:fileName)
         let l:textList = getline(0, '$')
