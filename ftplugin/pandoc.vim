@@ -11,18 +11,20 @@ let b:loaded_pandoc_mine=1
 " Variables for Conversions {{{1
 " ===========================================================================
 
-let b:pandoc_converting = 0  " keeps track of whether currently converting or not
-let b:pandoc_autoPDFEnabled = 0  " Turn autoPDF off by default...
-" Identify default (i.e., last) method for file conversions. If we can
-" identify the file as a presentation, initialize with beamer or revealjs;
-" otherwise initialize with pdflatex.
-let s:fileBegin = join(getline(0, 50), "\n")
-if s:fileBegin =~# '\ntransition:'
-    let b:pandoc_lastConversionMethod = 'markdown-to-revealjs-pandoc-direct.py'
-elseif s:fileBegin =~# '\n- aspectratio' || s:fileBegin =~# '\ntheme'
-    let b:pandoc_lastConversionMethod = 'markdown-to-beamer-pandoc-direct.py'
-else
-    let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'
+if !has('ios')
+    let b:pandoc_converting = 0  " keeps track of whether currently converting or not
+    let b:pandoc_autoPDFEnabled = 0  " Turn autoPDF off by default...
+    " Identify default (i.e., last) method for file conversions. If we can
+    " identify the file as a presentation, initialize with beamer or revealjs;
+    " otherwise initialize with pdflatex.
+    let s:fileBegin = join(getline(0, 50), "\n")
+    if s:fileBegin =~# '\ntransition:'
+        let b:pandoc_lastConversionMethod = 'markdown-to-revealjs-pandoc-direct.py'
+    elseif s:fileBegin =~# '\n- aspectratio' || s:fileBegin =~# '\ntheme'
+        let b:pandoc_lastConversionMethod = 'markdown-to-beamer-pandoc-direct.py'
+    else
+        let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'
+    endif
 endif
 
 " ======================================================================== }}}
@@ -45,68 +47,68 @@ nnoremap <buffer><silent> zn# :call pandoc#fold#foldAllSectionsNested()<CR>
 " ---------------
 "  (For all of these, call the helper function with relevant command.)
 
-" Note that the `cc` mapping is to repeat the last conversion
-nnoremap <buffer><silent> <LocalLeader>cc :call pandoc#conversion#MyConvertMappingHelper("")<CR>
-inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvertMappingHelper("")<CR>
-" PDF conversion
-nnoremap <buffer><silent> <LocalLeader>cp :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
-inoremap <buffer><silent> <LocalLeader>cp <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
-nnoremap <buffer><silent> <LocalLeader>cP :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
-inoremap <buffer><silent> <LocalLeader>cP <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
-" Diff conversion against git cache -- converts diff of current file to .pdf
-nnoremap <buffer><silent> <LocalLeader>cd :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
-inoremap <buffer><silent> <LocalLeader>cd <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
-" Diff conversion against HEAD -- converts diff of current file to .pdf
-nnoremap <buffer> <LocalLeader>cD :call pandoc#conversion#MarkdownGitDiff()<CR>
-inoremap <buffer> <LocalLeader>cD :call pandoc#conversion#MarkdownGitDiff()<CR>
-" HTML conversion
-nnoremap <buffer><silent> <LocalLeader>ch :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-html-pandoc-direct.py')<CR>
-inoremap <buffer><silent> <LocalLeader>ch <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-html-pandoc-direct.py')<CR>
-" RevealJS conversion
-nnoremap <buffer><silent> <LocalLeader>cr :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-revealjs-pandoc-direct.py')<CR>
-inoremap <buffer><silent> <LocalLeader>cr <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-revealjs-pandoc-direct.py')<CR>
-" LaTeX Beamer conversion
-nnoremap <buffer><silent> <LocalLeader>cb :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-beamer-pandoc-direct.py')<CR>
-inoremap <buffer><silent> <LocalLeader>cb <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-beamer-pandoc-direct.py')<CR>
-" Word .docx conversion
-nnoremap <buffer><silent> <LocalLeader>cw :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-docx-pandoc-direct.py')<CR>
-inoremap <buffer><silent> <LocalLeader>cw <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-docx-pandoc-direct.py')<CR>
-" Markdown conversion
-nnoremap <buffer><silent> <LocalLeader>cm :call
-        \ pandoc#conversion#MyConvertMappingHelper('convert-to-markdown.py')<CR>
-nnoremap <buffer><silent> <LocalLeader>cM :call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-markdown-pandoc-direct.py')<CR>
-inoremap <buffer><silent> <LocalLeader>cM <C-o>:call
-        \ pandoc#conversion#MyConvertMappingHelper('markdown-to-markdown-pandoc-direct.py')<CR>
-" Kill current conversion
-nnoremap <buffer><silent> <LocalLeader>ck :call pandoc#conversion#KillProcess()<CR>
+if !has('ios')
+    " Note that the `cc` mapping is to repeat the last conversion
+    nnoremap <buffer><silent> <LocalLeader>cc :call pandoc#conversion#MyConvertMappingHelper("")<CR>
+    inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvertMappingHelper("")<CR>
+    " PDF conversion
+    nnoremap <buffer><silent> <LocalLeader>cp :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>cp <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
+    nnoremap <buffer><silent> <LocalLeader>cP :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>cP <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
+    " Diff conversion against git cache -- converts diff of current file to .pdf
+    nnoremap <buffer><silent> <LocalLeader>cd :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>cd <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
+    " Diff conversion against HEAD -- converts diff of current file to .pdf
+    nnoremap <buffer> <LocalLeader>cD :call pandoc#conversion#MarkdownGitDiff()<CR>
+    inoremap <buffer> <LocalLeader>cD :call pandoc#conversion#MarkdownGitDiff()<CR>
+    " HTML conversion
+    nnoremap <buffer><silent> <LocalLeader>ch :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-html-pandoc-direct.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>ch <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-html-pandoc-direct.py')<CR>
+    " RevealJS conversion
+    nnoremap <buffer><silent> <LocalLeader>cr :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-revealjs-pandoc-direct.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>cr <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-revealjs-pandoc-direct.py')<CR>
+    " LaTeX Beamer conversion
+    nnoremap <buffer><silent> <LocalLeader>cb :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-beamer-pandoc-direct.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>cb <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-beamer-pandoc-direct.py')<CR>
+    " Word .docx conversion
+    nnoremap <buffer><silent> <LocalLeader>cw :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-docx-pandoc-direct.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>cw <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-docx-pandoc-direct.py')<CR>
+    " Markdown conversion
+    nnoremap <buffer><silent> <LocalLeader>cm :call
+            \ pandoc#conversion#MyConvertMappingHelper('convert-to-markdown.py')<CR>
+    nnoremap <buffer><silent> <LocalLeader>cM :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-markdown-pandoc-direct.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>cM <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-markdown-pandoc-direct.py')<CR>
+    " Kill current conversion
+    nnoremap <buffer><silent> <LocalLeader>ck :call pandoc#conversion#KillProcess()<CR>
 
-" Path to plugin's python conversion folder (e.g.,
-" `~/.vim/plugged/vim-pandoc-mine/pythonx/conversion/`)
-let s:pythonScriptDir = expand('<sfile>:p:h:h') . '/pythonx/conversion/'
-command! -buffer RemoveAuxFiles :execute '!'
-            \ . s:pythonScriptDir . 'remove-aux-files.py'
-            \ . ' ' . fnameescape(expand('%:p'))
-nnoremap <buffer><silent> <LocalLeader>cK :RemoveAuxFiles<CR>
+    " Path to plugin's python conversion folder (e.g.,
+    " `~/.vim/plugged/vim-pandoc-mine/pythonx/conversion/`)
+    let s:pythonScriptDir = expand('<sfile>:p:h:h') . '/pythonx/conversion/'
+    command! -buffer RemoveAuxFiles :execute '!'
+                \ . s:pythonScriptDir . 'remove-aux-files.py'
+                \ . ' ' . fnameescape(expand('%:p'))
+    nnoremap <buffer><silent> <LocalLeader>cK :RemoveAuxFiles<CR>
 
-nnoremap <buffer><silent> <LocalLeader>ca :call pandoc#conversion#ToggleAutoPDF()<CR>
-inoremap <buffer><silent> <LocalLeader>ca <C-o>:call pandoc#conversion#ToggleAutoPDF()<CR>
-
-nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
+    nnoremap <buffer><silent> <LocalLeader>ca :call pandoc#conversion#ToggleAutoPDF()<CR>
+    inoremap <buffer><silent> <LocalLeader>ca <C-o>:call pandoc#conversion#ToggleAutoPDF()<CR>
+endif
 
 " Find Notes and Footnotes {{{2
 " ------------------------
@@ -115,25 +117,27 @@ nnoremap <buffer><silent> <LocalLeader>fN ?\]{\.[a-z]\{-}}?e<CR>m>F]%m<
 nnoremap <buffer><silent> <LocalLeader>ff /\^\[<CR>m<l%m>`<
 nnoremap <buffer><silent> <LocalLeader>fF ?\^\[<CR>m<l%m>`<
 
-" Citations {{{2
-" ---------
+" Citations and Cross-References {{{2
+" ------------------------------
 " Find page references needing complete citations
 noremap <buffer><silent> <LocalLeader>fr /(\(\d\+f\{0,2}\(, \d\+f\{0,2}\\|--\d\+\)\?\))<CR>
 " Copy citation into `r` register
 inoremap <buffer> <LocalLeader>r <Esc>mz?@[A-z]<CR>"ryf `za
 nnoremap <buffer> <LocalLeader>r mz?@[A-z]<CR>"ryf `z
 
-" To break undo sequence automatically {{{2
-" ------------------------------------
-" These interfere with abbreviations if `inoremap` is used, so I'm using
-" simply `imap`.
-imap <buffer><silent> . .<C-G>u
-imap <buffer><silent> ! !<C-G>u
-imap <buffer><silent> ? ?<C-G>u
-imap <buffer><silent> ; ;<C-G>u
-"imap <buffer><silent> ] ]<C-G>u
-" The following interferes with listmode.
-"imap <buffer><silent> <CR> <CR><C-G>u
+nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
+
+"" To break undo sequence automatically {{{2
+"" ------------------------------------
+"" These interfere with abbreviations if `inoremap` is used, so I'm using
+"" simply `imap`.
+"imap <buffer><silent> . .<C-G>u
+"imap <buffer><silent> ! !<C-G>u
+"imap <buffer><silent> ? ?<C-G>u
+"imap <buffer><silent> ; ;<C-G>u
+""imap <buffer><silent> ] ]<C-G>u
+"" The following interferes with listmode.
+""imap <buffer><silent> <CR> <CR><C-G>u
 
 " List mode {{{2
 " ---------
@@ -151,21 +155,24 @@ endif
 " nnoremap <buffer><silent> <C-x> ciw<i <Esc>pa><Esc>mip`i
 
 " Jump to corresponding line in Skim.app
-if has('nvim')
-    command! -buffer JumpToPDF call jobstart("/usr/bin/env python3 " .
-                \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"on_stdout":
-                \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
-else  " normal vim
-    command! -buffer JumpToPDF call job_start("/usr/bin/env python3 " .
-                \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
-                \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"out_cb":
-                \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
+if !has('ios')
+    if has('nvim')
+        command! -buffer JumpToPDF call jobstart("/usr/bin/env python3 " .
+                    \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
+                    \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"on_stdout":
+                    \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
+    else  " normal vim
+        command! -buffer JumpToPDF call job_start("/usr/bin/env python3 " .
+                    \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
+                    \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"out_cb":
+                    \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
+    endif
+    nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
+    inoremap <buffer><silent> <LocalLeader>j <C-o>:JumpToPDF<CR>
+    " Open Dictionary.app with word under cursor
+    nnoremap <buffer><silent> K :!open dict:///<cword><CR><CR>
 endif
-nnoremap <buffer><silent> <LocalLeader>j :JumpToPDF<CR>
-inoremap <buffer><silent> <LocalLeader>j <C-o>:JumpToPDF<CR>
-" Open Dictionary.app with word under cursor
-nnoremap <buffer><silent> K :!open dict:///<cword><CR><CR>
+
 " Italicize/boldface current word
 nnoremap <buffer><silent> <D-e> "zciw*<Esc>"zpa*<Esc>
 inoremap <buffer><silent> <D-e> <Esc>"zciw*<Esc>"zpa*
@@ -185,9 +192,12 @@ nnoremap <buffer><silent> csnm mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 nnoremap <buffer><silent> csnf mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwfixme<Esc>`z
 nnoremap <buffer><silent> csnh mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwhighlight<Esc>`z
 nnoremap <buffer><silent> csns mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`z
+
 " Jump to .tex file in tmp dir
-nnoremap <silent><buffer> <LocalLeader>ft :call pandoc#ftplugin#JumpToTex(".tex")<CR>
-nnoremap <silent><buffer> <LocalLeader>fl :call pandoc#ftplugin#JumpToTex(".log")<CR>
+if !has('ios')
+    nnoremap <silent><buffer> <LocalLeader>ft :call pandoc#ftplugin#JumpToTex(".tex")<CR>
+    nnoremap <silent><buffer> <LocalLeader>fl :call pandoc#ftplugin#JumpToTex(".log")<CR>
+endif
 "}}}
 
 " ======================================================================== }}}
@@ -255,8 +265,8 @@ augroup pandoc
     autocmd!
     autocmd BufEnter *.md setlocal omnifunc=pandoc#references#MyCompletion
 augroup END
-" Remap ` ` so that it doesn't complete abbreviations from pop-up windows but
-" does otherwise.
+" Remap ` ` so that it abbreviations are completed only when not in pop-up
+" windows.
 inoremap <expr><buffer> <Space> pumvisible() ? " " : " "
 
 " ======================================================================== }}}
@@ -284,7 +294,9 @@ command! -buffer TidyPandoc call pandoc#ftplugin#TidyPandoc()
 " ======================================================================== }}}
 " Other {{{1
 " ============================================================================
-setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs
+if !has('ios')
+    setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs
+endif
 " Allow wrapping past BOL and EOL when using `h` and `l`
 setlocal whichwrap+=h,l
 " List of characters that can cause a line break; don't want breaking at '@',
