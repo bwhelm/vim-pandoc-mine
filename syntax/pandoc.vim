@@ -544,11 +544,15 @@ endif
     syn match myPandocComment "\\\@<!\[[^\[\]]*\]{\.comment}" contains=@pandocInline oneline
     syn match myPandocComment "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.comment}\)\@<![^\[\]]*\]{\.comment}" contains=@pandocInline oneline
     syn match myPandocComment "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.comment}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.comment}\)\@<![^\[\]]*\]{\.comment}" contains=@pandocInline oneline
+    syn match myPandocCommentOpen "\[" contained containedin=myPandocHighlight,myPandocComment,myPandocFixme,myPandocSmallCaps conceal cchar=[
+    syn match myPandocCommentClose "\]{\.\(highlight\|comment\|fixme\|smcaps\)}" contained containedin=myPandocHighlight,myPandocComment,myPandocFixme,myPandocSmallCaps conceal cchar=]
     " syn match myPandocMargin "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.margin}" contains=@pandocInline oneline
     syn match myPandocMargin "\\\@<!\[[^\[\]]*\]{\.margin}" contains=@pandocInline oneline
     syn match myPandocMargin "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.margin}\)\@<![^\[\]]*\]{\.margin}" contains=@pandocInline oneline
     syn match myPandocMargin "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.margin}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.margin}\)\@<![^\[\]]*\]{\.margin}" contains=@pandocInline oneline
     " syn match myPandocFixme "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.fixme}" contains=@pandocInline oneline
+    syn match myPandocMarginOpen "\[" contained containedin=myPandocMargin conceal cchar=|
+    syn match myPandocMarginClose "\]{\.margin}" contained containedin=myPandocMargin conceal cchar=>
     syn match myPandocFixme "\\\@<!\[[^\[\]]*\]{\.fixme}" contains=@pandocInline oneline
     syn match myPandocFixme "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\]{\.fixme}" contains=@pandocInline oneline
     syn match myPandocFixme "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\]{\.fixme}" contains=@pandocInline oneline
