@@ -558,22 +558,6 @@ endif
     syn match myPandocFixme "\\\@<!\[[^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\[[^\[\]]*\]\({\.fixme}\)\@<![^\[\]]*\]{\.fixme}" contains=@pandocInline oneline
     " syn match myPandocSmallCaps "\\\@<!\[\(\(\]\)\@<!.\)\{-}\]{\.smcaps}" contains=@pandocInline oneline
     syn match myPandocSmallCaps "\\\@<!\[\([^[]*\)\]{\.smcaps}" contains=@pandocInline oneline
-    " syn region myPandocCommentBlock start="^<!comment>" end="^</!comment>" contains=@pandocInline keepend
-    " syn region myPandocSpeakerBlock start="^<!speaker>" end="^</!speaker>" contains=@pandocInline keepend
-    " syn match myPandocHighlight "\\\@<!\[\(\(\]{\)\@<!.\)\{-}\]{\.highlight}" contains=@pandocInline oneline
-    " syn match myPandocHighlight "<highlight>.\{-}</highlight>" contains=@pandocInline oneline
-    " syn match myPandocComment "<comment>.\{-}</comment>" contains=@pandocInline oneline
-    " syn match myPandocMargin "<margin>.\{-}</margin>" contains=@pandocInline oneline
-    " syn match myPandocFixme "<fixme>.\{-}</fixme>" contains=@pandocInline oneline
-    " syn match myPandocSmallCaps "<smcaps>.\{-}</smcaps>" contains=@pandocInline oneline
-    " syn match myPandocCommentOpen "\[" contained containedin=myPandocHighlight,myPandocComment,myPandocFixme,myPandocSmallCaps conceal cchar=[
-    " syn match myPandocCommentClose "\]{\.\(highlight\|comment\|fixme\|smcaps\)}" contained containedin=myPandocHighlight,myPandocComment,myPandocFixme,myPandocSmallCaps conceal cchar=]
-    " syn match myPandocMarginOpen "\[" contained containedin=myPandocMargin conceal cchar=|
-    " syn match myPandocMarginClose "\]{\.margin}" contained containedin=myPandocMargin conceal cchar=>
-    " syn match myPandocCommentOpen "<\(highlight\|comment\|fixme\|smcaps\)>" contained containedin=myPandocHighlight,myPandocComment,myPandocFixme,myPandocSmallCaps conceal cchar=[
-    " syn match myPandocCommentClose "</\(highlight\|comment\|fixme\|smcaps\)>" contained containedin=myPandocHighlight,myPandocComment,myPandocFixme,myPandocSmallCaps conceal cchar=]
-    " syn match myPandocMarginOpen "<margin>" contained containedin=myPandocMargin conceal cchar=|
-    " syn match myPandocMarginClose "</margin>" contained containedin=myPandocMargin conceal cchar=>
 " }}}2
 " endif
 
