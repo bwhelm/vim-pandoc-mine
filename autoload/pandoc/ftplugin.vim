@@ -64,7 +64,13 @@ function! pandoc#ftplugin#TidyPandoc() abort  "{{{
     silent! global/\(^\s*\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s[^\n]*$\n\)\@<=\n\ze\s\+\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s\+/d
     " 3. removing extra spaces after list identifiers
     silent! %substitute /^\(\s*\)\((\?\d\+[.)]\|[-*+]\|(\?#[.)]\|(\?@[A-z0-9\-_]*[.)]\)\s\s\+/\1\2 /
-    " TODO: 4. remove excess escaping
+    " 4. remove excess escaping
+    silent! %substitute/\\"/"/g
+    silent! %substitute/\\\.\.\./.../g
+    " 5. Fix m-dashes and ellipses
+    silent! %substitute/\s*---\s*/---/g
+    silent! %substitute/\s*\.\.\.\s*/ ... /g
+    " Cleanup
     let @/ = l:saveSearch
 endfunction
 "}}}
