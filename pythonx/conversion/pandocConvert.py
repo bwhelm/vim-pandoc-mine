@@ -19,8 +19,7 @@ Here's what each of these are (read from stdin):
     * imageFormat: the format of any images to be produced
 """
 
-from distutils.spawn import find_executable
-from os import chdir, makedirs, listdir, environ, path, remove, rename, uname
+from os import chdir, makedirs, listdir, environ, path, remove, rename
 from subprocess import run, check_output, call
 from sys import stdout, stderr
 from time import time
@@ -141,8 +140,6 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
         .decode('utf-8').split('\n')[0].split(' ')[1].split('.')
     if int(pandocVersion[0]) < 2 and int(pandocVersion[1]) < 19:
         platform = 'old'
-    elif uname()[1] == 'instance-1':
-        platform = 'google'
     else:
         platform = 'new'
 
@@ -169,13 +166,11 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
                      '--from=markdown-fancy_lists+smart',
                      '--mathml',
                      '--wrap=none',
+                     # '--log=/Users/bennett/tmp/pandoc/log',
                      '--to=' + toFormat]
-    pandocOptions += ['--lua-filter',
-                      find_executable('fixYAML.lua')]
-    pandocOptions += ['--lua-filter',
-                      find_executable('pandocCommentFilter.lua')]
-    pandocOptions += ['--lua-filter',
-                      find_executable('internalreferences.lua')]
+    pandocOptions += ['--lua-filter', 'fixYAML.lua']
+    pandocOptions += ['--lua-filter', 'pandocCommentFilter.lua']
+    pandocOptions += ['--lua-filter', 'internalreferences.lua']
     pandocOptions += extraOptions.split()
 
     # addedFilter might be a String, a List, or None. This will add all to
@@ -275,7 +270,7 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
             if path.exists('/usr/bin/open') and not suppressPdfFlag:
                 call(['/usr/bin/open', path.join(pandocTempDir, endFile)])
     # If on raspberrypi, upload resulting file to dropbox.
-    if platform in ['old', 'google']:
+    if platform == 'old':
         message = check_output(
             ['/home/bennett/Applications/dropbox-uploader/dropbox_uploader.sh',
              'upload', path.join(pandocTempDir, endFile),

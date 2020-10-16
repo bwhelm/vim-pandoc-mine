@@ -42,7 +42,7 @@ toExtension = '.tex'
 # extraOptions = '--output=' + outputFile
 articleOptions = ''
 bookOptions = articleOptions
-addedFilter.append(find_executable('pandocBeamerFilter.lua'))
+addedFilter.append('pandocBeamerFilter.lua')
 
 imageFormat = '.pdf'
 
