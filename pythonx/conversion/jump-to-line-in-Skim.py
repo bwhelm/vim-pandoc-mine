@@ -13,7 +13,6 @@ the markdown file, and if so searching for that rather than the entire
 paragraph.
 '''
 
-from distutils.spawn import find_executable
 from os import path
 from pipes import quote
 from re import search, sub, escape
@@ -37,7 +36,7 @@ def toFormat(string, fromThis='markdown-fancy_lists', toThis='latex'):
                 '--to=' + toThis + '+smart',
                 '--biblatex',
                 '--lua-filter',
-                find_executable('pandocCommentFilter.lua')
+                'pandocCommentFilter.lua'
                 ] +
                pandocOptions, stdin=p1.stdout, stdout=PIPE)
     p1.stdout.close()
@@ -71,7 +70,7 @@ if document[0] == '---':
             yheader = 'yamlHeader: false'
     except IndexError:
         yheader = 'yamlHeader: false'
-yamlHeader = yaml.load(yheader.replace('\t', '  '))
+yamlHeader = yaml.safe_load(yheader.replace('\t', '  '))
 pandocOptions = []
 book = False
 try:

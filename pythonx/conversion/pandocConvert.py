@@ -151,9 +151,6 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
     filePath, fileName = path.split(myFile)
     chdir(filePath)  # This is needed to be able to pick up relative paths
     baseFileName, fileExtension = path.splitext(fileName)
-    if fileExtension != '.md':
-        writeError('Need to provide a .md file!')
-        exit(1)
     mdText = readFile(myFile)
 
     # Figure out command to send to pandoc

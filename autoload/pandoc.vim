@@ -2,16 +2,6 @@ scriptencoding utf-8
 " vim: set fdm=marker:
 " ============================================================================
 
-function! s:RemoveDiacritics(text) abort  " {{{
-    " This function returns text without diacritics. Modified from
-    " <http://vim.wikia.com/wiki/Remove_diacritical_signs_from_characters>.
-    let l:diacs = 'áâãàäÇçéèêëíîìïñóôõòöüúûù'  " lowercase diacritical signs
-    let l:repls = 'aaaaaCceeeeiiiinooooouuuu'  " corresponding replacements
-    let l:diacs .= toupper(l:diacs)
-    let l:repls .= toupper(l:repls)
-    return tr(a:text, l:diacs, l:repls)
-endfunction
-" }}}
 function! pandoc#AutoNameFile( ... ) abort  " {{{
     " For pandoc files, this function will generate a filename from the title
     " field of the YAML header, replacing diacritics, stripping out
@@ -50,10 +40,11 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
     endif
     let l:title = substitute(l:title, '[.!?,:;] ', '-', 'g')
     let l:title = tr(l:title, '/ ', '-_')
-    let l:title = <SID>RemoveDiacritics(l:title)
+    let l:title = iconv(l:title, 'utf8', 'ascii//TRANSLIT')
     let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
     let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
-    let l:title = substitute(l:title, '__', '_', 'g')
+    let l:title = substitute(l:title, '_\{2,}', '_', 'g')
+    let l:title = substitute(l:title, '-\{2,}', '-', 'g')
     let l:newName = fnameescape(expand('%:p:h') . '/' . l:title . l:extension)
     let l:currentName = expand('%:p')
     if l:newName !=? l:currentName && findfile(l:newName) !=# ''
