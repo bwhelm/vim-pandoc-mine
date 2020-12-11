@@ -295,7 +295,7 @@ command! -buffer TidyPandoc call pandoc#ftplugin#TidyPandoc()
 " Other {{{1
 " ============================================================================
 if !has('ios')
-    setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --atx-headers\ --standalone\ --preserve-tabs
+    setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --standalone\ --preserve-tabs
 endif
 " Allow wrapping past BOL and EOL when using `h` and `l`
 setlocal whichwrap+=h,l
