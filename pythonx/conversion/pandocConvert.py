@@ -9,7 +9,7 @@ Thus, the script should be called as follows:
          articleOptions filter, imageFormat
 
 Here's what each of these are (read from stdin):
-    * MARKDOWN_FILE: complete path to file to be converted
+    * file: complete path to file to be converted
     * TO_EXTENSION: extension of file type to be converted to (e.g., '.html'
       or '.docx')
     * extraOptions: special options for this extension
@@ -20,6 +20,8 @@ Here's what each of these are (read from stdin):
 """
 
 from os import chdir, makedirs, listdir, environ, path, remove, rename
+from ruamel.yaml import YAML
+from ruamel.yaml.composer import ComposerError
 from subprocess import run, check_output, call
 from sys import stdout, stderr
 from time import time
@@ -96,6 +98,34 @@ def removeAuxFiles(latexPath, baseFilename):
             remove(path.join(latexPath, baseFilename + '.' + extension))
         except OSError:
             pass
+
+
+def preprocessFile(baseFileName, fileExtension, text, yamlData):
+    """
+    Macros:
+
+    Here I abuse math environments to create easy macros.
+
+    1. In YAML header, specify macros as follows:
+
+        macros:
+        - first: this is the substituted text
+          second: this is more substituted text
+
+    2. Then in text, have users specify macros to be substituted as follows:
+
+        This is my text and $first$. This is more text and $second$.
+
+    As long as the macro labels are not identical to any actual math the user
+    would use, there should be no problem.
+    """
+    try:
+        macros = yamlData['macros'][0]
+        for key in macros:
+            text = text.replace('$' + str(key) + '$', str(macros[key]))
+    except KeyError:
+        pass  # No macros in file
+    return text
 
 
 def runLatex(latexPath, baseFileName, latexFormat, bookFlag):
@@ -181,35 +211,50 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
             else:
                 pandocOptions = pandocOptions + ['--filter', myFilter]
 
-    # Check to see if we need to use chapters or sections for 1st-level heading
-    bookFlag = False
-
-    # When toExtension == '.tex', latexFormat determines how latexmk creates a
-    # pdf file (whether using pdflatex, lualatex, or xelatex). Default is
-    # pdflatex (= '-pdf'). When toExtension == '.pdf', latexFormat determines
-    # how pandoc creates the pdf.
-    latexFormat = '-pdf'
-
+    # Get YAML data
     mdTextSplit = mdText.splitlines()
-    for lineIndex in range(len(mdTextSplit)):
-        line = mdTextSplit[lineIndex].lower()
-        if lineIndex == 0 and line != "---":
-            break
-        elif line.startswith('book: ') and line[6:] != 'false':
-            # bookFlag can be "true", "section", "chapter", or "part"
-            bookFlag = line[6:]
-            if bookFlag == "true":  # Default to "chapter"
-                bookFlag = "chapter"
-        elif line.startswith('biblatex: true') and toExtension == '.tex':
-            pandocOptions.append('--biblatex')
-        elif line.startswith('htmltoc: true') and toExtension == '.html':
-            pandocOptions.append('--toc')
-        elif line.startswith('lualatex: true'):
+    if mdTextSplit[0] == '---':  # Need to process YAML header
+        yamlText = []
+        for line in mdTextSplit[1:]:
+            if line == "---":
+                break
+            yamlText.append(line)
+        yaml = YAML(typ='safe')
+        try:
+            yamlData = yaml.load('\n'.join(yamlText))
+        except ComposerError:
+            writeError("ERROR: Cannot parse YAML header. If any of '%@*' " +
+                       "are in yaml header, it needs to be enclosed " +
+                       "in quotes.")
+            exit(1)
+        # Check to see if we need to use chapters or sections for 1st-level
+        # heading
+        if 'book' in yamlData:
+            bookFlag = yamlData['book']
+            if bookFlag is True:
+                bookFlag = 'chapter'
+        else:
+            bookFlag = False
+        # Set how latexmk creates pdf file (whether using pdflatex, lualatex,
+        # or xelatex). Default is pdflatex.
+        if 'lualatex' in yamlData and yamlData['lualatex']:
             latexFormat = '-lualatex'
-        elif line.startswith('xelatex: true'):
+        elif 'xelatex' in yamlData and yamlData['xelatex']:
             latexFormat = '-xelatex'
-        elif line[:3] in ('...', '---') and lineIndex != 0:
-            break
+        else:
+            latexFormat = '-pdf'
+        if toExtension == '.tex' and 'biblatex' in yamlData and \
+                yamlData['biblatex']:
+            pandocOptions.append('--biblatex')
+        if toExtension == '.html' and 'htmltoc' in yamlData and \
+                yamlData['htmltoc']:
+            pandocOptions.append('--toc')
+
+    # Preprocess markdown text, replacing macros
+    mdText = preprocessFile(baseFileName, fileExtension, mdText,
+                            yamlData)
+    myFile = path.join(filePath, baseFileName + '-processed' + fileExtension)
+    writeFile(myFile, mdText)
 
     if toFormat == 'latex' and toExtension == '.pdf':
         # Set `--pdf-engine` for pandoc conversion direct to .pdf
@@ -244,6 +289,8 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
     writeMessage("Moving " + endFile + " to " + path.join(pandocTempDir,
                  endFile))
     rename(path.join(filePath, endFile), path.join(pandocTempDir, endFile))
+    # Delete processed file
+    remove(myFile)
 
     if (toFormat == 'latex' and toExtension == '.tex'
             and not suppressPdfFlag) or toFormat == 'beamer':

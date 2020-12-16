@@ -18,7 +18,24 @@ different computer.
    open the resulting .pdf file in the app specified by `g:pandocPdfApp`, which
    by default is `/Applications/Skim.app`.
 
-4. I assume two pandoc filters are available: <bwhelm/pandoc-reference-filter>
+4. Pandoc conversion will initially run a pre-processing function that allows
+   for macros, abusing math environments.
+
+    1. In YAML header, specify macros as follows:
+
+        macros:
+        - first: this is the substituted text
+          second: "this is more substituted text with math: $1+1=2$"
+          third: "emphasis *can* be added, but must be in quotes"
+
+    2. Then in text, have users specify macros to be substituted as follows:
+
+        This is my text and $first$. This is more text and $second$.
+
+    3. As long as the macro labels are not identical to any actual math the user
+       would use, there should be no problem.
+
+1. I assume two pandoc filters are available: <bwhelm/pandoc-reference-filter>
    and <bwhelm/Pandoc-Comment-Filter>. These are assumed to be at
    `~/Applications/pandoc/pandoc-reference-filter/internalreferences.lua` and at
    `~/Applications/pandoc/Comment-Filter/pandocCommentFilter.lua`, respectively.
@@ -28,6 +45,6 @@ different computer.
     - Note that the section text-object takes a count, which is the depth of
       the desired section.
 
-5. I assume some CSL files are available:
+6. I assume some CSL files are available:
    `~/.pandoc/chicago-fullnote-bibliography.csl` and
    `~/.pandoc/chicago-manual-of-style-16th-edition-full-in-text.csl`.
