@@ -213,8 +213,11 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
 
     # Get YAML data
     mdTextSplit = mdText.splitlines()
+    bookFlag = False
+    yamlText = []
+    yamlData = {}
+    latexFormat = '.pdf'
     if mdTextSplit[0] == '---':  # Need to process YAML header
-        yamlText = []
         for line in mdTextSplit[1:]:
             if line == "---":
                 break
@@ -233,16 +236,12 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
             bookFlag = yamlData['book']
             if bookFlag is True:
                 bookFlag = 'chapter'
-        else:
-            bookFlag = False
         # Set how latexmk creates pdf file (whether using pdflatex, lualatex,
         # or xelatex). Default is pdflatex.
         if 'lualatex' in yamlData and yamlData['lualatex']:
             latexFormat = '-lualatex'
         elif 'xelatex' in yamlData and yamlData['xelatex']:
             latexFormat = '-xelatex'
-        else:
-            latexFormat = '-pdf'
         if toExtension == '.tex' and 'biblatex' in yamlData and \
                 yamlData['biblatex']:
             pandocOptions.append('--biblatex')
