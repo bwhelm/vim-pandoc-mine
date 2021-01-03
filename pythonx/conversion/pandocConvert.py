@@ -216,7 +216,7 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
     bookFlag = False
     yamlText = []
     yamlData = {}
-    latexFormat = '.pdf'
+    latexFormat = '-pdf'
     if mdTextSplit[0] == '---':  # Need to process YAML header
         for line in mdTextSplit[1:]:
             if line == "---":

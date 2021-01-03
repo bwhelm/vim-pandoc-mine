@@ -2,12 +2,30 @@ scriptencoding utf-8
 " vim: set fdm=marker:
 " ============================================================================
 
-function! pandoc#ftplugin#JumpToHeader(direction, count) abort  "{{{
-    " The count indicates the level of heading to jump to
-    let l:startPos = getcurpos()
-    if a:direction == 'b'
+function! pandoc#ftplugin#JumpToHeader(mode, direction, count) abort  "{{{
+    " `a:count` indicates the level of heading to jump to; `a:direction` is ''
+    " for forward or 'b' for backward search; `a:mode` is 'o' for operator
+    " pending, or 'n' for normal.
+    if a:mode ==# 'v'  " if in visual mode
+        " force motion to be linewise
+        let l:startPos = a:direction == 'b' ? getpos("'>") : getpos("'<")
+        let l:endPos = a:direction == 'b' ? getpos("'<") : getpos("'>")
+        normal! V
+        normal! V
+    else
+        if a:mode ==# 'o'  "if in operator pending mode
+            call setpos("'<", getpos("."))
+            call setpos("'>", getpos("."))
+            normal! V
+        endif
+        let l:startPos = getpos(".")
+        let l:endPos = l:startPos
+    endif
+
+    if a:direction == 'b'  " Avoid finding current line
         -
     else
+        call setpos('.', l:endPos)
         +
     endif
     let l:count = a:count == 0 ? 6 : a:count
@@ -20,15 +38,36 @@ function! pandoc#ftplugin#JumpToHeader(direction, count) abort  "{{{
         endif
         " Jump to heading and add to jump list
         execute 'normal!' l:found . 'G_'
-    else
-        redraw | echohl Error
-        if a:direction ==# 'b'
-            echo 'No previous heading of level' l:count 'or below.'
-        else
-            echo 'No next heading of level' l:count 'or below.'
+        if 'ov' =~# a:mode
+            if a:direction == ''  " Forward ... need to move 1 line short
+                call setpos("'<", l:startPos)
+                -
+                call setpos("'>", getpos('.'))
+            else  " Backward
+                call setpos("'<", getpos('.'))
+                call setpos("'>", l:startPos)
+            endif
+            normal! gv
         endif
-        echohl None
-        call setpos('.', l:startPos)  " Restore initial position
+    else
+        if 'ov' =~# a:mode
+            if a:direction == ''  " Forward: set end to end of doc
+                call setpos("'>", [0, line('$'), 1, 0])
+            else                  " Backward: set start to beg of doc
+                call setpos("'<", [0, 1, 1, 0])
+                call setpos("'>", l:startPos)
+            endif
+            normal! gv
+        else
+            redraw | echohl Error
+            if a:direction ==# 'b'
+                echo 'No previous heading of level' l:count 'or below.'
+            else
+                echo 'No next heading of level' l:count 'or below.'
+            endif
+            echohl None
+            call setpos('.', l:startPos)  " Restore initial position
+        endif
     endif
 endfunction
 ""}}}

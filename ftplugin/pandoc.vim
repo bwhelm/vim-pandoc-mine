@@ -34,8 +34,12 @@ endif
 " Jump to Headers {{{2
 " ---------------
 " Note: `<C-U>` below does away with the count. (See :h v:count.)
-noremap <silent><buffer> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('', v:count)<CR>
-noremap <silent><buffer> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('b', v:count)<CR>
+noremap <buffer> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('n', '', v:count)<CR>
+onoremap <buffer> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('o', '', v:count)<CR>
+vnoremap <buffer> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('v', '', v:count)<CR>
+noremap <buffer> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('n', 'b', v:count)<CR>
+onoremap <buffer> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('o', 'b', v:count)<CR>
+vnoremap <buffer> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('v', 'b', v:count)<CR>
 
 " Fold Section {{{2
 " ------------
