@@ -23,12 +23,12 @@ def getBibData():
     try:
         bibFile = check_output(['kpsewhich', 'Bibdatabase-new.bib'])[:-1].decode('utf-8')
     except CalledProcessError as e:
-        bibFile = expanduser('~/Documents/research/+texmf/bibtex/bib/bibdatabase-new.bib')
+        bibFile = expanduser('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-new.bib')
     bibText = readFile(bibFile)
     try:
         bibFile = check_output(['kpsewhich', 'Bibdatabase-helm-new.bib'])[:-1].decode('utf-8')
     except CalledProcessError as e:
-        bibFile = expanduser('~/Documents/research/+texmf/bibtex/bib/bibdatabase-helm-new.bib')
+        bibFile = expanduser('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-helm-new.bib')
     bibText += readFile(bibFile)
     bibDataList = findall(r'@[^@]*', bibText)
     return bibDataList
