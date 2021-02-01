@@ -311,7 +311,8 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
                       path.join(pandocTempDir, endFile)])
         else:
             if path.exists('/usr/bin/open') and not suppressPdfFlag:
-                call(['/usr/bin/open', path.join(pandocTempDir, endFile)])
+                call(['/usr/bin/open', '-g',
+                      path.join(pandocTempDir, endFile)])
     # If on raspberrypi, upload resulting file to dropbox.
     if platform == 'old':
         message = check_output(
