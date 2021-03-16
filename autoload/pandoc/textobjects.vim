@@ -86,21 +86,25 @@ function! pandoc#textobjects#FindInsideNote()
             elseif l:stopLine == l:line && l:line != 1  " Try searching forwards to end
                 let l:stopLine = line('$')
                 let l:direction = ''
-            else  " Failed to find a Note
+            else  " Failed to find a Note: return to original position
                 call setpos('.', l:currentPos)
                 return
             endif
         endif
     endwhile
     let l:startPos = getpos('.')
-    let l:startPos[2] += 1
     call searchpair('\[', '', '\]', 'W')
     let l:endPos = getpos('.')
-    let l:endPos[2] -= 1
-    return ['v', [0, l:startPos[1], l:startPos[2], 0], [0, l:endPos[1], l:endPos[2], 0]]
+    return ['v', [0, l:startPos[1], l:startPos[2] + 1, 0], [0, l:endPos[1], l:endPos[2] - 1, 0]]
 endfunction
 function! pandoc#textobjects#FindAroundNote()
-    let [l:type, l:startPos, l:endPos] = pandoc#textobjects#FindInsideNote()
+    let l:currentPos = getpos('.')
+    try
+        let [l:type, l:startPos, l:endPos] = pandoc#textobjects#FindInsideNote()
+    catch /E714/  " No Note found; return to original position
+        call setpos('.', l:currentPos)
+        return
+    endtry
     call search('{\.[a-z]\{2,}\zs}', '', line('.'))
     let l:endPos[2] = getpos('.')[2]
     return [l:type, [0, l:startPos[1], l:startPos[2] - 1, 0],
