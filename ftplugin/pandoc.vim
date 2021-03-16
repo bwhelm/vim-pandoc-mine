@@ -34,12 +34,12 @@ endif
 " Jump to Headers {{{2
 " ---------------
 " Note: `<C-U>` below does away with the count. (See :h v:count.)
-noremap <buffer> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('n', '', v:count)<CR>
-onoremap <buffer> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('o', '', v:count)<CR>
-vnoremap <buffer> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('v', '', v:count)<CR>
-noremap <buffer> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('n', 'b', v:count)<CR>
-onoremap <buffer> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('o', 'b', v:count)<CR>
-vnoremap <buffer> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('v', 'b', v:count)<CR>
+noremap <buffer><silent> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('n', '', v:count)<CR>
+onoremap <buffer><silent> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('o', '', v:count)<CR>
+vnoremap <buffer><silent> ]] :<C-U>call pandoc#ftplugin#JumpToHeader('v', '', v:count)<CR>
+noremap <buffer><silent> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('n', 'b', v:count)<CR>
+onoremap <buffer><silent> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('o', 'b', v:count)<CR>
+vnoremap <buffer><silent> [[ :<C-U>call pandoc#ftplugin#JumpToHeader('v', 'b', v:count)<CR>
 
 " Fold Section {{{2
 " ------------
@@ -126,10 +126,10 @@ nnoremap <buffer><silent> <LocalLeader>fF ?\^\[<CR>m<l%m>`<
 " Find page references needing complete citations
 noremap <buffer><silent> <LocalLeader>fr /(\(\d\+f\{0,2}\(, \d\+f\{0,2}\\|--\d\+\)\?\))<CR>
 " Copy citation into `r` register
-inoremap <buffer> <LocalLeader>r <Esc>mz?@[A-z]<CR>"ryf `za
-nnoremap <buffer> <LocalLeader>r mz?@[A-z]<CR>"ryf `z
+inoremap <buffer><silent> <LocalLeader>r <Esc>mz?@[A-z]<CR>"ryf `za
+nnoremap <buffer><silent> <LocalLeader>r mz?@[A-z]<CR>"ryf `z
 
-nnoremap <silent><buffer> <C-]> :call pandoc#references#GoToReference()<CR>
+nnoremap <buffer><silent> <C-]> :call pandoc#references#GoToReference()<CR>
 
 "" To break undo sequence automatically {{{2
 "" ------------------------------------
@@ -199,8 +199,8 @@ nnoremap <buffer><silent> csns mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 
 " Jump to .tex file in tmp dir
 if !has('ios')
-    nnoremap <silent><buffer> <LocalLeader>ft :call pandoc#ftplugin#JumpToTex(".tex")<CR>
-    nnoremap <silent><buffer> <LocalLeader>fl :call pandoc#ftplugin#JumpToTex(".log")<CR>
+    nnoremap <buffer><silent> <LocalLeader>ft :call pandoc#ftplugin#JumpToTex(".tex")<CR>
+    nnoremap <buffer><silent> <LocalLeader>fl :call pandoc#ftplugin#JumpToTex(".log")<CR>
 endif
 "}}}
 
@@ -271,7 +271,7 @@ augroup pandoc
 augroup END
 " Remap ` ` so that it abbreviations are completed only when not in pop-up
 " windows.
-inoremap <expr><buffer> <Space> pumvisible() ? " " : " "
+inoremap <expr><buffer><silent> <Space> pumvisible() ? " " : " "
 
 " ======================================================================== }}}
 " TOC Support {{{1
