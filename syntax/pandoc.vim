@@ -649,7 +649,8 @@ endif
 hi myFixme guibg=Red guifg=Black ctermbg=Red ctermfg=Black gui=bold term=bold cterm=bold
 hi link myPandocComment Identifier
 hi link myPandocCommentBlock Identifier
-hi link myPandocBoxBlock Special
+" hi link myPandocBoxBlock Special
+hi link myPandocBoxBlock Constant
 hi link myPandocCenterBlock Constant
 hi link myPandocSpeakerBlock Special
 hi link myPandocFixme Constant
