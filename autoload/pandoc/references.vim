@@ -240,13 +240,13 @@ endfunction
 
 function! s:GetBibData() abort
     " Read data from .bib files
-    if has('ios')
+    if $USER ==# 'mobile'
         let l:file = fnamemodify('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-new.bib', ':p')
     else
         let l:file = system('kpsewhich bibdatabase-new.bib')[:-2]
     endif
     let l:bibText = join(readfile(l:file), "\n")
-    if has('ios')
+    if $USER ==# 'mobile'
         let l:file = fnamemodify('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-helm-new.bib', ':p')
     else
         let l:file = system('kpsewhich bibdatabase-helm-new.bib')[:-2]

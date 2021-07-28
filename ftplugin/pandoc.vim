@@ -11,7 +11,7 @@ let b:loaded_pandoc_mine=1
 " Variables for Conversions {{{1
 " ===========================================================================
 
-if !has('ios')
+if $USER !=# 'mobile'
     let b:pandoc_converting = 0  " keeps track of whether currently converting or not
     let b:pandoc_autoPDFEnabled = 0  " Turn autoPDF off by default...
     " Identify default (i.e., last) method for file conversions. If we can
@@ -51,7 +51,7 @@ nnoremap <buffer><silent> zn# :call pandoc#fold#foldAllSectionsNested()<CR>
 " ---------------
 "  (For all of these, call the helper function with relevant command.)
 
-if !has('ios')
+if $USER !=# 'mobile'
     " Note that the `cc` mapping is to repeat the last conversion
     nnoremap <buffer><silent> <LocalLeader>cc :call pandoc#conversion#MyConvertMappingHelper("")<CR>
     inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvertMappingHelper("")<CR>
@@ -159,7 +159,7 @@ endif
 " nnoremap <buffer><silent> <C-x> ciw<i <Esc>pa><Esc>mip`i
 
 " Jump to corresponding line in Skim.app
-if !has('ios')
+if $USER !=# 'mobile'
     if has('nvim')
         command! -buffer JumpToPDF call jobstart("/usr/bin/env python3 " .
                     \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
@@ -198,7 +198,7 @@ nnoremap <buffer><silent> csnh mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 nnoremap <buffer><silent> csns mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`z
 
 " Jump to .tex file in tmp dir
-if !has('ios')
+if $USER !=# 'mobile'
     nnoremap <buffer><silent> <LocalLeader>ft :call pandoc#ftplugin#JumpToTex(".tex")<CR>
     nnoremap <buffer><silent> <LocalLeader>fl :call pandoc#ftplugin#JumpToTex(".log")<CR>
 endif
@@ -298,7 +298,7 @@ command! -buffer TidyPandoc call pandoc#ftplugin#TidyPandoc()
 " ======================================================================== }}}
 " Other {{{1
 " ============================================================================
-if !has('ios')
+if $USER !=# 'mobile'
     setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --standalone\ --preserve-tabs
 endif
 " Allow wrapping past BOL and EOL when using `h` and `l`
