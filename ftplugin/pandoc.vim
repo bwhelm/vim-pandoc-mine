@@ -23,7 +23,7 @@ if $USER !=# 'mobile'
     elseif s:fileBegin =~# '\n- aspectratio' || s:fileBegin =~# '\ntheme'
         let b:pandoc_lastConversionMethod = 'markdown-to-beamer-pandoc-direct.py'
     else
-        let b:pandoc_lastConversionMethod = 'markdown-to-PDF-LaTeX.py'
+        let b:pandoc_lastConversionMethod = 'markdown-to-PDF-pandoc-direct.py'
     endif
 endif
 
@@ -56,13 +56,13 @@ if $USER !=# 'mobile'
     nnoremap <buffer><silent> <LocalLeader>cc :call pandoc#conversion#MyConvertMappingHelper("")<CR>
     inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvertMappingHelper("")<CR>
     " PDF conversion
-    nnoremap <buffer><silent> <LocalLeader>cp :call
-            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
-    inoremap <buffer><silent> <LocalLeader>cp <C-o>:call
-            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
     nnoremap <buffer><silent> <LocalLeader>cP :call
-            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
     inoremap <buffer><silent> <LocalLeader>cP <C-o>:call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-LaTeX.py')<CR>
+    nnoremap <buffer><silent> <LocalLeader>cp :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
+    inoremap <buffer><silent> <LocalLeader>cp <C-o>:call
             \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
     " Diff conversion against git cache -- converts diff of current file to .pdf
     nnoremap <buffer><silent> <LocalLeader>cd :call

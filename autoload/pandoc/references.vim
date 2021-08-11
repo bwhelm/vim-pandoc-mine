@@ -116,7 +116,7 @@ endfunction
 " Completion Function for References/Bibliography {{{1
 " ============================================================================
 
-let s:abbrLength = 10  " Length of citation key abbreviation
+" let s:abbrLength = 10  " Length of citation key abbreviation
 
 function! s:GenerateHeaderID(header) abort
     " Generates pandoc-style identifiers for headers. Assumes headers are
@@ -236,7 +236,6 @@ endfunction
 "     autocmd!
 "     autocmd CompleteDone * pclose
 " augroup END
-
 
 function! s:GetBibData() abort
     " Read data from .bib files
