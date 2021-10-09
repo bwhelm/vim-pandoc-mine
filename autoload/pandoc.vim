@@ -34,20 +34,21 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
         " Try to guess a suffix: if presentation, name it that!
         if l:fileBegin =~# '\n- aspectratio' || l:fileBegin =~# '\ntheme' ||
                     \ l:fileBegin =~# '\nbeamerarticle'
-            let l:title .= '-Presentation'
+            let l:title .= '-presentation'
             redraw | echo 'Identified as presentation.'
         endif
     endif
+    let l:title = tolower(l:title)
     let l:title = substitute(l:title, '[.!?,:;] ', '-', 'g')
     let l:title = tr(l:title, '/ ', '-_')
     let l:title = iconv(l:title, 'utf8', 'ascii//TRANSLIT')
-    let l:title = substitute(l:title, '[^A-Za-z0-9 _-]', '', 'g')
-    let l:title = substitute(l:title, '\c\<\(A\|An\|The\)_', '', 'g')
+    let l:title = substitute(l:title, '[^a-z0-9 _-]', '', 'g')
+    let l:title = substitute(l:title, '\c\<\(a\|an\|the\)_', '', 'g')
     let l:title = substitute(l:title, '_\{2,}', '_', 'g')
     let l:title = substitute(l:title, '-\{2,}', '-', 'g')
     let l:newName = fnameescape(expand('%:p:h') . '/' . l:title . l:extension)
     let l:currentName = expand('%:p')
-    if l:newName !=? l:currentName && findfile(l:newName) !=# ''
+    if l:newName !=? l:currentName && findfile(l:newName, '.;') !=# ''
         " Note: if l:newName merely modifies the case of l:currentName, this
         " will not throw up a warning. In most cases this is what I want,
         " but if there is another file that is a case variant of the
@@ -64,7 +65,7 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
         echohl None
     endif
     if l:currentName !=# ''  "File already has a name
-        if findfile(l:currentName, '.') ==# ''  " No existing file
+        if findfile(l:currentName, '.;') ==# ''  " No existing file
             execute 'write' l:newName
         elseif l:currentName ==# l:newName  " Existing file with same name
             update
