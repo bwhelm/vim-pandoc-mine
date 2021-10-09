@@ -46,7 +46,7 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
     let l:title = substitute(l:title, '\c\<\(a\|an\|the\)_', '', 'g')
     let l:title = substitute(l:title, '_\{2,}', '_', 'g')
     let l:title = substitute(l:title, '-\{2,}', '-', 'g')
-    let l:newName = fnameescape(expand('%:p:h') . '/' . l:title . l:extension)
+    let l:newName = expand('%:p:h') . '/' . l:title . l:extension
     let l:currentName = expand('%:p')
     if l:newName !=? l:currentName && findfile(l:newName, '.;') !=# ''
         " Note: if l:newName merely modifies the case of l:currentName, this
