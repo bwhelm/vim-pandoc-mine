@@ -66,9 +66,9 @@ if $USER !=# 'mobile'
             \ pandoc#conversion#MyConvertMappingHelper('markdown-to-PDF-pandoc-direct.py')<CR>
     " Diff conversion against git cache -- converts diff of current file to .pdf
     nnoremap <buffer><silent> <LocalLeader>cd :call
-            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX-diff.py')<CR>
     inoremap <buffer><silent> <LocalLeader>cd <C-o>:call
-            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX-diff.py')<CR>
     " Diff conversion against HEAD -- converts diff of current file to .pdf
     nnoremap <buffer> <LocalLeader>cD :call pandoc#conversion#MarkdownGitDiff()<CR>
     inoremap <buffer> <LocalLeader>cD :call pandoc#conversion#MarkdownGitDiff()<CR>
@@ -82,6 +82,9 @@ if $USER !=# 'mobile'
             \ pandoc#conversion#MyConvertMappingHelper('markdown-to-revealjs-pandoc-direct.py')<CR>
     inoremap <buffer><silent> <LocalLeader>cr <C-o>:call
             \ pandoc#conversion#MyConvertMappingHelper('markdown-to-revealjs-pandoc-direct.py')<CR>
+    " LaTeX conversion
+    nnoremap <buffer><silent> <LocalLeader>cl :call
+            \ pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py')<CR>
     " LaTeX Beamer conversion
     nnoremap <buffer><silent> <LocalLeader>cb :call
             \ pandoc#conversion#MyConvertMappingHelper('markdown-to-beamer-pandoc-direct.py')<CR>

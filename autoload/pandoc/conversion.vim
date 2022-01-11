@@ -27,7 +27,7 @@ function! pandoc#conversion#MarkdownGitDiff() abort  "{{{2
         echohl None
         return
     endif
-    call pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX.py', answer)
+    call pandoc#conversion#MyConvertMappingHelper('markdown-to-LaTeX-diff.py', answer)
 endfunction
 "2}}}
 function! pandoc#conversion#DisplayMessages(PID, text, ...) abort  "{{{2

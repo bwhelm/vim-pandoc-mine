@@ -86,7 +86,7 @@ def readFile(fileName):
 
 
 def runPandoc(pandocCommandList):
-    # writeError(str(pandocCommandList))
+    # writeMessage(str(pandocCommandList))
     return run(pandocCommandList, shell=False).returncode
 
 

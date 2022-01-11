@@ -37,7 +37,7 @@ function! s:JumpToReference(searchString) abort
         "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-new.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-helm-new.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
         if !has('python3')  " use slower vimscript if python not available
             let l:biblio = s:constructOneEntry(a:searchString)
-        else  " if not on iPad, python is faster
+        else  " python is faster
             if has('nvim')
                 python3 import references
                 let l:biblio = py3eval("references.constructOneEntry('" . a:searchString . "')")
@@ -50,7 +50,7 @@ function! s:JumpToReference(searchString) abort
             new +setlocal\ buftype=nofile\ bufhidden=wipe\ noswapfile\ nobuflisted\ nospell\ modifiable\ statusline=Reference
             resize 5
             put! =l:biblio
-            " Set filetype *after* adading content so as not to trigger
+            " Set filetype *after* adding content so as not to trigger
             " template prompt.
             setlocal filetype=pandoc
             $delete_
@@ -187,7 +187,7 @@ endfunction
 function! s:GetBibEntries(base) abort
     if !has('python3')  " use slower vimscript if python not available
         return s:createBibList(a:base)
-    else  " if not on iPad, python is faster
+    else  " python is faster
         if has('nvim')
             python3 import references
             return py3eval("references.createBibList('" . a:base . "')")
