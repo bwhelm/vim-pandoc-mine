@@ -30,7 +30,6 @@ toExtension = '.html'
 # extraOptions = '-V revealjs-url=http://lab.hakim.se/reveal-js'
 articleOptions = ''
 bookOptions = articleOptions
-imageFormat = '.png'
 
 # Make sure reveal.js is symlinked to tmp/pandoc
 revealJSAliasDir = path.expanduser('~/tmp/pandoc/')
@@ -47,8 +46,7 @@ if not path.exists(path.join(revealJSAliasDir, revealJSAliasFile)):
 
 theFile = argv[1].strip('"')
 pandocTempDir = path.expanduser(argv[2])
-pdfApp = path.expanduser(argv[3])
 
-pandocConvert.convertMd(pdfApp, pandocTempDir, theFile, toFormat, toExtension,
+pandocConvert.convertMd(pandocTempDir, theFile, toFormat, toExtension,
                         extraOptions, bookOptions, articleOptions,
-                        addedFilter, imageFormat)
+                        addedFilter)

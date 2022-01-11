@@ -33,12 +33,10 @@ bookOptions = '--toc --css=' +\
         path.expanduser('~/Applications/pandoc/buttondown.css')
 articleOptions = '--css=' +\
         path.expanduser('~/Applications/pandoc/buttondown.css')
-imageFormat = '.png'
 
 theFile = argv[1].strip('"')
 pandocTempDir = path.expanduser(argv[2])
-pdfApp = path.expanduser(argv[3])
 
-pandocConvert.convertMd(pdfApp, pandocTempDir, theFile, toFormat, toExtension,
+pandocConvert.convertMd(pandocTempDir, theFile, toFormat, toExtension,
                         extraOptions, bookOptions, articleOptions,
-                        addedFilter, imageFormat)
+                        addedFilter)

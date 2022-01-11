@@ -18,7 +18,6 @@ baseFileName, fileExtension = path.splitext(fileName)
 outputFile = baseFileName + '.tex'
 
 pandocTempDir = path.expanduser(argv[2])
-pdfApp = path.expanduser(argv[3])
 
 # Adjust for pandoc-citeproc's different versions on pandoc > 2.10.x
 pandocVersion = run(['pandoc', '--version'], encoding='utf8',
@@ -44,8 +43,6 @@ articleOptions = ''
 bookOptions = articleOptions
 addedFilter.append('pandocBeamerFilter.lua')
 
-imageFormat = '.pdf'
-
-pandocConvert.convertMd(pdfApp, pandocTempDir, theFile, toFormat, toExtension,
+pandocConvert.convertMd(pandocTempDir, theFile, toFormat, toExtension,
                         extraOptions, bookOptions, articleOptions,
-                        addedFilter, imageFormat)
+                        addedFilter)

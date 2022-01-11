@@ -30,12 +30,10 @@ toExtension = '.md'
 extraOptions += '--preserve-tabs --wrap=none --atx-headers'
 bookOptions = ''
 articleOptions = ''
-imageFormat = ''
 
 theFile = argv[1].strip('"')
 pandocTempDir = path.expanduser(argv[2])
-pdfApp = path.expanduser(argv[3])
 
-pandocConvert.convertMd(pdfApp, pandocTempDir, theFile, toFormat, toExtension,
+pandocConvert.convertMd(pandocTempDir, theFile, toFormat, toExtension,
                         extraOptions, bookOptions, articleOptions,
-                        addedFilter, imageFormat)
+                        addedFilter)

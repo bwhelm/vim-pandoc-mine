@@ -153,9 +153,8 @@ def runLatex(latexPath, baseFileName, latexFormat, bookFlag):
     return False     # No error
 
 
-def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
-              extraOptions, bookOptions, articleOptions, addedFilter,
-              imageFormat):
+def convertMd(pandocTempDir, myFile, toFormat, toExtension,
+              extraOptions, bookOptions, articleOptions, addedFilter):
     writeMessage('Starting conversion to ' + toExtension)
 
     pandocTempDirImages = path.join(pandocTempDir, 'Figures')
@@ -269,6 +268,10 @@ def convertMd(pdfApp, pandocTempDir, myFile, toFormat, toExtension,
         pandocOptions = pandocOptions + articleOptions.split()
 
     outFile = path.join(filePath, baseFileName + toExtension)
+    if path.exists(outFile):
+        writeError('Error: ' + outFile + ' already exists! Delete it and try again.')
+        remove(myFile)
+        exit(1)
     pandocCommandList = ['/usr/bin/env', 'pandoc', myFile, '-o',
                          outFile] + pandocOptions
 

@@ -19,7 +19,6 @@ extraOptions = ''
 bookOptions = ''
 articleOptions = ''
 addedFilter = ''
-imageFormat = '.pdf'
 
 
 # Get old file in git repository to diff with
@@ -27,7 +26,6 @@ currentFileName = argv[1].strip('"')
 currentFilePath, currentFileShortName = path.split(currentFileName)
 chdir(currentFilePath)
 pandocTempDir = path.expanduser(argv[2])
-pdfApp = path.expanduser(argv[3])
 if len(argv) > 4:
     gitObject = argv[4]  # To identify the old commit to diff with....
 else:
@@ -42,16 +40,16 @@ oldFileText = check_output(['git', 'show', gitObject + ':' +
 # Create .tex file of file in git cache
 pandocConvert.writeMessage('Retrieving from git cache...')
 pandocConvert.writeFile(oldFileName, oldFileText)
-pandocConvert.convertMd(pdfApp, pandocTempDir, oldFileName, toFormat,
+pandocConvert.convertMd(pandocTempDir, oldFileName, toFormat,
                         toExtension, extraOptions, bookOptions,
-                        articleOptions, addedFilter, imageFormat)
+                        articleOptions, addedFilter)
 remove(oldFileName)  # No longer needed after conversion....
 
 # Create .tex file of current working file
 pandocConvert.writeMessage('Creating .tex of working file...')
-pandocConvert.convertMd(pdfApp, pandocTempDir, currentFileName, toFormat,
+pandocConvert.convertMd(pandocTempDir, currentFileName, toFormat,
                         toExtension, extraOptions, bookOptions,
-                        articleOptions, addedFilter, imageFormat)
+                        articleOptions, addedFilter)
 
 # Create texdiff file
 pandocConvert.writeMessage('Creating latexdiff...')

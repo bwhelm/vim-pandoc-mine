@@ -18,7 +18,6 @@ extraOptions = ''
 bookOptions = ''
 articleOptions = ''
 addedFilter = ''
-imageFormat = '.pdf'
 
 
 # Get old file in git repository to diff with
@@ -26,13 +25,12 @@ currentFileName = argv[1].strip('"')
 currentFilePath, currentFileShortName = path.split(currentFileName)
 chdir(currentFilePath)
 pandocTempDir = path.expanduser(argv[2])
-pdfApp = path.expanduser(argv[3])
 
 # Create .tex file of current working file
 pandocConvert.writeMessage('Creating .tex of working file...')
-pandocConvert.convertMd(pdfApp, pandocTempDir, currentFileName, toFormat,
+pandocConvert.convertMd(pandocTempDir, currentFileName, toFormat,
                         toExtension, extraOptions, bookOptions,
-                        articleOptions, addedFilter, imageFormat)
+                        articleOptions, addedFilter)
 
 currentFileBaseName, currentFileExt = path.splitext(currentFileShortName)
 texFileShortName = currentFileBaseName + ".tex"
