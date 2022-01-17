@@ -8,7 +8,7 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
     " non-alphabetic characters and short words, converting ',' to '-', and
     " converting spaces to `_`.
     try
-        update
+        silent update
     catch
     endtry
     let l:suffix = join(a:000, ' ')
@@ -68,7 +68,7 @@ function! pandoc#AutoNameFile( ... ) abort  " {{{
         if findfile(l:currentName, '.;') ==# ''  " No existing file
             execute 'write' l:newName
         elseif l:currentName ==# l:newName  " Existing file with same name
-            update
+            silent update
             echohl Comment
             echo 'Updated existing file w/o renaming.'
             echohl None

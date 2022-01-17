@@ -217,7 +217,7 @@ function! s:MyConvertHelper(command, ...) abort  "{{{2
         let l:fileName = fnamemodify(tempname(), ':h') . '/temp.md'
         call writefile(l:textList, l:fileName)
     else
-        update
+        silent update
     endif
     let l:buffer = bufnr('%')
     " l:pandoc_converting will be > 0 only if a conversion is ongoing.
