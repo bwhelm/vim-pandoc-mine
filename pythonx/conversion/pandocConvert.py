@@ -210,6 +210,12 @@ def convertMd(pandocTempDir, myFile, toFormat, toExtension,
             else:
                 pandocOptions = pandocOptions + ['--filter', myFilter]
 
+    # If converting to LaTeX, I don't want to update image locations. So I'll
+    # set `processimage: false` in YAML, which signals to
+    # `pandocCommentFilter.lua` not to do this.
+    if suppressPdfFlag:
+        mdText = mdText[:4] + 'processimage: false\n' + mdText[4:]
+
     # Get YAML data
     mdTextSplit = mdText.splitlines()
     bookFlag = False
