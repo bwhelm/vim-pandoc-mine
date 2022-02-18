@@ -282,11 +282,11 @@ inoremap <expr><buffer><silent> <Space> pumvisible() ? " " : " "
 command! -buffer -nargs=* TOC call pandoc#toc#ShowTOC("<args>")
 
 " ======================================================================== }}}
-" AutoNameFile {{{1
-" ============================================================================
-command! -buffer -nargs=* AutoNameFile call pandoc#AutoNameFile(<q-args>)
+" " AutoNameFile {{{1
+" " ============================================================================
+" command! -buffer -nargs=* AutoNameFile call pandoc#AutoNameFile(<q-args>)
 
-" ======================================================================== }}}
+" " ======================================================================== }}}
 " Folding {{{1
 " ============================================================================
 setlocal foldtext=pandoc#fold#FoldText()
