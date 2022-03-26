@@ -289,13 +289,13 @@ if !has("ios")
 " }}}2
 endif
 
-if !has("ios")  " [with `else` clause]
+" if !has("ios")  " [with `else` clause]
 " Clusters: {{{2
     syn cluster pandocInline contains=@Spell,pandocHTML,pandocLaTeXInlineMath,pandocLaTeXCommand,pandocReferenceLabel,pandocReferenceURL,pandocAutomaticLink,pandocPCite,pandocICite,pandocCiteKey,pandocEmphasis,pandocStrong,pandocStrongEmphasis,pandocNoFormatted,pandocNoFormattedInEmphasis,pandocNoFormattedInStrong,pandocSubscript,pandocSuperscript,pandocStrikeout,pandocFootnoteDef,pandocFootnoteID,pandocNewLine,pandocEllipses,myPandocComment,myPandocMargin,myPandocFixme,myPandocHighlight,myPandocSmallCaps,myPandocLinkMark,myPandocIndexMark,myFixme
-else
-    syn cluster pandocInline contains=@Spell,pandocEmphasis,pandocPCite,pandocICite,pandocCiteKey
+" else
+"     syn cluster pandocInline contains=@Spell,pandocEmphasis,pandocPCite,pandocICite,pandocCiteKey
 "}}}
-endif
+" endif
 
 if !has("ios")
 " Links: {{{2
@@ -340,7 +340,7 @@ syn match pandocCiteAnchor /[-@]/ contained containedin=pandocCiteKey display
 syn match pandocCiteLocator /[\[\]]/ contained containedin=pandocPCite,pandocICite
 " }}}2
 
-if !has("ios")
+" if !has("ios")
 " Text Styles: {{{2
 
 " Emphasis: {{{3
@@ -392,7 +392,7 @@ if !has("ios")
     call s:WithConceal('strikeout', 'syn match pandocStrikeoutMark /\~\~/ contained containedin=pandocStrikeout', 'conceal cchar='.s:cchars['strike'])
     " }}}3
 " }}}
-endif
+" endif
 " Headers: {{{2
 syn match pandocAtxHeader /\(\%^\|<.\+>.*\n\|^\s*\n\)\@<=#\{1,6}.*\n/ contains=@pandocInline display
 syn match pandocAtxHeaderMark /\(^#\{1,6}\|\\\@<!#\+\(\s*.*$\)\@=\)/ contained containedin=pandocAtxHeader

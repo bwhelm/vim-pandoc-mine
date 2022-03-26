@@ -219,46 +219,46 @@ if exists('*textobj#user#plugin')
 
     call textobj#user#plugin('pandoc', {
         \   'section': {
-        \       'select-a': 'a#',
+        \       'select-a': '<buffer> a#',
         \       'select-a-function': 'pandoc#textobjects#FindAroundSection',
-        \       'select-i': 'i#',
+        \       'select-i': '<buffer> i#',
         \       'select-i-function': 'pandoc#textobjects#FindInsideSection',
         \   },
         \   'innerCitation': {
         \       'pattern': s:innerCitationPattern,
-        \       'select': 'ic',
+        \       'select': '<buffer> ic',
         \       'scan': 'nearest',
         \   },
         \   'aroundCitation': {
         \       'pattern': s:aroundCitationPattern,
-        \       'select': 'ac',
+        \       'select': '<buffer> ac',
         \       'scan': 'nearest',
         \   },
         \   'pageRange': {
         \       'pattern': s:pageRangePattern,
-        \       'select': 'pr',
+        \       'select': '<buffer> pr',
         \       'scan': 'nearest',
         \   },
         \   'inlineNote': {
-        \       'select-a': 'an',
+        \       'select-a': '<buffer> an',
         \       'select-a-function': 'pandoc#textobjects#FindAroundNote',
-        \       'select-i': 'in',
+        \       'select-i': '<buffer> in',
         \       'select-i-function': 'pandoc#textobjects#FindInsideNote',
         \   },
         \   'insideBlockNote': {
         \       'pattern': '^:\{3,} [a-z]\{2,}\n\zs\_.*\ze\n:\{3,}$',
-        \       'select': 'iN',
+        \       'select': '<buffer> iN',
         \       'scan': 'nearest',
         \   },
         \   'aroundBlockNote': {
         \       'pattern': '^:\{3,} [a-z]\{2,}\n\_.*\n:\{3,}$',
-        \       'select': 'aN',
+        \       'select': '<buffer> aN',
         \       'scan': 'nearest',
         \   },
         \   'footnote': {
-        \       'select-a': 'af',
+        \       'select-a': '<buffer> af',
         \       'select-a-function': 'pandoc#textobjects#FindAroundFootnote',
-        \       'select-i': 'if',
+        \       'select-i': '<buffer> if',
         \       'select-i-function': 'pandoc#textobjects#FindInsideFootnote',
         \   },
         \})
