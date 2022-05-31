@@ -21,14 +21,14 @@ def readFile(fileName):
 def getBibData():
     """ Read data from .bib files """
     try:
-        bibFile = check_output(['kpsewhich', 'Bibdatabase-new.bib'])[:-1].decode('utf-8')
+        bibFile = check_output(['kpsewhich', 'Bibdatabase.bib'])[:-1].decode('utf-8')
     except CalledProcessError as e:
-        bibFile = expanduser('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-new.bib')
+        bibFile = expanduser('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase.bib')
     bibText = readFile(bibFile)
     try:
-        bibFile = check_output(['kpsewhich', 'Bibdatabase-helm-new.bib'])[:-1].decode('utf-8')
+        bibFile = check_output(['kpsewhich', 'Bibdatabase-helm.bib'])[:-1].decode('utf-8')
     except CalledProcessError as e:
-        bibFile = expanduser('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-helm-new.bib')
+        bibFile = expanduser('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-helm.bib')
     bibText += readFile(bibFile)
     bibDataList = findall(r'@[^@]*', bibText)
     return bibDataList

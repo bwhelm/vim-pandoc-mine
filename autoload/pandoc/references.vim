@@ -34,7 +34,7 @@ function! s:JumpToReference(searchString) abort
         " The pandoc method is pretty slow, though very accurate. Using my
         " citation is much faster, and probably accurate enough for most
         " purposes.
-        "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-new.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-helm-new.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
+        "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-helm.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
         if !has('python3')  " use slower vimscript if python not available
             let l:biblio = s:constructOneEntry(a:searchString)
         else  " python is faster
@@ -240,15 +240,15 @@ endfunction
 function! s:GetBibData() abort
     " Read data from .bib files
     if $USER ==# 'mobile'
-        let l:file = fnamemodify('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-new.bib', ':p')
+        let l:file = fnamemodify('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase.bib', ':p')
     else
-        let l:file = system('kpsewhich bibdatabase-new.bib')[:-2]
+        let l:file = system('kpsewhich bibdatabase.bib')[:-2]
     endif
     let l:bibText = join(readfile(l:file), "\n")
     if $USER ==# 'mobile'
-        let l:file = fnamemodify('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-helm-new.bib', ':p')
+        let l:file = fnamemodify('~/Documents/Dropbox/research/+texmf/bibtex/bib/bibdatabase-helm.bib', ':p')
     else
-        let l:file = system('kpsewhich bibdatabase-helm-new.bib')[:-2]
+        let l:file = system('kpsewhich bibdatabase-helm.bib')[:-2]
     endif
     let l:bibText .= join(readfile(l:file), "\n")
     return l:bibText
