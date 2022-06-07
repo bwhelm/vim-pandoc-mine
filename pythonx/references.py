@@ -40,6 +40,7 @@ def retrieveBibField(bibItem, fieldname):
                        IGNORECASE).group(1)
     except AttributeError:
         field = ''
+    debug("Field:" + field)
     return field
 
 
@@ -83,10 +84,16 @@ def constructBookEntry(bibItem):
 def constructArticleEntry(bibItem):
     """Create markdown bibliography entry for article"""
     author = retrieveBibField(bibItem, 'author')
+    if "," in author:
+        shortauthor = author[:author.find(',')]
+    elif " " in author:
+        shortauthor = author[author.rindex(' ') + 1:]
+    else:
+        shortauthor = author
     entry = author + ' (' + retrieveBibField(bibItem, 'year') + '). "' + \
         retrieveBibField(bibItem, 'title') + '". *' + \
         retrieveBibField(bibItem, 'journal') + '*.'
-    shortEntry = author[:author.find(',')] + '(' + \
+    shortEntry = shortauthor + '(' + \
         retrieveBibField(bibItem, 'year') + '). "' + \
         retrieveBibField(bibItem, 'title') + '". *' + \
         retrieveBibField(bibItem, 'journal') + '*.'
