@@ -214,7 +214,8 @@ def convertMd(pandocTempDir, myFile, toFormat, toExtension,
     # set `processimage: false` in YAML, which signals to
     # `pandocCommentFilter.lua` not to do this.
     if suppressPdfFlag:
-        mdText = mdText[:4] + 'processimage: false\n' + mdText[4:]
+        location = mdText.find('\n') + 1
+        mdText = mdText[:location] + 'processimage: false\n' + mdText[location:]
 
     # Get YAML data
     mdTextSplit = mdText.splitlines()
