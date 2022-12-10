@@ -183,19 +183,19 @@ endif
 " Italicize/boldface current word. Note: iVim doesn't recognize <C-S-x>
 " mappings, and terminal vim doesn't recognize <D-x> mappings
 if has('ios')
-    inoremap <buffer><silent> <D-e> <Esc>ciw*<C-r>*
-    nnoremap <buffer><silent> <D-e> ciw*<C-r>*<Esc>b
-    xnoremap <buffer><silent> <D-e> c*<C-r>"*<Esc>gvlol
-    inoremap <buffer><silent> <D-b> <Esc>ciw**<C-R>**
-    nnoremap <buffer><silent> <D-b> ciw**<C-r>**<Esc>b
-    xnoremap <buffer><silent> <D-b> c**<C-r>"**<Esc>gvlloll
+    inoremap <buffer><silent> <D-e> <Esc>ciw*<C-R>*
+    nnoremap <buffer><silent> <D-e> ciw*<C-R>"*<Esc>b
+    xnoremap <buffer><silent> <D-e> c*<C-R>"*<Esc>gvlol
+    inoremap <buffer><silent> <D-b> <Esc>ciw**<C-R>"**
+    nnoremap <buffer><silent> <D-b> ciw**<C-R>"**<Esc>b
+    xnoremap <buffer><silent> <D-b> c**<C-R>"**<Esc>gvlloll
 else
-    inoremap <buffer><silent> <C-S-e> <Esc>ciw*<C-r>*
-    nnoremap <buffer><silent> <C-S-e> ciw*<C-r>*<Esc>b
-    xnoremap <buffer><silent> <C-S-e> c*<C-r>"*<Esc>gvlol
-    inoremap <buffer><silent> <C-S-b> <Esc>ciw**<C-R>**
-    nnoremap <buffer><silent> <C-S-b> ciw**<C-r>**<Esc>b
-    xnoremap <buffer><silent> <C-S-b> c**<C-r>"**<Esc>gvlloll
+    inoremap <buffer><silent> <C-S-e> <Esc>ciw*<C-R>"*
+    nnoremap <buffer><silent> <C-S-e> ciw*<C-R>"*<Esc>b
+    xnoremap <buffer><silent> <C-S-e> c*<C-R>"*<Esc>gvlol
+    inoremap <buffer><silent> <C-S-b> <Esc>ciw**<C-R>"**
+    nnoremap <buffer><silent> <C-S-b> ciw**<C-R>"**<Esc>b
+    xnoremap <buffer><silent> <C-S-b> c**<C-R>"**<Esc>gvlloll
 endif
 
 " Next mapping will delete the surrounding comment, leaving the inside text.
