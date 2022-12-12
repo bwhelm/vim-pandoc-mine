@@ -192,7 +192,7 @@ def convertMd(pandocTempDir, myFile, toFormat, toExtension,
                      '--from=markdown-fancy_lists+smart',
                      '--mathml',
                      '--wrap=none',
-                     # '--log=/Users/bennett/tmp/pandoc/log',
+                     # '--log=$USER/tmp/pandoc/log',
                      '--to=' + toFormat]
     pandocOptions += ['--lua-filter', 'fixYAML.lua']
     pandocOptions += ['--lua-filter', 'pandocCommentFilter.lua']
@@ -286,7 +286,7 @@ def convertMd(pandocTempDir, myFile, toFormat, toExtension,
     if platform == 'old':
         # If on raspberrypi, sync the bibliographical database.
         writeMessage('Synchronizing bibTeX databases...')
-        run(['/home/bennett/coding/sync-bib.py'])
+        run(['$USER/coding/sync-bib.py'])
     pandocError = runPandoc(pandocCommandList)
     if pandocError:
         writeError('Error creating ' + toExtension + ' file: ' +
@@ -326,7 +326,7 @@ def convertMd(pandocTempDir, myFile, toFormat, toExtension,
     # If on raspberrypi, upload resulting file to dropbox.
     if platform == 'old':
         message = check_output(
-            ['/home/bennett/Applications/dropbox-uploader/dropbox_uploader.sh',
+            ['$USER/Applications/dropbox-uploader/dropbox_uploader.sh',
              'upload', path.join(pandocTempDir, endFile),
              endFile]).decode('utf-8')[:-1]
         writeMessage(message)

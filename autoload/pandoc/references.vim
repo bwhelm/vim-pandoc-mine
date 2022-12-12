@@ -34,7 +34,7 @@ function! s:JumpToReference(searchString) abort
         " The pandoc method is pretty slow, though very accurate. Using my
         " citation is much faster, and probably accurate enough for most
         " purposes.
-        "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase.bib --bibliography=/Users/bennett/Library/texmf/bibtex/bib/bibdatabase-helm.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
+        "let l:biblio = system("echo '" . a:searchString . "' | pandoc --bibliography=$USER/Library/texmf/bibtex/bib/bibdatabase.bib --bibliography=$USER/Library/texmf/bibtex/bib/bibdatabase-helm.bib --filter=/usr/local/bin/pandoc-citeproc -t plain")
         if !has('python3')  " use slower vimscript if python not available
             let l:biblio = s:constructOneEntry(a:searchString)
         else  " python is faster
