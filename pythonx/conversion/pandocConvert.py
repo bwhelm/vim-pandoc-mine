@@ -86,7 +86,7 @@ def readFile(fileName):
 
 
 def runPandoc(pandocCommandList):
-    # writeMessage(str(pandocCommandList))
+    writeMessage(str(pandocCommandList))
     return run(pandocCommandList, shell=False).returncode
 
 
@@ -192,6 +192,8 @@ def convertMd(pandocTempDir, myFile, toFormat, toExtension,
                      '--from=markdown-fancy_lists+smart',
                      '--mathml',
                      '--wrap=none',
+                     '--resource-path=./:' +
+                     path.expanduser('~/Documents/research/+texmf/bibtex/bib/'),
                      # '--log=$USER/tmp/pandoc/log',
                      '--to=' + toFormat]
     pandocOptions += ['--lua-filter', 'fixYAML.lua']
