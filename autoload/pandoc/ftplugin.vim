@@ -80,7 +80,8 @@ function! pandoc#ftplugin#JumpToTex(filetype) abort  "{{{
     if filereadable(l:filename)
         let l:linenum = '0'
         if a:filetype ==# '\.tex'
-            let l:linenum = system('/usr/bin/env python3 ' .
+            let l:pipenv = executable('pipenv') ? "pipenv run" : ""
+            let l:linenum = system('/usr/bin/env ' . l:pipenv . ' python3 ' .
                         \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
                         \ ' "' . expand('%:p') . '" ' . line('.') . ' ' . a:filetype)
         endif
