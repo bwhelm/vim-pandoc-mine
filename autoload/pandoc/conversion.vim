@@ -243,9 +243,8 @@ function! s:MyConvertHelper(command, ...) abort  "{{{2
         call pandoc#conversion#DisplayError(0, 'Already converting...')
     else
         call setloclist(0, [])
-        let l:pipenv = executable('pipenv') ? "pipenv run" : ""
         if has('nvim')
-            let l:jobPID = jobstart('/usr/bin/env ' . l:pipenv . ' python3 ' .
+            let l:jobPID = jobstart('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
                     \ ' "' . l:fileName . '" ' . s:pandocTempDir . ' ' .
                     \ l:auxCommand,
@@ -253,7 +252,7 @@ function! s:MyConvertHelper(command, ...) abort  "{{{2
                     \ 'on_stderr': 'pandoc#conversion#DisplayError',
                     \ 'on_exit': 'pandoc#conversion#EndProcess'})
         else
-            let l:jobPID = job_start('/usr/bin/env ' . l:pipenv . ' python3 ' .
+            let l:jobPID = job_start('/usr/bin/env python3 ' .
                     \ s:pythonScriptDir . l:command .
                     \ ' "' . l:fileName . '" ' . s:pandocTempDir . ' ' .
                     \ l:auxCommand,

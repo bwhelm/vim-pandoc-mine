@@ -163,14 +163,13 @@ endif
 
 " Jump to corresponding line in Skim.app
 if executable("pandoc")
-    let s:pipenv = executable('pipenv') ? "pipenv run" : ""
     if has('nvim')
-        command! -buffer JumpToPDF call jobstart("/usr/bin/env " . s:pipenv . " python3 " .
+        command! -buffer JumpToPDF call jobstart("/usr/bin/env python3 " .
                     \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
                     \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"on_stdout":
                     \ "pandoc#conversion#DisplayMessages", "on_stderr": "pandoc#conversion#DisplayError"})
     else  " normal vim
-        command! -buffer JumpToPDF call job_start("/usr/bin/env " . s:pipenv . " python3 " .
+        command! -buffer JumpToPDF call job_start("/usr/bin/env python3 " .
                     \ s:pythonScriptDir . 'jump-to-line-in-Skim.py' .
                     \ ' "' . expand('%:p') . '" ' . line(".") . " pdf", {"out_cb":
                     \ "pandoc#conversion#DisplayMessages", "err_cb": "pandoc#conversion#DisplayError"})
