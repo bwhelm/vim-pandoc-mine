@@ -189,7 +189,7 @@ if has('ios')
     inoremap <buffer><silent> <D-b> <Esc>ciw**<C-R>"**
     nnoremap <buffer><silent> <D-b> ciw**<C-R>"**<Esc>b
     xnoremap <buffer><silent> <D-b> c**<C-R>"**<Esc>gvlloll
-else
+elseif $USER !=# 'mobile'
     inoremap <buffer><silent> <C-S-e> <Esc>ciw*<C-R>"*
     nnoremap <buffer><silent> <C-S-e> ciw*<C-R>"*<Esc>b
     xnoremap <buffer><silent> <C-S-e> c*<C-R>"*<Esc>gvlol
