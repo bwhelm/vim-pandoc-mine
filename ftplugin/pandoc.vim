@@ -11,7 +11,7 @@ let b:loaded_pandoc_mine=1
 " Variables for Conversions {{{1
 " ===========================================================================
 
-if $USER !=# 'mobile'
+if executable('pandoc')
     let b:pandoc_converting = 0  " keeps track of whether currently converting or not
     let b:pandoc_autoPDFEnabled = 0  " Turn autoPDF off by default...
     " Identify default (i.e., last) method for file conversions. If we can
@@ -51,7 +51,7 @@ nnoremap <buffer><silent> zn# :call pandoc#fold#foldAllSectionsNested()<CR>
 " ---------------
 "  (For all of these, call the helper function with relevant command.)
 
-if $USER !=# 'mobile'
+if executable('pandoc')
     " Note that the `cc` mapping is to repeat the last conversion
     nnoremap <buffer><silent> <LocalLeader>cc :call pandoc#conversion#MyConvertMappingHelper("")<CR>
     inoremap <buffer><silent> <LocalLeader>cc <C-o>:call pandoc#conversion#MyConvertMappingHelper("")<CR>
@@ -182,14 +182,14 @@ endif
 
 " Italicize/boldface current word. Note: iVim doesn't recognize <C-S-x>
 " mappings, and terminal vim doesn't recognize <D-x> mappings
-if has('ios')
+if g:device ==# "ivim"
     inoremap <buffer><silent> <D-e> <Esc>ciw*<C-R>*
     nnoremap <buffer><silent> <D-e> ciw*<C-R>"*<Esc>b
     xnoremap <buffer><silent> <D-e> c*<C-R>"*<Esc>gvlol
     inoremap <buffer><silent> <D-b> <Esc>ciw**<C-R>"**
     nnoremap <buffer><silent> <D-b> ciw**<C-R>"**<Esc>b
     xnoremap <buffer><silent> <D-b> c**<C-R>"**<Esc>gvlloll
-elseif $USER !=# 'mobile'
+else
     inoremap <buffer><silent> <C-S-e> <Esc>ciw*<C-R>"*
     nnoremap <buffer><silent> <C-S-e> ciw*<C-R>"*<Esc>b
     xnoremap <buffer><silent> <C-S-e> c*<C-R>"*<Esc>gvlol
@@ -211,7 +211,7 @@ nnoremap <buffer><silent> csnh mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|sm
 nnoremap <buffer><silent> csns mz/{\.\(comment\\|margin\\|fixme\\|highlight\\|smcaps\)}<CR>llcwsmcaps<Esc>`z
 
 " Jump to .tex file in tmp dir
-if $USER !=# 'mobile'
+if g:device ==# "mac"
     nnoremap <buffer><silent> <LocalLeader>ft :call pandoc#ftplugin#JumpToTex(".tex")<CR>
     nnoremap <buffer><silent> <LocalLeader>fl :call pandoc#ftplugin#JumpToTex(".log")<CR>
 endif
@@ -311,7 +311,7 @@ command! -buffer TidyPandoc call pandoc#ftplugin#TidyPandoc()
 " ======================================================================== }}}
 " Other {{{1
 " ============================================================================
-if $USER !=# 'mobile'
+if executable("pandoc")
     setlocal equalprg=pandoc\ -t\ markdown+table_captions-simple_tables-multiline_tables-grid_tables+pipe_tables+line_blocks-fancy_lists+definition_lists+example_lists\ --wrap=none\ --from=markdown-fancy_lists\ --standalone\ --preserve-tabs
 endif
 " Allow wrapping past BOL and EOL when using `h` and `l`
